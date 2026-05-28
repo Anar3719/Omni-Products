@@ -1,795 +1,1139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NBFI · Product OS</title>
-<style>
-:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--green:#639922;--green-bg:#EAF3DE;--green-text:#3B6D11;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#A32D2D;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#854F0B;--r:8px;--rl:12px}
-@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--green-bg:#1a2e0a;--green-text:#97C459;--blue-bg:#0a1e35;--blue-text:#85B7EB;--red-bg:#2e0a0a;--red-text:#F09595;--amber-bg:#2e1e0a;--amber-text:#EF9F27}}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.topbar{display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
-.brand{font-size:14px;font-weight:600;color:var(--text)}.brand span{font-weight:400;color:var(--text3)}
-.spacer{flex:1}
-.tbtn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap}
-.tbtn:hover,.tbtn.on{background:var(--bg);color:var(--text)}
-.tbtn.prim{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
-.tbtn.prim:hover{opacity:.9}
-.team-bar{padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.tlbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0}
-.mchip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);color:var(--text2);background:var(--bg)}
-.mchip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
-.mchip button:hover{color:var(--red)}
-.minp{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text);outline:none;width:120px}
-.layout{display:flex;flex:1;overflow:hidden}
-.sb{width:185px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
-.sb-head{padding:12px 13px 9px;border-bottom:1px solid var(--border)}
-.sb-org{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.09em}
-.sb-title{font-size:15px;font-weight:600;color:var(--text);margin-top:2px}
-.sb-scroll{flex:1;overflow-y:auto;padding:4px 0 6px}
-.sb-sec{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px 3px;display:flex;align-items:center;justify-content:space-between}
-.sb-add{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0}
-.sb-add:hover{color:var(--text)}
-.pitem{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;border-radius:6px;margin:1px 5px;position:relative}
-.pitem:hover{background:var(--bg)}.pitem.on{background:var(--bg);font-weight:600}
-.pname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--text2)}
-.pitem.on .pname{color:var(--text)}
-.pitem-act{display:none;gap:2px}
-.pitem:hover .pitem-act{display:flex}
-.piabtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 3px;border-radius:4px;line-height:1}
-.piabtn:hover{background:var(--bg3);color:var(--text)}.piabtn.del:hover{color:var(--red)}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dl{background:var(--green)}.dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
-.pcnt{font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0 5px;min-width:18px;text-align:center;flex-shrink:0}
-.sb-foot{border-top:1px solid var(--border);padding:5px}
-.gbtn{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;color:var(--text2);cursor:pointer;border-radius:6px}
-.gbtn:hover,.gbtn.on{background:var(--bg);color:var(--text);font-weight:600}
-.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
-.phdr{padding:13px 18px 0;border-bottom:1px solid var(--border);flex-shrink:0}
-.ptrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.pt{font-size:18px;font-weight:700;color:var(--text)}
-.plocal{font-size:13px;color:var(--text3);font-weight:400}
-.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600;cursor:pointer;position:relative}
-.bl{background:var(--green-bg);color:var(--green-text)}.bp{background:var(--blue-bg);color:var(--blue-text)}.bb{background:var(--red-bg);color:var(--red-text)}.bpl{background:var(--amber-bg);color:var(--amber-text)}
-.ptype{font-size:12px;color:var(--text3);margin-left:auto}
-.smenu{position:absolute;top:calc(100% + 4px);left:0;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:4px;z-index:100;min-width:130px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.sopt{display:flex;align-items:center;gap:7px;padding:6px 9px;font-size:12px;cursor:pointer;border-radius:5px;color:var(--text2)}
-.sopt:hover{background:var(--bg2)}
-.pmeta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px;padding:7px 10px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border)}
-.pmeta-g{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.pmeta-l{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.pmeta-v{font-size:12px;color:var(--text);font-weight:500}
-.pmeta-c{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
-.pmeta-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0}
-.tabs{display:flex}
-.tab{padding:8px 13px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;user-select:none}
-.tab:hover{color:var(--text)}.tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
-.mbody{flex:1;overflow-y:auto;padding:15px 18px}
-.tmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
-.clr{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:0}
-.clr:hover{color:var(--text2);text-decoration:underline}
-.prog{height:3px;background:var(--bg3);border-radius:999px;margin-bottom:11px;overflow:hidden}
-.pfill{height:100%;background:var(--green);border-radius:999px;transition:width .3s}
-.ar{display:flex;gap:6px;margin-bottom:11px}
-.ar input,.ar select{font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:7px 9px;background:var(--bg2);color:var(--text);outline:none}
-.ar input{flex:1}.ar select{max-width:125px}
-.ar input:focus,.ar select:focus{border-color:var(--blue)}
-.ar button{display:inline-flex;align-items:center;gap:4px;font-size:13px;padding:7px 11px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer;flex-shrink:0}
-.ar button:hover{background:var(--bg2)}
-.tlist{display:flex;flex-direction:column;gap:4px}
-.titem{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:var(--r);border:1px solid transparent}
-.titem:hover{border-color:var(--border)}
-.chk{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.chk.ck{background:var(--green);border-color:var(--green)}
-.chk.ck::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
-.ttxt{flex:1;font-size:13px;color:var(--text);line-height:1.4}
-.ttxt.dn{color:var(--text3);text-decoration:line-through}
-.atag{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:2px 7px;white-space:nowrap}
-.xbtn{background:none;border:none;font-size:15px;color:var(--text3);cursor:pointer;opacity:0;flex-shrink:0;line-height:1;padding:0}
-.titem:hover .xbtn{opacity:1}.xbtn:hover{color:var(--red)}
-.donesec{margin-top:11px;border-top:1px solid var(--border);padding-top:9px}
-.dnhdr{font-size:12px;color:var(--text3);margin-bottom:6px}
-.muted{font-size:13px;color:var(--text3);padding:6px 0}
-.rcols{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.rcol{background:var(--bg2);border-radius:var(--rl);padding:11px}
-.rch{display:flex;align-items:center;gap:5px;margin-bottom:9px}
-.rct{font-size:13px;font-weight:600;color:var(--text)}
-.rcc{font-size:11px;color:var(--text3);background:var(--bg);border-radius:999px;padding:1px 6px;border:1px solid var(--border)}
-.rlist{min-height:28px;display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
-.rcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--text);display:flex;align-items:flex-start;gap:3px;line-height:1.5}
-.rcard-t{flex:1;min-width:0;word-break:break-word}
-.mvb,.rxb{background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;opacity:0;flex-shrink:0;line-height:1.5;padding:0}
-.rcard:hover .mvb,.rcard:hover .rxb{opacity:.7}
-.mvb:hover{opacity:1!important;color:var(--text)}.rxb:hover{opacity:1!important;color:var(--red)}
-.radd{display:flex;gap:4px}
-.radd input{flex:1;min-width:0;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 7px;background:var(--bg);color:var(--text);outline:none}
-.radd input:focus{border-color:var(--blue)}
-.radd button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;flex-shrink:0}
-.radd button:hover{background:var(--bg2)}
-.stitle{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;margin-top:15px}
-.stitle:first-child{margin-top:0}
-.idesc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:13px}
-.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px}
-.tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--border2);color:var(--text2)}
-.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:4px}
-.ps-col{background:var(--bg2);border-radius:var(--rl);padding:11px}
-.ps-col-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.ps-items{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
-.ps-item{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);font-size:12px;color:var(--text)}
-.ps-item-name{flex:1}
-.ps-xbtn{background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;opacity:0;line-height:1;padding:0}
-.ps-item:hover .ps-xbtn{opacity:1}.ps-xbtn:hover{color:var(--red)}
-.ps-add{display:flex;gap:4px}
-.ps-add input{flex:1;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 7px;background:var(--bg);color:var(--text);outline:none}
-.ps-add input:focus{border-color:var(--blue)}
-.ps-add button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer}
-.ps-add button:hover{background:var(--bg)}
-.team-sec{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-bottom:5px}
-.tf{display:flex;align-items:center;gap:11px;margin-bottom:9px}
-.tf:last-child{margin-bottom:0}
-.tfl{font-size:12px;color:var(--text3);width:75px;flex-shrink:0}
-.tf select{font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
-.dev-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.dev-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text2);background:var(--bg)}
-.dev-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
-.dev-chip button:hover{color:var(--red)}
-.dev-add-sel{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text2);outline:none;cursor:pointer}
-.conn-row{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;background:var(--bg2);border-radius:var(--r);margin-bottom:3px;flex-wrap:wrap}
-.cproj{font-weight:600;color:var(--text)}.citem{color:var(--text2)}
-.crel{font-size:10px;padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--text3);background:var(--bg)}
-.carr{color:var(--text3);font-size:11px}
-.csa{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--green-bg);color:var(--green-text);font-weight:600}
-.csp{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--amber-bg);color:var(--amber-text);font-weight:600}
-.cdel{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;opacity:0;padding:0;margin-left:auto}
-.conn-row:hover .cdel{opacity:1}.cdel:hover{color:var(--red)}
-.ghdr{padding:14px 18px 13px;border-bottom:1px solid var(--border);flex-shrink:0}
-.gtitle{font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px}
-.gsub{font-size:13px;color:var(--text2)}
-.filter-bar{display:flex;gap:5px;padding:9px 18px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
-.fbtn{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer}
-.fbtn:hover{background:var(--bg2)}.fbtn.on{background:var(--bg2);border-color:var(--border2);color:var(--text);font-weight:600}
-.scrollbody{flex:1;overflow-y:auto;padding:15px 18px}
-.lsec{margin-bottom:17px}
-.lhdr{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.llbl{font-size:14px;font-weight:600;color:var(--text)}
-.lcnt{font-size:11px;color:var(--text3);background:var(--bg2);border-radius:999px;padding:1px 6px;border:1px solid var(--border)}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:7px}
-.lcard{background:var(--bg2);border-radius:var(--r);padding:8px 10px;cursor:pointer}
-.lcard:hover{background:var(--bg3)}
-.lcard-n{font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.05em}
-.lcard-cnt{font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0}
-.litem{font-size:12px;color:var(--text2);padding:2px 0;display:flex;align-items:flex-start;gap:4px;line-height:1.4}
-.litem::before{content:"\00B7";color:var(--text3);flex-shrink:0}
-.add-conn-form{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-top:3px}
-.acr{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
-.acr select,.acr input{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
-.stog{display:flex;border:1px solid var(--border2);border-radius:var(--r);overflow:hidden}
-.stog button{font-size:11px;padding:5px 9px;border:none;background:transparent;color:var(--text2);cursor:pointer}
-.stog button.on{background:var(--blue);color:#fff}
-.acr button.primary{font-size:12px;padding:5px 11px;border:1px solid var(--blue);border-radius:var(--r);background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
-.ov-body{flex:1;overflow-y:auto;padding:18px}
-.ov-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px}
-.ov-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
-.ov-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:20px}
-.sc{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;border:1px solid var(--border)}
-.sv{font-size:26px;font-weight:700;color:var(--text);margin-bottom:2px}
-.sl{font-size:12px;color:var(--text2)}
-.sc.green .sv{color:var(--green)}.sc.blue .sv{color:var(--blue)}.sc.red .sv{color:var(--red)}.sc.amber .sv{color:var(--amber)}
-.ov-sec{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
-.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:9px;margin-bottom:20px}
-.opc{background:var(--bg2);border-radius:var(--rl);padding:11px 13px;cursor:pointer;border:1px solid var(--border)}
-.opc:hover{border-color:var(--border2)}
-.opc-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
-.opc-name{font-size:13px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.opc-type{font-size:11px;color:var(--text3);margin-bottom:7px}
-.opc-row{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px}
-.opc-prog{height:3px;background:var(--bg3);border-radius:999px;margin-top:7px;overflow:hidden}
-.opc-pfill{height:100%;background:var(--green);border-radius:999px}
-.opc-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.opc-chip{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);color:var(--text3)}
-.opc-chip.warn{color:var(--amber-text);border-color:var(--amber)}
-.eco-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg2)}
-.eco-legend{position:absolute;bottom:13px;left:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:11px;z-index:10}
-.eco-legend-title{font-weight:600;color:var(--text);margin-bottom:6px}
-.eco-lr{display:flex;align-items:center;gap:5px;color:var(--text2);margin-bottom:3px}
-.eco-lr:last-child{margin-bottom:0}
-.eco-hint{position:absolute;top:13px;right:13px;font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;z-index:10}
-.eco-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:12px;z-index:20;max-width:220px;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none}
-.eco-tt-name{font-weight:700;color:var(--text);font-size:13px;margin-bottom:3px}
-.eco-tt-type{color:var(--text3);font-size:11px;margin-bottom:6px}
-.eco-tt-row{display:flex;gap:7px;font-size:11px;color:var(--text2);margin-bottom:2px}
-.eco-tt-key{color:var(--text3);min-width:70px}
-.modal-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
-.modal-box{position:relative;background:var(--bg);border-radius:var(--rl);border:1px solid var(--border2);width:100%;max-width:500px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.15)}
-.modal-box.sm{max-width:380px}
-.modal-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border)}
-.modal-title{font-size:16px;font-weight:700;color:var(--text)}
-.modal-sub{font-size:13px;color:var(--text2);margin-top:2px}
-.modal-body{flex:1;overflow-y:auto;padding:16px 20px}
-.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-.mfld{margin-bottom:14px}
-.mfld:last-child{margin-bottom:0}
-.mfld label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-.mfld input,.mfld textarea,.mfld select{width:100%;font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:8px 10px;background:var(--bg2);color:var(--text);outline:none;font-family:inherit}
-.mfld textarea{resize:vertical;min-height:70px;line-height:1.5}
-.mfld input:focus,.mfld textarea:focus,.mfld select:focus{border-color:var(--blue)}
-.tag-inp-wrap{display:flex;flex-direction:column;gap:6px}
-.tag-chips{display:flex;flex-wrap:wrap;gap:5px}
-.tag-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
-.tag-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
-.tag-chip button:hover{color:var(--red)}
-.mbtn{font-size:13px;padding:7px 14px;border-radius:var(--r);cursor:pointer;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--text2)}
-.mbtn:hover{background:var(--bg2)}.mbtn.prim{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
-.mbtn.prim:hover{opacity:.9}.mbtn.danger{background:var(--red);color:#fff;border-color:var(--red)}
-.del-warn{font-size:13px;color:var(--text2);line-height:1.6}.del-warn strong{color:var(--text)}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-</style>
+    <meta charset="UTF-8">
+    <title>Системийн Архитектур & Телеметр Процесс v24.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a; 
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --primary: #f8fafc;
+            --primary-soft: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --error: #ef4444;
+            --error-bg: rgba(239, 68, 68, 0.2);
+            --error-path-bg: rgba(239, 68, 68, 0.08);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --border: #334155;
+            --line: #475569;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; overflow: hidden; color: var(--primary); }
+        
+        /* Дээд навигаци ба KPI */
+        .top-nav {
+            position: absolute; top: 0; left: 0; width: 100%; background: var(--surface);
+            border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+        .nav-header {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-bottom: 1px solid var(--border);
+        }
+        .nav-header h1 { font-size: 16px; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        
+        .kpi-board { display: flex; gap: 20px; padding: 12px 24px; background: rgba(15, 23, 42, 0.5); align-items: center; }
+        .kpi-card { background: var(--surface-light); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; min-width: 140px; }
+        .kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+        .kpi-label { font-size: 11px; color: var(--primary-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .kpi-value.err-text { color: var(--error); }
+        .kpi-value.succ-text { color: var(--success); }
+
+        /* Ангилал болон Сонгох хэсэг */
+        .filter-section {
+            display: flex; gap: 12px; align-items: center; margin-left: auto; margin-right: 12px;
+        }
+        .node-selector {
+            background: var(--bg); color: white; border: 1px solid var(--border);
+            padding: 8px 12px; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; min-width: 160px;
+        }
+        .node-selector:focus { border-color: var(--accent); }
+        .node-selector option { background: var(--surface); color: white; }
+
+        /* Системийн ТАВ (Хуудаслалт) */
+        .system-tabs {
+            display: flex; gap: 6px; padding: 0 24px; background: rgba(15, 23, 42, 0.3); overflow-x: auto; border-bottom: 1px solid var(--border);
+        }
+        .sys-tab {
+            padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--primary-soft); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .sys-tab:hover { color: white; background: rgba(255,255,255,0.02); }
+        .sys-tab.active-tab { color: var(--accent); border-bottom-color: var(--accent); background: rgba(59, 130, 246, 0.05); }
+        .sys-tab.has-error { border-bottom-color: var(--error); color: #fca5a5; }
+
+        /* Ажлын талбар */
+        #canvas { 
+            width: 100vw; height: 100vh; position: absolute; top:0; left:0; 
+            background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 24px 24px; cursor: grab;
+        }
+        #canvas:active { cursor: grabbing; }
+        
+        #viewport {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0;
+            padding-top: 180px; pointer-events: none; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        
+        #svg-canvas { 
+            position: absolute; top: 0; left: 0; width: 10000px; height: 10000px; pointer-events: none; z-index: 0; 
+        }
+
+        /* Үндсэн Систем блок */
+        .node { 
+            position: absolute; width: 260px; background: var(--surface); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 16px; cursor: grab; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); 
+            z-index: 10; transition: border-color 0.2s, box-shadow 0.2s; user-select: none; pointer-events: auto;
+        }
+        .node:hover { border-color: var(--accent); }
+        .node.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .node.has-err-trace { border-color: var(--error); box-shadow: 0 0 15px rgba(239, 68, 68, 0.25); }
+        .node-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
+        .node-dept { font-size: 12px; color: var(--primary-soft); display: flex; align-items: center; gap:4px; }
+        .node-health { font-size: 10px; padding: 2px 6px; border-radius: 4px; color: white; font-weight: bold; }
+
+        /* Процессын алхмуудын блок */
+        .step-block {
+            position: absolute; width: 250px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            z-index: 10; transition: transform 0.2s, border-color 0.2s; cursor: pointer; user-select: none; pointer-events: auto;
+        }
+        .step-block:hover { border-color: var(--accent); transform: translateY(-1px); }
+        .step-block.active-step { border-color: var(--accent); background: var(--surface-light); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+        
+        @keyframes pulse-critical { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .step-block.err-direct { border-color: var(--error); background: #311c1c; animation: pulse-critical 2s infinite; border-width: 1.5px; }
+        
+        @keyframes pulse-trace-border { 0% { border-color: rgba(239, 68, 68, 0.4); } 50% { border-color: rgba(239, 68, 68, 1); } 100% { border-color: rgba(239, 68, 68, 0.4); } }
+        .step-block.err-propagated { border-color: var(--error); background: var(--error-path-bg); animation: pulse-trace-border 2.5s infinite; }
+        
+        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; position: relative; }
+        .status-pill { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-ok { background: var(--success-bg); color: var(--success); }
+        .status-err { background: var(--error-bg); color: var(--error); }
+        
+        .note-indicator { font-size: 11px; cursor: help; opacity: 0.8; margin-left: 6px; transition: 0.2s; }
+        .note-indicator:hover { opacity: 1; transform: scale(1.2); }
+        
+        .step-block .custom-note-tooltip {
+            position: absolute; top: -10px; left: 105%; width: 240px;
+            background: #ffffff; color: #334155; padding: 12px 16px;
+            border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.12);
+            border: 1px solid #cbd5e1; font-size: 13px; font-weight: 500; line-height: 1.5;
+            white-space: normal; word-wrap: break-word; z-index: 1000; display: none; pointer-events: none;
+        }
+        .step-block .custom-note-tooltip::before {
+            content: ""; position: absolute; top: 18px; left: -6px;
+            border-width: 6px 6px 6px 0; border-style: solid; border-color: transparent #ffffff transparent transparent;
+        }
+        .step-block:hover .custom-note-tooltip { display: block; }
+
+        .step-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--primary-soft); margin-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 4px; }
+        .checklist-indicator { font-weight: 500; font-size: 11px; }
+        .checklist-indicator.done { color: var(--success); font-weight: 600; }
+        .checklist-indicator.has-unchecked { color: var(--error); font-weight: 600; }
+        
+        /* Удирдлагын самбар */
+        .side-panel { 
+            position: fixed; right: -500px; top: 0; width: 480px; background: var(--surface); 
+            height: 100vh; box-shadow: -10px 0 30px rgba(0,0,0,0.3); 
+            display: flex; flex-direction: column; z-index: 101; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid var(--border);
+        }
+        .side-panel.open { right: 0; }
+        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-light); }
+        .panel-header h3 { margin: 0; font-size: 16px; font-weight: 700; color: white; }
+        .btn-close-icon { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary-soft); }
+        .btn-close-icon:hover { color: white; }
+        
+        .panel-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--primary-soft); margin-bottom: 8px; text-transform: uppercase; }
+        
+        .edit-input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px; font-family: inherit; }
+        .edit-input:focus { outline: none; border-color: var(--accent); }
+        .edit-textarea { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 70px; }
+        .edit-textarea:focus { outline: none; border-color: var(--accent); }
+        
+        .section-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .toggle-group { display: flex; background: var(--bg); border-radius: 6px; padding: 4px; border: 1px solid var(--border); }
+        .toggle-btn { flex: 1; padding: 8px 14px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: transparent; color: var(--primary-soft); transition: 0.2s; }
+        .toggle-btn.active-ok { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .toggle-btn.active-err { background: var(--error); color: white; }
+
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--primary); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-sm { padding: 8px 12px; font-size: 12px; }
+        .btn-danger-text { background: none; color: var(--error); border: none; cursor: pointer; font-size: 12px; font-weight: 600; }
+        
+        .task-list-scroll { max-height: 250px; overflow-y: auto; margin-top: 10px; padding-right: 5px;}
+        .task-row { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+
+        .check-item-row { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; }
+        .check-item-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--success); }
+        .check-item-row .chk-text { flex: 1; background: transparent; border: none; color: white; font-size: 13px; }
+        .check-item-row .chk-text:focus { outline: none; border-bottom: 1px solid var(--accent); }
+
+        /* Лог ба Тайлангийн хэсэг */
+        .log-item { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; }
+        .log-item-header { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 6px; }
+        .log-text { color: #ffffff; font-weight: 600; font-size: 13px; margin-bottom: 6px;}
+        .log-time-row { display: flex; flex-direction: column; gap: 3px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.04); margin-top: 6px; }
+        .log-time-lbl { font-size: 11px; color: var(--primary-soft); display: flex; justify-content: space-between; }
+        .log-time-lbl b { color: #f8fafc; font-family: monospace; }
+        .log-comment { font-style: italic; color: #cbd5e1; background: rgba(59, 130, 246, 0.15); border-left: 2px solid var(--accent); padding: 6px 10px; border-radius: 0 4px 4px 0; margin-top: 6px; }
+    </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <span class="brand">NBFI <span>&middot; Product OS</span></span>
-    <div class="spacer"></div>
-    <button class="tbtn prim" onclick="openModal('add-project',{})">+ Add project</button>
-    <button class="tbtn" id="team-btn" onclick="toggleTeam()">&#128101; Team</button>
-    <button class="tbtn" onclick="exportData()">&#8659; Export</button>
-  </div>
-  <div class="team-bar" id="team-bar" style="display:none"></div>
-  <div class="layout">
-    <div class="sb">
-      <div class="sb-head"><div class="sb-org">NBFI</div><div class="sb-title">Product OS</div></div>
-      <div class="sb-scroll" id="sb-scroll"></div>
-      <div class="sb-foot" id="sb-foot"></div>
+
+<div class="top-nav">
+    <div class="nav-header">
+        <h1><span>⚡</span> System Architecture & Telemetry Tracker v24.0</h1>
+        <div class="filter-section">
+            <select id="category-filter" class="node-selector" onchange="onCategoryFilterChange(this.value)">
+                <option value="">📁 Бүх ангилал...</option>
+            </select>
+            
+            <button class="btn btn-outline btn-sm" style="border-color: var(--accent); color: white; background: rgba(59, 130, 246, 0.1);" onclick="centerCanvas()">🎯 Голлуулах</button>
+            <button class="btn btn-outline btn-sm" style="border-color: #eab308; color: #fde047; background: rgba(234, 179, 8, 0.1);" onclick="viewSystemLogs()">📋 Лог & Тайлан Харах</button>
+
+            <button id="undo-btn" class="btn btn-outline btn-sm" style="display:none; background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: var(--accent);" onclick="triggerUndo()">↺ Буцаах (Undo)</button>
+            <button class="btn btn-success btn-sm" onclick="exportData()">📤 Дата Экспорт</button>
+            <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                📥 Дата Импорт
+                <input type="file" id="import-file" style="display:none;" onchange="importData(event)">
+            </label>
+            <button class="btn btn-outline btn-sm" style="border-color: rgba(239, 68, 68, 0.4); color: var(--error);" onclick="clearData()">⚠️ Цэвэрлэх</button>
+            <button class="btn btn-primary btn-sm" onclick="addNewNode()">+ Шинэ Систем (Page)</button>
+        </div>
     </div>
-    <div class="main" id="main"></div>
-  </div>
+
+    <div class="system-tabs" id="system-tabs-container"></div>
+
+    <div class="kpi-board">
+        <div class="kpi-card">
+            <span class="kpi-value" id="kpi-total">0</span>
+            <span class="kpi-label">Идэвхтэй алхам</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-value err-text" id="kpi-errors">0</span>
+            <span class="kpi-label">Гэмтэлтэй (Critical)</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-value succ-text" id="kpi-health">100%</span>
+            <span class="kpi-label">Системийн эрүүл мэнд</span>
+        </div>
+        <button class="btn btn-outline btn-sm" id="edit-current-sys-btn" style="margin-left: auto; font-size:12px;" onclick="editCurrentSystem()">⚙️ Энэ хуудасны тохиргоо</button>
+    </div>
 </div>
-<div id="modal-overlay" class="modal-overlay" style="display:none">
-  <div class="modal-bg" id="modal-bg"></div>
-  <div class="modal-box" id="modal-box"></div>
+
+<div id="canvas">
+    <div id="viewport">
+        <svg id="svg-canvas"></svg>
+    </div>
 </div>
-<div class="eco-tooltip" id="eco-tt"></div>
+
+<div id="side-panel" class="side-panel">
+    <div class="panel-header">
+        <h3 id="panel-title">⚙️ Удирдлага</h3>
+        <button class="btn-close-icon" onclick="closePanel()">×</button>
+    </div>
+    <div id="panel-content" class="panel-body"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
+        authDomain: "omni-products.firebaseapp.com",
+        databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
+        projectId: "omni-products",
+        storageBucket: "omni-products.firebasestorage.app",
+        messagingSenderId: "879805024712",
+        appId: "1:879805024712:web:9b694019cf8388953998fd",
+        measurementId: "G-KQND2ECQ33"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Гаднаас дуудаж ашиглах Firebase функцуудыг Глобал болгох
+    window.fbDatabase = database;
+    window.fbRef = ref;
+    window.fbSet = set;
+
+    // Firebase Realtime Баазаас датаг Live сонсож ачаалах
+    const telemetryRef = ref(database, 'sys_telemetry_nodes');
+    onValue(telemetryRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && Array.isArray(data)) {
+            nodes = data;
+            // Хэрэв идэвхтэй хуудас байхгүй эсвэл устсан бол эхний хуудсыг сонгоно
+            if (!currentSystemId && nodes.length > 0) {
+                currentSystemId = nodes[0].id;
+            }
+            if (currentSystemId && !nodes.some(n => n.id === currentSystemId) && nodes.length > 0) {
+                currentSystemId = nodes[0].id;
+            }
+            renderTabs();
+            updateCategoryDropdown();
+            renderMainCanvasOnly();
+            updateDashboardKPIs();
+        } else if (!data) {
+            // Хэрэв Firebase бүрэн хоосон бол Анхны демо өгөгдлийг үүсгэнэ
+            const initialDemo = generateDefaultDemoData();
+            nodes = initialDemo;
+            currentSystemId = nodes[0].id;
+            set(telemetryRef, nodes);
+        }
+    });
+</script>
 
 <script>
-/* ── UTILS ── */
-function $(id){return document.getElementById(id);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
-function toArr(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
+    const canvas = document.getElementById('canvas');
+    const viewport = document.getElementById('viewport');
+    const svgCanvas = document.getElementById('svg-canvas');
+    const panel = document.getElementById('side-panel');
+    const content = document.getElementById('panel-content');
+    const categoryFilter = document.getElementById('category-filter');
+    const tabsContainer = document.getElementById('system-tabs-container');
 
-/* ── CONSTANTS ── */
-const SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
-const LANES=['now','next','later'];
-const DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
+    const STORAGE_KEY = 'sys_admin_telemetry_v24';
+    let undoHistory = [];
+    
+    let panX = 100;
+    let panY = 50;
+    let zoom = 1;
+    let isPanning = false;
+    let startPanX = 0;
+    let startPanY = 0;
 
-/* ── STATE ── */
-let D={};
-let ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
-let mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
+    let currentSystemId = null;
+    let selectedCategory = "";
+    let nodes = []; // Firebase-ээс live дүүрнэ
 
-/* ── DATA HELPERS ── */
-function projs(){return Object.values(D.projects||{});}
-function pTasks(pid){return Object.values(D.tasks||{}).filter(t=>t.p===pid);}
-function openTasks(pid){return pTasks(pid).filter(t=>!t.done).length;}
-function roadItems(pid){return Object.values(D.road||{}).filter(r=>r.p===pid);}
-function getMeta(pid){return(D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
-function getItems(pid){return getMeta(pid).items||[];}
-function pName(pid){const p=(D.projects||{})[pid];return p?p.name:pid;}
-function sdot(s){const m=SM[s]||SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
-function badge(s,click){const m=SM[s]||SM.progress;return '<span class="bdg '+m.b+'"'+(click?' onclick="toggleSmenu(event)" title="Click to change"':'')+'>'+sdot(s)+m.l+'</span>';}
-function connRow(c,del){
-  const arr=c.st==='active'?'\u2192':'\u2194';
-  const sb=c.st==='active'?'<span class="csa">active</span>':'<span class="csp">planned</span>';
-  const db=del?'<button class="cdel" onclick="delConn(\''+c.id+'\')">&#10005;</button>':'';
-  return'<div class="conn-row"><span class="cproj">'+esc(pName(c.fp))+'</span>'+(c.fi?'<span class="citem">/ '+esc(c.fi)+'</span>':'')+
-    '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
-    '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
+    function getFormattedTimestamp() {
+        const d = new Date();
+        const pad = (n) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
 
-/* ── SAVE/LOAD ── */
-function save(){
-  try{localStorage.setItem('nbfi_v4',JSON.stringify(D));}
-  catch(e){console.error('Save error',e);}
-}
-function exportData(){
-  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
-}
+    function calculateDuration(startStr, endStr) {
+        if (!startStr || !endStr) return null;
+        const start = new Date(startStr.replace(' ', 'T'));
+        const end = new Date(endStr.replace(' ', 'T'));
+        if (isNaN(start) || Math.isNaN(end)) return null;
+        
+        const diffMs = end - start;
+        if (diffMs < 0) return "0м";
+        
+        const diffMins = Math.floor(diffMs / 60000);
+        const hrs = Math.floor(diffMins / 60);
+        const mins = diffMins % 60;
+        
+        if (hrs > 0) return `${hrs}ц ${mins}м`;
+        return `${mins}м`;
+    }
 
-/* ── DEFAULT DATA ── */
-function defaultData(){
-  const tasks={},road={},conns={};
-  [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false},
-   {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false},
-   {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false},
-   {id:'t4',p:'los',txt:'Complete business requirements document',a:'',done:false},
-   {id:'t5',p:'los',txt:'Review loan origination process flow',a:'',done:false},
-   {id:'t6',p:'los',txt:'Sprint planning with dev team',a:'',done:false},
-   {id:'t7',p:'khurimtlal',txt:'Finalize UX/UI in Figma',a:'',done:false},
-   {id:'t8',p:'khurimtlal',txt:'Write savings product requirements',a:'',done:false},
-   {id:'t9',p:'khurimtlal',txt:'Define Keep integration scope',a:'',done:false},
-   {id:'t10',p:'omnicars',txt:'Document all known bugs',a:'',done:false},
-   {id:'t11',p:'omnicars',txt:'Bug fix prioritization with devs',a:'',done:false},
-   {id:'t12',p:'omnicars',txt:'Test car evaluation flow end-to-end',a:'',done:false},
-   {id:'t13',p:'omnipay',txt:'Define merchant onboarding flow',a:'',done:false},
-   {id:'t14',p:'omnipay',txt:'Review BNPL checkout requirements',a:'',done:false},
-   {id:'t15',p:'omnipay',txt:'Add new ticket sale categories',a:'',done:false},
-   {id:'t16',p:'keep',txt:'Define Khurimtlal integration scope',a:'',done:false},
-   {id:'t17',p:'keep',txt:'Review current app analytics',a:'',done:false}
-  ].forEach(t=>tasks[t.id]=t);
-  [{id:'r1',p:'moni',txt:'eSIM Boxo integration',lane:'now'},{id:'r2',p:'moni',txt:'OmniPay BNPL checkout',lane:'now'},
-   {id:'r3',p:'moni',txt:'Loyalty system MVP',lane:'next'},{id:'r4',p:'moni',txt:'Expanded merchant ecosystem',lane:'later'},
-   {id:'r5',p:'los',txt:'Core loan origination flow',lane:'now'},{id:'r6',p:'los',txt:'Omnicars integration planning',lane:'next'},{id:'r7',p:'los',txt:'Loan automation features',lane:'later'},
-   {id:'r8',p:'khurimtlal',txt:'Core savings features',lane:'now'},{id:'r9',p:'khurimtlal',txt:'Keep integration',lane:'next'},{id:'r10',p:'khurimtlal',txt:'Advanced goal tracking',lane:'later'},
-   {id:'r11',p:'omnicars',txt:'Bug fixes & stabilization',lane:'now'},{id:'r12',p:'omnicars',txt:'LOS integration planning',lane:'next'},{id:'r13',p:'omnicars',txt:'Expanded vehicle types',lane:'later'},
-   {id:'r14',p:'omnipay',txt:'Merchant onboarding + BNPL',lane:'now'},{id:'r15',p:'omnipay',txt:'More event categories',lane:'next'},{id:'r16',p:'omnipay',txt:'Expanded merchant network',lane:'later'},
-   {id:'r17',p:'keep',txt:'Maintenance',lane:'now'},{id:'r18',p:'keep',txt:'Khurimtlal integration',lane:'next'},{id:'r19',p:'keep',txt:'Advanced analytics',lane:'later'}
-  ].forEach(r=>road[r.id]=r);
-  [{id:'c1',fp:'omnipay',fi:'BNPL checkout',tp:'moni',ti:'OmniPay embed',rel:'embedded in',st:'active'},
-   {id:'c2',fp:'moni-transfer',fi:'P2P transfers',tp:'moni',ti:'',rel:'linked',st:'active'},
-   {id:'c3',fp:'los',fi:'Loan origination',tp:'omnicars',ti:'Car evaluation',rel:'planned integration',st:'planned'},
-   {id:'c4',fp:'keep',fi:'Finance tracking',tp:'khurimtlal',ti:'Savings goals',rel:'planned integration',st:'planned'}
-  ].forEach(c=>conns[c.id]=c);
-  return{
-    projects:{
-      moni:{id:'moni',name:'Moni',local:'',type:'Fintech super-app',status:'live',desc:'Core fintech platform. Live and stable with continuous feature expansion.',tags:['iOS','Android','Fintech']},
-      los:{id:'los',name:'LOS',local:'',type:'Loan origination system',status:'progress',desc:'Core system for traditional loan processing and origination.',tags:['Web','Internal','Lending']},
-      khurimtlal:{id:'khurimtlal',name:'Khurimtlal',local:'\u0425\u0443\u0440\u0438\u043c\u0442\u043b\u0430\u043b',type:'Savings app',status:'progress',desc:'Savings product \u2014 customers build and track savings goals.',tags:['iOS','Android','Savings']},
-      omnicars:{id:'omnicars',name:'Omnicars',local:'',type:'Car evaluation app',status:'bugs',desc:'Platform for customers to evaluate and value their vehicles. Has active bugs.',tags:['Web','Evaluation']},
-      omnipay:{id:'omnipay',name:'OmniPay',local:'',type:'Ecommerce web app',status:'progress',desc:'Ecommerce platform inside Moni. BNPL checkout, merchants, event & concert tickets.',tags:['Web','BNPL','Ecommerce']},
-      keep:{id:'keep',name:'Keep',local:'',type:'Finance tracker app',status:'live',desc:'Personal finance tracking app. Live and stable.',tags:['iOS','Android','Finance']},
-      'moni-transfer':{id:'moni-transfer',name:'Moni Transfer',local:'',type:'Transfer app',status:'live',desc:'Money transfer app.',tags:['iOS','Android']},
-      erp:{id:'erp',name:'ERP',local:'',type:'Internal web system',status:'progress',desc:'Enterprise resource planning website.',tags:['Web','Internal']},
-      crm:{id:'crm',name:'CRM',local:'',type:'CRM platform',status:'progress',desc:'CRM platform being built.',tags:['Web','Internal']}
-    },
-    pmeta:{
-      moni:{leader:'',devs:[],items:[{id:'m1',name:'eSIM',kind:'feature'},{id:'m2',name:'OmniPay embed',kind:'feature'},{id:'m3',name:'Loyalty system',kind:'feature'},{id:'m4',name:'Boxo API',kind:'service'}]},
-      los:{leader:'',devs:[],items:[{id:'l1',name:'Loan origination',kind:'feature'},{id:'l2',name:'Credit scoring',kind:'feature'}]},
-      khurimtlal:{leader:'',devs:[],items:[{id:'k1',name:'Savings goals',kind:'feature'},{id:'k2',name:'Goal tracking',kind:'feature'}]},
-      omnicars:{leader:'',devs:[],items:[{id:'o1',name:'Car evaluation',kind:'feature'},{id:'o2',name:'Vehicle valuation',kind:'feature'}]},
-      omnipay:{leader:'',devs:[],items:[{id:'op1',name:'BNPL checkout',kind:'feature'},{id:'op2',name:'Merchant portal',kind:'feature'},{id:'op3',name:'Event tickets',kind:'feature'},{id:'op4',name:'Payment gateway',kind:'service'}]},
-      keep:{leader:'',devs:[],items:[{id:'ke1',name:'Finance tracking',kind:'feature'},{id:'ke2',name:'Analytics',kind:'feature'}]},
-      'moni-transfer':{leader:'',devs:[],items:[{id:'mt1',name:'P2P transfers',kind:'feature'},{id:'mt2',name:'Bank transfers',kind:'feature'}]},
-      erp:{leader:'',devs:[],items:[]},crm:{leader:'',devs:[],items:[]}
-    },
-    tasks,road,conns,
-    team:['You','CEO','Dev lead','Designer','QA'],
-    ecoPos:JSON.parse(JSON.stringify(DEF_ECO))
-  };
-}
+    function generateDefaultDemoData() {
+        const timeNow = getFormattedTimestamp();
+        return [
+            { id: 1, name: "Хугацаа хэтэрсэн төлөлт", x: 50, y: 150, dept: "Зээлийн газар", category: "Зээлийн алба", isOpen: true, children: [
+                { id: 101, text: "Үндсэн зээлийн төлөлт", status: "ok", duration: "120ms", time: "11:33", created_at: timeNow, detected_at: null, checked_at: timeNow, comment: "Хүсэлт амжилттай баталгаажсан", children: [], checklist: [] },
+                { id: 103, text: "Алданги тооцоолол хэсэг", status: "error", errorMsg: "Шалгах талбар дутуу", duration: "850ms", time: "09:15", created_at: "2026-05-27 21:30:00", detected_at: "2026-05-28 09:15:00", checked_at: null, checklist: [
+                    { id: 1, text: "Алдангийн хувь хэмжээ тулгалт", checked: true },
+                    { id: 2, text: "Бодогдсон үлдэгдэл шалгах", checked: false }
+                ], children: [] }
+            ]}
+        ];
+    }
 
-/* ── NORMALISE ── */
-function normalise(d){
-  const projects={};
-  Object.entries(d.projects||{}).forEach(([k,p])=>{projects[k]={...p,tags:toArr(p.tags)};});
-  const pmeta={};
-  Object.entries(d.pmeta||{}).forEach(([k,m])=>{pmeta[k]={leader:m.leader||'',devs:toArr(m.devs),items:toArr(m.items).map(i=>({...i}))};});
-  const tasks={},road={},conns={},ecoPos={};
-  Object.entries(d.tasks||{}).forEach(([k,t])=>{tasks[k]={...t};});
-  Object.entries(d.road||{}).forEach(([k,r])=>{road[k]={...r};});
-  Object.entries(d.conns||{}).forEach(([k,c])=>{conns[k]={...c};});
-  Object.entries(d.ecoPos||DEF_ECO).forEach(([k,p])=>{ecoPos[k]={...p};});
-  return{projects,tasks,road,team:toArr(d.team||[]),pmeta,conns,ecoPos};
-}
-
-/* ── RENDER ── */
-function render(){renderSB();renderTeam();renderMain();}
-
-function renderSB(){
-  const s=$('sb-scroll'),f=$('sb-foot');if(!s||!f)return;
-  s.innerHTML='<div class="sb-sec">Projects <button class="sb-add" onclick="openModal(\'add-project\',{})" title="Add">+</button></div>'+
-    projs().map(p=>{
-      const m=SM[p.status]||SM.progress,on=!ui.gview&&ui.sel===p.id,cnt=openTasks(p.id);
-      return'<div class="pitem'+(on?' on':'')+'" onclick="selProj(\''+p.id+'\')">'+
-        '<span class="dot '+m.d+'"></span><span class="pname">'+esc(p.name)+'</span>'+
-        (cnt?'<span class="pcnt">'+cnt+'</span>':'')+
-        '<span class="pitem-act">'+
-        '<button class="piabtn" onclick="event.stopPropagation();openModal(\'edit-project\',{id:\''+p.id+'\'})" title="Edit">&#9998;</button>'+
-        '<button class="piabtn del" onclick="event.stopPropagation();openModal(\'del-project\',{id:\''+p.id+'\'})" title="Delete">&#10005;</button>'+
-        '</span></div>';
-    }).join('');
-  f.innerHTML=
-    '<div class="gbtn'+(ui.gview==='overview'?' on':'')+'" onclick="setGview(\'overview\')">&#8962; Overview</div>'+
-    '<div class="gbtn'+(ui.gview==='road'?' on':'')+'" onclick="setGview(\'road\')">&#9783; All roadmap</div>'+
-    '<div class="gbtn'+(ui.gview==='ints'?' on':'')+'" onclick="setGview(\'ints\')">&#9741; Integrations</div>'+
-    '<div class="gbtn'+(ui.gview==='eco'?' on':'')+'" onclick="setGview(\'eco\')">&#9711; Ecosystem</div>';
-}
-
-function renderTeam(){
-  const bar=$('team-bar');if(!bar)return;
-  bar.style.display=ui.showTeam?'flex':'none';
-  if(!ui.showTeam)return;
-  bar.innerHTML='<span class="tlbl">Team</span>'+
-    (D.team||[]).map((m,i)=>'<span class="mchip">'+esc(m)+'<button onclick="delMem('+i+')">&#10005;</button></span>').join('')+
-    '<input class="minp" id="mi" type="text" placeholder="Add member..." onkeydown="if(event.key===\'Enter\')addMem()">'+
-    '<button class="tbtn" onclick="addMem()">+ Add</button>';
-}
-
-function renderMain(){
-  const main=$('main');if(!main)return;
-  if(ui.gview==='overview'){main.innerHTML=buildOverview();return;}
-  if(ui.gview==='road'){main.innerHTML=buildGRoad();return;}
-  if(ui.gview==='ints'){main.innerHTML=buildGInts();return;}
-  if(ui.gview==='eco'){main.innerHTML=buildEco();attachEcoEvents();return;}
-  const p=(D.projects||{})[ui.sel];
-  if(!p){main.innerHTML='<div style="padding:24px;color:var(--text3)">Select a project</div>';return;}
-  const meta=getMeta(ui.sel),items=meta.items||[];
-  const feats=items.filter(i=>i.kind==='feature'),svcs=items.filter(i=>i.kind==='service');
-  const parts=[];
-  if(meta.leader)parts.push('<span class="pmeta-g"><span class="pmeta-l">Lead</span><span class="pmeta-v">'+esc(meta.leader)+'</span></span>');
-  if(meta.devs&&meta.devs.length)parts.push('<span class="pmeta-g"><span class="pmeta-l">Devs</span>'+meta.devs.map(d=>'<span class="pmeta-c">'+esc(d)+'</span>').join('')+'</span>');
-  if(feats.length)parts.push('<span class="pmeta-g"><span class="pmeta-l">Features</span><span class="pmeta-v">'+feats.length+'</span></span>');
-  if(svcs.length)parts.push('<span class="pmeta-g"><span class="pmeta-l">Services</span><span class="pmeta-v">'+svcs.length+'</span></span>');
-  const metaRow=parts.length?'<div class="pmeta-row">'+parts.map((x,i)=>i<parts.length-1?x+'<span class="pmeta-sep"></span>':x).join('')+'</div>':'<div class="pmeta-row" style="color:var(--text3);font-size:12px">No team assigned \u2014 set in Info tab</div>';
-  const smenu=ui.statusMenu?'<div class="smenu">'+Object.entries(SM).map(([k,v])=>'<div class="sopt" onclick="setStatus(\''+k+'\')">'+sdot(k)+v.l+'</div>').join('')+'</div>':'';
-  let body='';
-  if(ui.tab==='tasks')body=buildTasks();
-  else if(ui.tab==='road')body=buildRoad();
-  else body=buildInfo();
-  main.innerHTML='<div class="phdr">'+
-    '<div class="ptrow"><span class="pt">'+esc(p.name)+(p.local?' <span class="plocal">'+esc(p.local)+'</span>':'')+
-    '</span><div style="position:relative">'+badge(p.status,true)+smenu+'</div>'+
-    '<span class="ptype">'+esc(p.type)+'</span>'+
-    '<button class="tbtn" style="margin-left:auto;font-size:11px" onclick="openModal(\'edit-project\',{id:\''+p.id+'\'})">&#9998; Edit</button></div>'+
-    metaRow+
-    '<div class="tabs">'+
-    '<div class="tab'+(ui.tab==='tasks'?' on':'')+'" onclick="setTab(\'tasks\')">Tasks</div>'+
-    '<div class="tab'+(ui.tab==='road'?' on':'')+'" onclick="setTab(\'road\')">Roadmap</div>'+
-    '<div class="tab'+(ui.tab==='info'?' on':'')+'" onclick="setTab(\'info\')">Info</div>'+
-    '</div></div><div class="mbody">'+body+'</div>';
-}
-
-/* ── OVERVIEW ── */
-function buildOverview(){
-  const ps=projs();
-  const live=ps.filter(p=>p.status==='live').length,prog=ps.filter(p=>p.status==='progress').length;
-  const bugs=ps.filter(p=>p.status==='bugs').length,totalOpen=Object.values(D.tasks||{}).filter(t=>!t.done).length;
-  const cards=ps.map(p=>{
-    const at=pTasks(p.id),ot=at.filter(t=>!t.done).length,dt=at.length-ot;
-    const pct=at.length>0?Math.round(dt/at.length*100):0;
-    const meta=getMeta(p.id),items=meta.items||[];
-    const pc=Object.values(D.conns||{}).filter(c=>c.fp===p.id||c.tp===p.id).length;
-    return'<div class="opc" onclick="selProj(\''+p.id+'\')">'+
-      '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status,false)+'</div>'+
-      '<div class="opc-type">'+esc(p.type)+'</div>'+
-      '<div class="opc-row"><span>'+ot+' open tasks</span><span>'+pc+' connections</span></div>'+
-      (at.length?'<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div>':'')+
-      '<div class="opc-meta">'+
-      (meta.leader?'<span class="opc-chip">&#128100; '+esc(meta.leader)+'</span>':'<span class="opc-chip warn">No lead</span>')+
-      (items.filter(i=>i.kind==='feature').length?'<span class="opc-chip">'+items.filter(i=>i.kind==='feature').length+'f</span>':'')+
-      (items.filter(i=>i.kind==='service').length?'<span class="opc-chip">'+items.filter(i=>i.kind==='service').length+'s</span>':'')+
-      '</div></div>';
-  }).join('');
-  const nowItems=Object.values(D.road||{}).filter(r=>r.lane==='now');
-  const byP={};nowItems.forEach(i=>{if(!byP[i.p])byP[i.p]=[];byP[i.p].push(i);});
-  const nowHtml=Object.entries(byP).map(([pid,its])=>{
-    const proj=(D.projects||{})[pid];if(!proj)return'';
-    return'<div class="lcard" onclick="selProj(\''+pid+'\')"><div class="lcard-n"><span>'+esc(proj.name)+'</span><span class="lcard-cnt">'+its.length+'</span></div>'+its.map(i=>'<div class="litem">'+esc(i.txt)+'</div>').join('')+'</div>';
-  }).join('');
-  const ac=Object.values(D.conns||{}).filter(c=>c.st==='active').length;
-  const pc=Object.values(D.conns||{}).filter(c=>c.st==='planned').length;
-  return'<div class="ov-body">'+
-    '<div class="ov-title">Product Portfolio</div>'+
-    '<div class="ov-sub">Full picture of where we stand and where we\'re moving</div>'+
-    '<div class="ov-stats">'+
-    '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live &amp; stable</div></div>'+
-    '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In active dev</div></div>'+
-    '<div class="sc red"><div class="sv">'+bugs+'</div><div class="sl">Has bugs</div></div>'+
-    '<div class="sc"><div class="sv">'+totalOpen+'</div><div class="sl">Open tasks</div></div>'+
-    '</div><div class="ov-sec">All projects</div><div class="ov-grid">'+cards+'</div>'+
-    '<div class="ov-sec">Working on right now</div><div class="lgrid" style="margin-bottom:20px">'+(nowHtml||'<div class="muted">Nothing in Now lane.</div>')+'</div>'+
-    '<div class="ov-sec">Integration health</div>'+
-    '<div class="ov-stats" style="grid-template-columns:repeat(3,1fr);max-width:380px">'+
-    '<div class="sc"><div class="sv">'+(ac+pc)+'</div><div class="sl">Total</div></div>'+
-    '<div class="sc green"><div class="sv">'+ac+'</div><div class="sl">Active</div></div>'+
-    '<div class="sc amber"><div class="sv">'+pc+'</div><div class="sl">Planned</div></div>'+
-    '</div></div>';
-}
-
-/* ── TASKS ── */
-function buildTasks(){
-  const all=pTasks(ui.sel),open=all.filter(t=>!t.done),done=all.filter(t=>t.done);
-  const total=all.length,doneN=done.length,pct=total?Math.round(doneN/total*100):0;
-  const opts=(D.team||[]).map(m=>'<option value="'+esc(m)+'">'+esc(m)+'</option>').join('');
-  const prog=total?'<div class="tmeta"><span>'+doneN+'/'+total+' done</span>'+(doneN?'<button class="clr" onclick="clearDone()">Clear done</button>':'')+'</div><div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>':'';
-  const ti=t=>'<div class="titem"><div class="chk'+(t.done?' ck':'')+'" onclick="toggleTask(\''+t.id+'\')"></div>'+
-    '<span class="ttxt'+(t.done?' dn':'')+'">'+esc(t.txt)+'</span>'+(t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
-    '<button class="xbtn" onclick="delTask(\''+t.id+'\')">&#10005;</button></div>';
-  const ds=done.length?'<div class="donesec"><div class="dnhdr">Done ('+done.length+')</div><div class="tlist">'+done.map(ti).join('')+'</div></div>':'';
-  return'<div class="ar"><input id="ti" type="text" placeholder="Add a task..." onkeydown="if(event.key===\'Enter\')addTask()">'+
-    '<select id="ta"><option value="">Unassigned</option>'+opts+'</select>'+
-    '<button onclick="addTask()">+ Add</button></div>'+
-    prog+'<div class="tlist">'+(open.length?open.map(ti).join(''):'<div class="muted">No open tasks \u2014 add one above.</div>')+'</div>'+ds;
-}
-
-/* ── ROADMAP ── */
-function buildRoad(){
-  const lbl={now:'Now',next:'Next',later:'Later'};
-  return'<div class="rcols">'+LANES.map((lane,li)=>{
-    const items=roadItems(ui.sel).filter(r=>r.lane===lane);
-    return'<div class="rcol"><div class="rch"><span class="rct">'+lbl[lane]+'</span><span class="rcc">'+items.length+'</span></div>'+
-      '<div class="rlist">'+(items.length?items.map(r=>
-        '<div class="rcard">'+
-        (li>0?'<button class="mvb" onclick="moveRoad(\''+r.id+'\',-1)">\u2039</button>':'')+
-        '<span class="rcard-t">'+esc(r.txt)+'</span>'+
-        (li<2?'<button class="mvb" onclick="moveRoad(\''+r.id+'\',1)">\u203a</button>':'')+
-        '<button class="rxb" onclick="delRoad(\''+r.id+'\')">&#10005;</button></div>'
-      ).join(''):'<div style="font-size:12px;color:var(--text3);padding:4px 0">Empty</div>')+'</div>'+
-      '<div class="radd"><input id="ri_'+lane+'" type="text" placeholder="Add item..." onkeydown="if(event.key===\'Enter\')addRoad(\''+lane+'\')"><button onclick="addRoad(\''+lane+'\')">+</button></div></div>';
-  }).join('')+'</div>';
-}
-
-/* ── INFO ── */
-function buildInfo(){
-  const p=(D.projects||{})[ui.sel];if(!p)return'';
-  const meta=getMeta(ui.sel),items=meta.items||[];
-  const feats=items.filter(i=>i.kind==='feature'),svcs=items.filter(i=>i.kind==='service');
-  const leaderOpts='<option value="">Unassigned</option>'+(D.team||[]).map(m=>'<option value="'+esc(m)+'"'+(meta.leader===m?' selected':'')+'>'+esc(m)+'</option>').join('');
-  const devChips=(meta.devs||[]).map((d,i)=>'<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>').join('');
-  const avail=(D.team||[]).filter(m=>!(meta.devs||[]).includes(m));
-  const devAdd=avail.length?'<select class="dev-add-sel" onchange="addDev(this.value);this.value=\'\'"><option value="">+ Add developer</option>'+avail.map(m=>'<option value="'+esc(m)+'">'+esc(m)+'</option>').join('')+'</select>':'';
-  const projConns=Object.values(D.conns||{}).filter(c=>c.fp===ui.sel||c.tp===ui.sel);
-  return'<p class="idesc">'+esc(p.desc)+'</p>'+
-    (p.tags&&p.tags.length?'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'</div>':'')+
-    '<div class="stitle">Products &amp; services</div>'+
-    '<div class="ps-grid">'+
-    '<div class="ps-col"><div class="ps-col-title">Features</div>'+
-    '<div class="ps-items">'+feats.map(i=>'<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>').join('')+'</div>'+
-    '<div class="ps-add"><input id="fi_inp" type="text" placeholder="Add feature..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
-    '<div class="ps-col"><div class="ps-col-title">External services</div>'+
-    '<div class="ps-items">'+svcs.map(i=>'<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>').join('')+'</div>'+
-    '<div class="ps-add"><input id="si_inp" type="text" placeholder="Add service/API..." onkeydown="if(event.key===\'Enter\')addItem(\'service\')"><button onclick="addItem(\'service\')">+</button></div></div></div>'+
-    '<div class="stitle">Project team</div>'+
-    '<div class="team-sec">'+
-    '<div class="tf"><span class="tfl">Leader</span><select onchange="setLeader(this.value)">'+leaderOpts+'</select></div>'+
-    '<div class="tf" style="align-items:flex-start"><span class="tfl" style="margin-top:4px">Developers</span>'+
-    '<div class="dev-chips">'+devChips+devAdd+(!devChips&&!devAdd?'<span style="font-size:12px;color:var(--text3)">Add via Team button above</span>':'')+'</div></div>'+
-    '</div>'+
-    '<div class="stitle">Connections ('+projConns.length+')</div>'+
-    (projConns.length?projConns.map(c=>connRow(c,true)).join(''):'<div class="muted">No connections yet \u2014 add in Integrations.</div>');
-}
-
-/* ── GLOBAL ROADMAP ── */
-function buildGRoad(){
-  const lbl={now:'Now',next:'Next',later:'Later'};
-  const fps=ui.roadFilter==='all'?projs():projs().filter(p=>p.status===ui.roadFilter);
-  return'<div class="ghdr"><div class="gtitle">All roadmap</div><div class="gsub">Now / Next / Later across all projects</div></div>'+
-    '<div class="filter-bar">'+['all','live','progress','bugs'].map(f=>'<button class="fbtn'+(ui.roadFilter===f?' on':'')+'" onclick="setRoadFilter(\''+f+'\')">'+(f==='all'?'All':(SM[f]||{l:f}).l)+'</button>').join('')+'</div>'+
-    '<div class="scrollbody">'+LANES.map(lane=>{
-      const allI=Object.values(D.road||{}).filter(r=>r.lane===lane&&fps.find(p=>p.id===r.p));
-      if(!allI.length)return'';
-      const byP={};allI.forEach(i=>{if(!byP[i.p])byP[i.p]=[];byP[i.p].push(i);});
-      return'<div class="lsec"><div class="lhdr"><span class="llbl">'+lbl[lane]+'</span><span class="lcnt">'+allI.length+' items</span></div>'+
-        '<div class="lgrid">'+Object.entries(byP).map(([pid,its])=>{
-          const proj=(D.projects||{})[pid];if(!proj)return'';
-          const meta=getMeta(pid);
-          return'<div class="lcard" onclick="selProj(\''+pid+'\')">'+
-            '<div class="lcard-n"><span>'+esc(proj.name)+'</span>'+sdot(proj.status)+'<span class="lcard-cnt">'+its.length+'</span></div>'+
-            (meta.leader?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">Lead: '+esc(meta.leader)+'</div>':'')+
-            its.map(i=>'<div class="litem">'+esc(i.txt)+'</div>').join('')+'</div>';
-        }).join('')+'</div></div>';
-    }).join('')+'</div>';
-}
-
-/* ── INTEGRATIONS ── */
-function buildGInts(){
-  const active=Object.values(D.conns||{}).filter(c=>c.st==='active');
-  const planned=Object.values(D.conns||{}).filter(c=>c.st==='planned');
-  const fp=ui.nc.fp||'',tp=ui.nc.tp||'';
-  const fpItems=getItems(fp),tpItems=getItems(tp);
-  const pOpts=(sel)=>projs().map(x=>'<option value="'+x.id+'"'+(sel===x.id?' selected':'')+'>'+esc(x.name)+'</option>').join('');
-  const iOpts=(items,val)=>'<option value=""'+(val===''?' selected':'')+'>Project level</option>'+items.map(i=>'<option value="'+esc(i.name)+'"'+(val===i.name?' selected':'')+'>'+esc(i.name)+'</option>').join('');
-  return'<div class="ghdr"><div class="gtitle">Integration map</div><div class="gsub">Feature &amp; service connections across the portfolio</div></div>'+
-    '<div class="scrollbody">'+
-    '<div class="stitle">Active ('+active.length+')</div>'+(active.length?active.map(c=>connRow(c,true)).join(''):'<div class="muted">No active connections.</div>')+
-    '<div class="stitle" style="margin-top:15px">Planned ('+planned.length+')</div>'+(planned.length?planned.map(c=>connRow(c,true)).join(''):'<div class="muted">No planned connections.</div>')+
-    '<div class="stitle" style="margin-top:18px">Add connection</div>'+
-    '<div class="add-conn-form">'+
-    '<div class="acr">'+
-    '<select onchange="ncSet(\'fp\',this.value)"><option value="">From...</option>'+pOpts(fp)+'</select>'+
-    '<select onchange="ncSet(\'fi\',this.value)">'+iOpts(fpItems,ui.nc.fi||'')+'</select>'+
-    '<span style="color:var(--text3)">\u2192</span>'+
-    '<select onchange="ncSet(\'tp\',this.value)"><option value="">To...</option>'+pOpts(tp)+'</select>'+
-    '<select onchange="ncSet(\'ti\',this.value)">'+iOpts(tpItems,ui.nc.ti||'')+'</select>'+
-    '</div><div class="acr">'+
-    '<input id="conn-rel" type="text" placeholder="Relationship..." value="'+esc(ui.nc.rel)+'" oninput="ui.nc.rel=this.value" style="width:230px">'+
-    '<div class="stog"><button class="'+(ui.nc.st==='planned'?'on':'')+'" onclick="ncSetSt(\'planned\')">Planned</button>'+
-    '<button class="'+(ui.nc.st==='active'?'on':'')+'" onclick="ncSetSt(\'active\')">Active</button></div>'+
-    '<button class="primary" onclick="addConn()">Add</button></div></div></div>';
-}
-
-/* ── ECOSYSTEM ── */
-function buildEco(){
-  const stC={live:'#639922',progress:'#378ADD',bugs:'#E24B4A',planned:'#BA7517'};
-  let edges='',nodes='';
-  const seen=new Set();
-  Object.values(D.conns||{}).forEach(c=>{
-    if(c.fp===c.tp)return;
-    const key=[c.fp,c.tp].sort().join('|');if(seen.has(key))return;seen.add(key);
-    const fp=(D.ecoPos||{})[c.fp]||{x:440,y:240},tp=(D.ecoPos||{})[c.tp]||{x:440,y:240};
-    const col=c.st==='active'?'#378ADD':'#BA7517',dash=c.st==='active'?'':'6,4';
-    const mx=(fp.x+tp.x)/2,my=(fp.y+tp.y)/2-5;
-    edges+='<line x1="'+fp.x+'" y1="'+fp.y+'" x2="'+tp.x+'" y2="'+tp.y+'" stroke="'+col+'" stroke-width="1.5" stroke-dasharray="'+dash+'" opacity="0.55"/>';
-    edges+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" font-size="9" fill="'+col+'" opacity="0.75">'+esc(c.rel)+'</text>';
-  });
-  projs().forEach(p=>{
-    const pos=(D.ecoPos||{})[p.id]||{x:440,y:240};
-    const col=stC[p.status]||'#378ADD';
-    const meta=getMeta(p.id),items=meta.items||[];
-    const feats=items.filter(i=>i.kind==='feature').length,svcs=items.filter(i=>i.kind==='service').length;
-    const ot=openTasks(p.id),r=p.id==='moni'?40:30;
-    if(p.status==='bugs')nodes+='<circle cx="'+pos.x+'" cy="'+pos.y+'" r="'+(r+6)+'" fill="none" stroke="#E24B4A" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.4"/>';
-    nodes+='<circle cx="'+pos.x+'" cy="'+pos.y+'" r="'+r+'" fill="'+col+'" opacity="0.13" stroke="'+col+'" stroke-width="2" style="cursor:pointer" class="eco-node" data-id="'+p.id+'" onclick="selProj(\''+p.id+'\')"/>';
-    nodes+='<text x="'+pos.x+'" y="'+(pos.y+4)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(p.id==='moni'?13:11)+'" font-weight="600" fill="'+col+'" style="pointer-events:none">'+esc(p.name)+'</text>';
-    if(ot>0){nodes+='<circle cx="'+(pos.x+r-3)+'" cy="'+(pos.y-r+3)+'" r="8" fill="#E24B4A"/><text x="'+(pos.x+r-3)+'" y="'+(pos.y-r+3)+'" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="white" font-weight="700" style="pointer-events:none">'+ot+'</text>';}
-    const ct=(feats?feats+'f':'')+(feats&&svcs?' ':'')+( svcs?svcs+'s':'');
-    if(ct)nodes+='<text x="'+pos.x+'" y="'+(pos.y+r+12)+'" text-anchor="middle" font-size="9" fill="'+col+'" opacity="0.65" style="pointer-events:none">'+ct+'</text>';
-  });
-  return'<div class="ghdr"><div class="gtitle">Ecosystem</div><div class="gsub">Visual map of all projects and connections</div></div>'+
-    '<div class="eco-wrap" id="eco-wrap">'+
-    '<svg viewBox="0 0 900 500" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">'+edges+nodes+'</svg>'+
-    '<div class="eco-legend"><div class="eco-legend-title">Legend</div>'+
-    '<div class="eco-lr"><svg width="16" height="8"><circle cx="8" cy="4" r="4" fill="#639922" opacity="0.25" stroke="#639922" stroke-width="1.5"/></svg>Live</div>'+
-    '<div class="eco-lr"><svg width="16" height="8"><circle cx="8" cy="4" r="4" fill="#378ADD" opacity="0.25" stroke="#378ADD" stroke-width="1.5"/></svg>In progress</div>'+
-    '<div class="eco-lr"><svg width="16" height="8"><circle cx="8" cy="4" r="4" fill="#E24B4A" opacity="0.25" stroke="#E24B4A" stroke-width="1.5"/></svg>Has bugs</div>'+
-    '<div class="eco-lr"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#378ADD" stroke-width="1.5"/></svg>Active</div>'+
-    '<div class="eco-lr"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#BA7517" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Planned</div>'+
-    '</div><div class="eco-hint">Click any node to open project</div></div>';
-}
-
-function attachEcoEvents(){
-  const tt=$('eco-tt');
-  document.querySelectorAll('.eco-node').forEach(node=>{
-    node.addEventListener('mouseenter',function(e){
-      const p=(D.projects||{})[this.dataset.id];if(!p)return;
-      const meta=getMeta(p.id),items=meta.items||[];
-      tt.innerHTML='<div class="eco-tt-name">'+esc(p.name)+'</div><div class="eco-tt-type">'+esc(p.type)+'</div>'+
-        (meta.leader?'<div class="eco-tt-row"><span class="eco-tt-key">Lead</span><span>'+esc(meta.leader)+'</span></div>':'')+
-        '<div class="eco-tt-row"><span class="eco-tt-key">Status</span><span>'+(SM[p.status]||SM.progress).l+'</span></div>'+
-        '<div class="eco-tt-row"><span class="eco-tt-key">Open tasks</span><span>'+openTasks(p.id)+'</span></div>'+
-        '<div class="eco-tt-row"><span class="eco-tt-key">Connections</span><span>'+Object.values(D.conns||{}).filter(c=>c.fp===p.id||c.tp===p.id).length+'</span></div>'+
-        '<div class="eco-tt-row"><span class="eco-tt-key">Features</span><span>'+items.filter(i=>i.kind==='feature').length+'</span></div>';
-      tt.style.display='block';
+    canvas.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.node') || e.target.closest('.step-block') || e.target.closest('#side-panel') || e.target.closest('.top-nav')) return;
+        viewport.style.transition = 'none';
+        isPanning = true;
+        startPanX = e.clientX - panX;
+        startPanY = e.clientY - panY;
     });
-    node.addEventListener('mousemove',function(e){
-      const wrap=$('eco-wrap');if(!wrap)return;
-      const rect=wrap.getBoundingClientRect();
-      let l=e.clientX-rect.left+14,t=e.clientY-rect.top+14;
-      if(l+230>rect.width)l=e.clientX-rect.left-234;
-      tt.style.left=l+'px';tt.style.top=t+'px';
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        panX = e.clientX - startPanX;
+        panY = e.clientY - startPanY;
+        applyTransform();
     });
-    node.addEventListener('mouseleave',()=>tt.style.display='none');
-  });
-}
 
-/* ── MODALS ── */
-function openModal(type,data){
-  ui.modal={type,data};
-  if(type==='add-project')mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
-  if(type==='edit-project'&&data.id){const p=(D.projects||{})[data.id]||{};mFormState={name:p.name||'',local:p.local||'',type:p.type||'',status:p.status||'progress',desc:p.desc||'',tags:[...(p.tags||[])]};};
-  renderModal();
-}
-function closeModal(){ui.modal=null;renderModal();}
-function renderModal(){
-  const ov=$('modal-overlay'),box=$('modal-box'),bg=$('modal-bg');
-  if(!ui.modal){ov.style.display='none';return;}
-  ov.style.display='flex';bg.onclick=closeModal;box.className='modal-box';
-  const{type,data}=ui.modal;
-  if(type==='add-project'||type==='edit-project'){
-    const isEdit=type==='edit-project';
-    const tagChips=mFormState.tags.map((t,i)=>'<span class="tag-chip">'+esc(t)+'<button onclick="removeModalTag('+i+')">&#10005;</button></span>').join('');
-    box.innerHTML='<div class="modal-hdr"><div class="modal-title">'+(isEdit?'Edit project':'Add project')+'</div></div>'+
-      '<div class="modal-body">'+
-      '<div class="mfld"><label>Name *</label><input id="mf-name" type="text" value="'+esc(mFormState.name)+'" placeholder="e.g. Moni" oninput="mFormState.name=this.value"></div>'+
-      '<div class="mfld"><label>Mongolian name</label><input id="mf-local" type="text" value="'+esc(mFormState.local)+'" oninput="mFormState.local=this.value"></div>'+
-      '<div class="mfld"><label>Type</label><input id="mf-type" type="text" value="'+esc(mFormState.type)+'" placeholder="e.g. Fintech super-app" oninput="mFormState.type=this.value"></div>'+
-      '<div class="mfld"><label>Status</label><select id="mf-status" onchange="mFormState.status=this.value">'+Object.entries(SM).map(([k,v])=>'<option value="'+k+'"'+(mFormState.status===k?' selected':'')+'>'+v.l+'</option>').join('')+'</select></div>'+
-      '<div class="mfld"><label>Description</label><textarea oninput="mFormState.desc=this.value">'+esc(mFormState.desc)+'</textarea></div>'+
-      '<div class="mfld"><label>Tags</label><div class="tag-inp-wrap"><div class="tag-chips" id="modal-tag-chips">'+tagChips+'</div>'+
-      '<input type="text" id="mf-tag-inp" placeholder="Type tag + Enter" onkeydown="if(event.key===\'Enter\'){addModalTag();event.preventDefault()}"></div></div>'+
-      '</div><div class="modal-foot">'+
-      '<button class="mbtn" onclick="closeModal()">Cancel</button>'+
-      '<button class="mbtn prim" onclick="saveProject(\''+(isEdit?data.id:'')+'\')">&#10003; '+(isEdit?'Save':'Create')+'</button></div>';
-  }else if(type==='del-project'){
-    box.className='modal-box sm';
-    const p=(D.projects||{})[data.id];
-    const tc=Object.values(D.tasks||{}).filter(t=>t.p===data.id).length;
-    const rc=Object.values(D.road||{}).filter(r=>r.p===data.id).length;
-    box.innerHTML='<div class="modal-hdr"><div class="modal-title">Delete project</div></div>'+
-      '<div class="modal-body"><p class="del-warn">Delete <strong>'+esc(p?p.name:data.id)+'</strong>? This also removes '+tc+' task'+(tc!==1?'s':'')+' and '+rc+' roadmap item'+(rc!==1?'s':'')+'.</p></div>'+
-      '<div class="modal-foot"><button class="mbtn" onclick="closeModal()">Cancel</button>'+
-      '<button class="mbtn danger" onclick="deleteProject(\''+data.id+'\')">Delete</button></div>';
-  }
-}
-function addModalTag(){const inp=$('mf-tag-inp'),val=(inp?inp.value:'').trim();if(!val||mFormState.tags.includes(val))return;mFormState.tags.push(val);if(inp)inp.value='';const el=$('modal-tag-chips');if(el)el.innerHTML=mFormState.tags.map((t,i)=>'<span class="tag-chip">'+esc(t)+'<button onclick="removeModalTag('+i+')">&#10005;</button></span>').join('');}
-function removeModalTag(i){mFormState.tags.splice(i,1);renderModal();}
-function saveProject(editId){
-  if(!mFormState.name.trim()){alert('Name required.');return;}
-  const id=editId||'p'+uid();
-  const proj={id,name:mFormState.name.trim(),local:mFormState.local.trim(),type:mFormState.type.trim(),status:mFormState.status,desc:mFormState.desc.trim(),tags:[...mFormState.tags]};
-  if(!D.projects)D.projects={};
-  D.projects[id]=proj;
-  if(!editId){
-    if(!D.pmeta)D.pmeta={};D.pmeta[id]={leader:'',devs:[],items:[]};
-    if(!D.ecoPos)D.ecoPos={};
-    D.ecoPos[id]={x:Math.round(200+Math.random()*500),y:Math.round(100+Math.random()*300)};
-    ui.sel=id;ui.gview=null;ui.tab='tasks';
-  }
-  closeModal();save();render();
-}
-function deleteProject(id){
-  delete D.projects[id];if(D.pmeta)delete D.pmeta[id];if(D.ecoPos)delete D.ecoPos[id];
-  Object.keys(D.tasks||{}).forEach(k=>{if((D.tasks[k]||{}).p===id)delete D.tasks[k];});
-  Object.keys(D.road||{}).forEach(k=>{if((D.road[k]||{}).p===id)delete D.road[k];});
-  Object.keys(D.conns||{}).forEach(k=>{const c=D.conns[k]||{};if(c.fp===id||c.tp===id)delete D.conns[k];});
-  if(ui.sel===id){const ids=Object.keys(D.projects||{});ui.sel=ids[0]||null;ui.gview='overview';}
-  closeModal();save();render();
-}
+    window.addEventListener('mouseup', () => { isPanning = false; });
 
-/* ── ACTIONS ── */
-function selProj(id){ui.sel=id;ui.gview=null;ui.tab='tasks';ui.statusMenu=false;render();}
-function setTab(t){ui.tab=t;ui.statusMenu=false;render();}
-function setGview(v){ui.gview=v;ui.statusMenu=false;render();}
-function toggleTeam(){ui.showTeam=!ui.showTeam;render();}
-function setRoadFilter(f){ui.roadFilter=f;renderMain();}
-function toggleSmenu(e){e.stopPropagation();ui.statusMenu=!ui.statusMenu;renderMain();}
-function setStatus(s){const p=(D.projects||{})[ui.sel];if(!p)return;p.status=s;ui.statusMenu=false;save();render();}
-document.addEventListener('click',e=>{if(ui.statusMenu&&!e.target.closest('.bdg')&&!e.target.closest('.smenu')){ui.statusMenu=false;renderMain();}});
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        viewport.style.transition = 'none';
+        const zoomIntensity = 0.05;
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        const zoomFactor = e.deltaY < 0 ? (1 + zoomIntensity) : (1 - zoomIntensity);
+        
+        if (zoom * zoomFactor < 0.2 || zoom * zoomFactor > 1.8) return;
 
-function addTask(){const ti=$('ti'),ta=$('ta');const txt=(ti?ti.value:'').trim();if(!txt)return;const id='t'+uid();if(!D.tasks)D.tasks={};D.tasks[id]={id,p:ui.sel,txt,a:ta?ta.value:'',done:false};if(ti)ti.value='';save();render();}
-function toggleTask(id){const t=(D.tasks||{})[id];if(!t)return;t.done=!t.done;save();render();}
-function delTask(id){delete D.tasks[id];save();render();}
-function clearDone(){Object.keys(D.tasks||{}).forEach(k=>{if((D.tasks[k]||{}).p===ui.sel&&D.tasks[k].done)delete D.tasks[k];});save();render();}
-function addRoad(lane){const el=$('ri_'+lane),txt=(el?el.value:'').trim();if(!txt)return;const id='r'+uid();if(!D.road)D.road={};D.road[id]={id,p:ui.sel,txt,lane};if(el)el.value='';save();render();}
-function delRoad(id){delete D.road[id];save();render();}
-function moveRoad(id,dir){const r=(D.road||{})[id];if(!r)return;const ni=LANES.indexOf(r.lane)+dir;if(ni<0||ni>2)return;r.lane=LANES[ni];save();render();}
-function addMem(){const el=$('mi'),name=(el?el.value:'').trim();if(!name)return;if(!D.team)D.team=[];if(!D.team.includes(name))D.team.push(name);if(el)el.value='';save();render();}
-function delMem(i){if(!D.team)return;D.team.splice(i,1);save();render();}
-function setLeader(val){if(!D.pmeta)D.pmeta={};const m=getMeta(ui.sel);D.pmeta[ui.sel]={...m,leader:val};save();render();}
-function addDev(name){if(!name)return;if(!D.pmeta)D.pmeta={};const m=getMeta(ui.sel);if(!(m.devs||[]).includes(name)){D.pmeta[ui.sel]={...m,devs:[...(m.devs||[]),name]};save();render();}}
-function removeDev(i){if(!D.pmeta)return;const m=getMeta(ui.sel);const d=[...(m.devs||[])];d.splice(i,1);D.pmeta[ui.sel]={...m,devs:d};save();render();}
-function addItem(kind){const inp=$(kind==='feature'?'fi_inp':'si_inp');const name=(inp?inp.value:'').trim();if(!name)return;if(!D.pmeta)D.pmeta={};const m=getMeta(ui.sel);D.pmeta[ui.sel]={...m,items:[...(m.items||[]),{id:'i'+uid(),name,kind}]};if(inp)inp.value='';save();render();}
-function removeItem(iid){if(!D.pmeta)return;const m=getMeta(ui.sel);D.pmeta[ui.sel]={...m,items:(m.items||[]).filter(i=>i.id!==iid)};save();render();}
-function ncSet(key,val){ui.nc[key]=val;if(key==='fp')ui.nc.fi='';if(key==='tp')ui.nc.ti='';renderMain();}
-function ncSetSt(val){ui.nc.st=val;renderMain();}
-function addConn(){if(!ui.nc.fp||!ui.nc.tp){alert('Select both projects.');return;}const rel=(($('conn-rel')||{}).value||ui.nc.rel||'').trim()||'integration';const id='c'+uid();if(!D.conns)D.conns={};D.conns[id]={id,fp:ui.nc.fp,fi:ui.nc.fi||'',tp:ui.nc.tp,ti:ui.nc.ti||'',rel,st:ui.nc.st};save();render();}
-function delConn(id){delete D.conns[id];save();render();}
+        panX = mouseX - (mouseX - panX) * zoomFactor;
+        panY = mouseY - (mouseY - panY) * zoomFactor;
+        zoom *= zoomFactor;
+        
+        applyTransform();
+    }, { passive: false });
 
-/* ── BOOT ── */
-(function(){
-  let raw=null;
-  try{const s=localStorage.getItem('nbfi_v4');if(s)raw=JSON.parse(s);}catch(e){}
-  D=normalise(raw||defaultData());
-  if(!ui.sel){const ids=Object.keys(D.projects||{});ui.sel=ids[0]||null;}
-  render();
-})();
-</script>
-  </div> <script type="module">
-        // Firebase SDK-уудыг CDN-ээс татаж авах
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    function applyTransform() {
+        viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+        canvas.style.backgroundPosition = `${panX}px ${panY}px`;
+    }
 
-        // Таны Omni Products төслийн тохиргоо
-        const firebaseConfig = {
-            apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
-            authDomain: "omni-products.firebaseapp.com",
-            databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
-            projectId: "omni-products",
-            storageBucket: "omni-products.firebasestorage.app",
-            messagingSenderId: "879805024712",
-            appId: "1:879805024712:web:9b694019cf8388953998fd",
-            measurementId: "G-KQND2ECQ33"
+    function centerCanvas() {
+        viewport.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+        const node = nodes.find(n => n.id === currentSystemId);
+        if (node) {
+            zoom = 1;
+            panX = 120 - node.x;
+            panY = 120 - node.y;
+        } else {
+            panX = 100;
+            panY = 50;
+            zoom = 1;
+        }
+        applyTransform();
+    }
+
+    function viewSystemLogs() {
+        const node = nodes.find(n => n.id === currentSystemId);
+        if (!node) return;
+
+        panel.classList.add('open');
+        document.getElementById('panel-title').innerHTML = `📋 Системийн Лог & Тайлан: ${node.name}`;
+        
+        const allSteps = flattenSteps(node.children || []);
+        
+        if (allSteps.length === 0) {
+            content.innerHTML = `<div style="text-align:center; color:var(--primary-soft); padding: 40px 0;">Бүртгэгдсэн алхам, урсгал одоогоор байхгүй байна.</div>`;
+            return;
+        }
+
+        let logsHTML = `<div class="section-box" style="margin-bottom:12px; background: rgba(59, 130, 246, 0.05);">
+            <div style="font-size:12px; color:var(--primary-soft);">Нийт <b>${allSteps.length}</b> алхмын хугацааны мөчлөгийг доор нэгтгэв.</div>
+        </div>`;
+
+        allSteps.forEach(step => {
+            const isDirectError = isStepDirectError(step);
+            const statusText = isDirectError ? "CRITICAL (Засагдаагүй)" : "OK / ЧЕКЛЭГДСЭН";
+            const statusColor = isDirectError ? "var(--error)" : "var(--success)";
+            const statusBg = isDirectError ? "var(--error-bg)" : "var(--success-bg)";
+            
+            const resolveTimeText = calculateDuration(step.detected_at, step.checked_at);
+
+            logsHTML += `
+                <div class="log-item" style="border-left: 4px solid ${statusColor};">
+                    <div class="log-item-header">
+                        <span style="color: ${statusColor}; background: ${statusBg}; padding: 2px 6px; border-radius:4px; font-size:10px; font-weight:700;">${statusText}</span>
+                        <span style="color: var(--primary-soft);">⏱️ Сүүлийн цикл: ${step.duration || '0ms'}</span>
+                    </div>
+                    <div class="log-text">${step.text}</div>
+                    
+                    <div class="log-time-row">
+                        <div class="log-time-lbl">➕ Бүртгэгдсэн цаг: <b>${step.created_at || 'Тодорхойгүй'}</b></div>
+                        <div class="log-time-lbl">⚠️ Алдаа илрүүлсэн цаг: <b>${step.detected_at || 'Алдаа гараагүй'}</b></div>
+                        <div class="log-time-lbl">✅ Чеклэж хаасан цаг: <b>${step.checked_at || (isDirectError ? 'Шийдвэрлэгдээгүй байна' : 'Хэвийн хаагдсан')}</b></div>
+                        ${resolveTimeText ? `<div class="log-time-lbl" style="color: #67e8f9; font-weight:600; margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;">⚡ Засалтын нийт хурд: <span>${resolveTimeText}</span></div>` : ''}
+                    </div>
+
+                    ${step.status === 'error' && step.errorMsg ? `<div style="color:#fca5a5; font-size:11px; margin-top:6px; font-weight:500;">❌ Алдааны тайлбар: ${step.errorMsg}</div>` : ''}
+                    ${step.comment && step.comment.trim() !== '' ? `<div class="log-comment">💬 Таны оруулсан тайлбар: <br>${step.comment}</div>` : ''}
+                </div>
+            `;
+        });
+
+        content.innerHTML = `<div style="display:flex; flex-direction:column; gap:2px;">${logsHTML}</div>`;
+    }
+
+    function pushToUndoHistory() {
+        undoHistory.push(JSON.stringify(nodes));
+        if (undoHistory.length > 20) undoHistory.shift(); 
+        updateUndoButtonVisibility();
+    }
+
+    function triggerUndo() {
+        if (undoHistory.length === 0) return;
+        nodes = JSON.parse(undoHistory.pop());
+        closePanel();
+        save();
+        updateUndoButtonVisibility();
+    }
+
+    function updateUndoButtonVisibility() {
+        document.getElementById('undo-btn').style.display = undoHistory.length > 0 ? 'inline-flex' : 'none';
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); triggerUndo(); }
+    });
+
+    // ХУУЧИН LOCALSTORAGE-ООС ЭХЛЭХЭД УНШИХ (БААЗ ХООСОН ҮЕД АШИГЛАХАД ЗОРИУЛЖ БҮТЭН БЭЛДЭВ)
+    let rawSavedData = localStorage.getItem(STORAGE_KEY);
+    if (rawSavedData && rawSavedData !== '[]' && nodes.length === 0) {
+        try { nodes = JSON.parse(rawSavedData); } catch(e){}
+    }
+
+    let expandedSteps = { 103: true }; 
+    let selectedStepGlobal = null; 
+    let selectedNodeGlobal = null;
+
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(nodes, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `moni_pages_backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function updateFieldSilently(key, value) {
+        let itemToUpdate = selectedStepGlobal || selectedNodeGlobal;
+        if (!itemToUpdate) return;
+        
+        itemToUpdate[key] = value;
+
+        if (selectedStepGlobal && key === 'comment' && value.trim() !== '') {
+            if (!selectedStepGlobal.detected_at) {
+                selectedStepGlobal.detected_at = getFormattedTimestamp();
+            }
+        }
+
+        save(); // Local + Firebase рүү зэрэг хадгална
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) { 
+                    pushToUndoHistory(); 
+                    nodes = imported; 
+                    if(nodes.length > 0) currentSystemId = nodes[0].id;
+                    save(); 
+                    alert("✅ Дата амжилттай сэргээгдлээ!"); 
+                } else { alert("❌ Буруу файлын бүтэц!"); }
+            } catch (err) { alert("❌ Файлыг уншиж чадсангүй!"); }
         };
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const analytics = getAnalytics(app);
-        console.log("Firebase Realtime Database амжилттай холбогдлоо!");
-    </script>
-</body>
-</html>
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // ХАДГАЛАХ СИСТЕМ: Firebase Realtime Database руу Live түлхэнэ
+    function save() { 
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes)); 
+        updateDashboardKPIs(); 
+        
+        if (window.fbSet && window.fbDatabase && window.fbRef) {
+            window.fbSet(window.fbRef(window.fbDatabase, 'sys_telemetry_nodes'), nodes)
+                .catch(err => console.error("Firebase live save error:", err));
+        }
+    }
+
+    function flattenSteps(items) {
+        let all = []; if (!items) return all;
+        items.forEach(i => { all.push(i); if(i.children) all = all.concat(flattenSteps(i.children)); });
+        return all;
+    }
+
+    function isStepDirectError(step) {
+        if (!step) return false;
+        if (step.status === 'error') return true;
+        if (step.checklist && step.checklist.length > 0) {
+            return step.checklist.some(c => !c.checked);
+        }
+        return false;
+    }
+
+    function checkHasErrorRecursive(step) {
+        if (!step) return false;
+        if (isStepDirectError(step)) return true;
+        if (step.children && step.children.length > 0) {
+            return step.children.some(child => checkHasErrorRecursive(child));
+        }
+        return false;
+    }
+
+    function updateCategoryDropdown() {
+        const categories = new Set();
+        nodes.forEach(n => { if(n.category) categories.add(n.category); });
+        
+        const prevValue = categoryFilter.value;
+        categoryFilter.innerHTML = '<option value="">📁 Бүх ангилал...</option>';
+        categories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat; opt.innerText = `📂 ${cat}`;
+            categoryFilter.appendChild(opt);
+        });
+        categoryFilter.value = prevValue;
+    }
+
+    function onCategoryFilterChange(val) {
+        selectedCategory = val;
+        renderTabs();
+        const filtered = nodes.filter(n => !selectedCategory || n.category === selectedCategory);
+        if(filtered.length > 0 && !filtered.some(n => n.id === currentSystemId)) {
+            switchPage(filtered[0].id);
+        } else if(filtered.length === 0) {
+            currentSystemId = null;
+            renderMainCanvasOnly();
+        }
+    }
+
+    function renderTabs() {
+        tabsContainer.innerHTML = '';
+        const filteredNodes = nodes.filter(n => !selectedCategory || n.category === selectedCategory);
+        
+        filteredNodes.forEach(node => {
+            const btn = document.createElement('button');
+            const steps = flattenSteps(node.children || []);
+            const hasErr = steps.some(s => checkHasErrorRecursive(s));
+            
+            btn.className = `sys-tab ${currentSystemId === node.id ? 'active-tab' : ''} ${hasErr ? 'has-error' : ''}`;
+            btn.innerHTML = `💻 ${node.name} ${hasErr ? '⚠️' : ''}`;
+            btn.onclick = () => switchPage(node.id);
+            tabsContainer.appendChild(btn);
+        });
+    }
+
+    function switchPage(id) {
+        currentSystemId = id;
+        selectedStepGlobal = null;
+        selectedNodeGlobal = nodes.find(n => n.id === id);
+        closePanel();
+        renderTabs();
+        renderMainCanvasOnly();
+        updateDashboardKPIs();
+    }
+
+    function updateDashboardKPIs() {
+        const currentNode = nodes.find(n => n.id === currentSystemId);
+        if(!currentNode) {
+            document.getElementById('kpi-total').innerText = 0;
+            document.getElementById('kpi-errors').innerText = 0;
+            document.getElementById('kpi-health').innerText = "100%";
+            return;
+        }
+        let totalSteps = 0; let errors = 0;
+        const steps = flattenSteps(currentNode.children || []);
+        totalSteps = steps.length;
+        steps.forEach(s => { if(isStepDirectError(s)) errors++; });
+
+        document.getElementById('kpi-total').innerText = totalSteps;
+        document.getElementById('kpi-errors').innerText = errors;
+        let health = totalSteps === 0 ? 100 : Math.round(((totalSteps - errors) / totalSteps) * 100);
+        document.getElementById('kpi-health').innerText = `${health}%`;
+        document.getElementById('kpi-health').className = `kpi-value ${health < 90 ? 'err-text' : 'succ-text'}`;
+    }
+
+    function drawLine(x1, y1, x2, y2, isErrorPath) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const dx = Math.abs(x2 - x1) * 0.4;
+        const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+        path.setAttribute("d", d);
+        path.setAttribute("stroke", isErrorPath ? "var(--error)" : "var(--line)");
+        path.setAttribute("stroke-width", isErrorPath ? "2.5" : "1.8");
+        path.setAttribute("fill", "none");
+        
+        if(isErrorPath) {
+            path.setAttribute("stroke-dasharray", "6,4");
+            const animate = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            animate.setAttribute("attributeName", "stroke-dashoffset");
+            animate.setAttribute("values", "20;0");
+            animate.setAttribute("dur", "0.6s");
+            animate.setAttribute("repeatCount", "indefinite");
+            path.appendChild(animate);
+        }
+        svgCanvas.appendChild(path);
+    }
+
+    const BLOCK_H = 92; const GAP_Y = 24;
+
+    function getSubtreeHeight(step) {
+        if (!expandedSteps[step.id] || !step.children || step.children.length === 0) return BLOCK_H;
+        let h = 0;
+        step.children.forEach((c, i) => { h += getSubtreeHeight(c); if (i > 0) h += GAP_Y; });
+        return Math.max(BLOCK_H, h);
+    }
+
+    let linesToDraw = [];
+
+    function renderMainCanvasOnly() {
+        viewport.querySelectorAll('.node, .step-block').forEach(n => n.remove());
+        svgCanvas.innerHTML = '';
+        linesToDraw = []; 
+
+        const node = nodes.find(n => n.id === currentSystemId);
+        if (!node) return;
+
+        const div = document.createElement('div');
+        const nodeSteps = flattenSteps(node.children || []);
+        const hasErrorInSystem = nodeSteps.some(s => checkHasErrorRecursive(s));
+
+        div.className = `node ${selectedNodeGlobal && selectedNodeGlobal.id === node.id && !selectedStepGlobal ? 'active' : ''} ${hasErrorInSystem ? 'has-err-trace' : ''}`;
+        div.style.left = node.x + 'px'; div.style.top = node.y + 'px';
+        div.innerHTML = `
+            <div class="node-title">${node.name} <span class="node-health" style="background:${hasErrorInSystem ? 'var(--error)' : 'var(--success)'};">${hasErrorInSystem ? 'АЛДААТАЙ' : 'ХЭВИЙН'}</span></div>
+            <div class="node-dept">🏢 ${node.dept || 'Салбаргүй'} ${node.category ? `• [${node.category}]` : ''}</div>
+        `;
+        div.onmousedown = (e) => { e.stopPropagation(); startDrag(e, node); };
+        div.onclick = (e) => { 
+            if(!div.dataset.dragged) { selectedStepGlobal = null; selectedNodeGlobal = node; editCurrentSystem(); renderMainCanvasOnly(); }
+            delete div.dataset.dragged;
+        };
+        viewport.appendChild(div);
+
+        if (node.children && node.children.length > 0) {
+            calculateLevelPositions(node.children, node.x + 320, node.y + 36, node.x + 260, node.y + 36);
+        }
+
+        linesToDraw.forEach(line => {
+            drawLine(line.x1, line.y1, line.x2, line.y2, line.isErrorPath);
+        });
+    }
+
+    function calculateLevelPositions(steps, currentX, parentCenterY, parentOutX, parentOutY) {
+        if (!steps || steps.length === 0) return;
+        let totalHeight = 0;
+        steps.forEach((step, i) => { totalHeight += getSubtreeHeight(step); if (i > 0) totalHeight += GAP_Y; });
+        let currentY = parentCenterY - (totalHeight / 2);
+
+        steps.forEach((step) => {
+            const sh = getSubtreeHeight(step);
+            const stepCenterY = currentY + (sh / 2);
+            const stepTop = stepCenterY - (BLOCK_H / 2);
+            const isExpanded = expandedSteps[step.id];
+            
+            const isDirectError = isStepDirectError(step); 
+            const isErrorPath = checkHasErrorRecursive(step); 
+
+            linesToDraw.push({
+                x1: parentOutX,
+                y1: parentOutY,
+                x2: currentX,
+                y2: stepTop + (BLOCK_H / 2),
+                isErrorPath: isErrorPath
+            });
+
+            const stepDiv = document.createElement('div');
+            let errorStyleClass = isDirectError ? 'err-direct' : (isErrorPath ? 'err-propagated' : '');
+
+            stepDiv.className = `step-block ${errorStyleClass} ${selectedStepGlobal && selectedStepGlobal.id === step.id ? 'active-step' : ''}`;
+            stepDiv.style.left = currentX + 'px'; stepDiv.style.top = stepTop + 'px'; stepDiv.style.height = BLOCK_H + 'px';
+
+            const hasChildren = step.children && step.children.length > 0;
+            const chkList = step.checklist || [];
+            const totalChecks = chkList.length;
+            const completedChecks = chkList.filter(c => c.checked).length;
+            let checklistHTML = '';
+            if (totalChecks > 0) {
+                const isAllDone = totalChecks === completedChecks;
+                checklistHTML = `<span class="checklist-indicator ${isAllDone ? 'done' : 'has-unchecked'}">📋 Өгөгдөл: ${completedChecks}/${totalChecks}</span>`;
+            } else {
+                checklistHTML = `<span style="opacity:0.3;">📋 Үл үзэгдэх</span>`;
+            }
+
+            let customErrorMsg = step.errorMsg || '';
+            if (step.status === 'ok' && totalChecks > completedChecks) {
+                customErrorMsg = "Шалгах талбар дутуу";
+            }
+
+            let noteIndicatorHTML = '';
+            let noteTooltipHTML = '';
+            if (step.comment && step.comment.trim() !== '') {
+                noteIndicatorHTML = `<span class="note-indicator">📄</span>`;
+                noteTooltipHTML = `<div class="custom-note-tooltip">
+                    <b>Тэмдэглэл:</b><br>${step.comment.replace(/\n/g, '<br>')}
+                    ${step.detected_at ? `<br><small style="color:#94a3b8; font-size:10px;">⚠️ Илрүүлсэн: ${step.detected_at}</small>` : ''}
+                </div>`;
+            }
+
+            stepDiv.innerHTML = `
+                <div class="status-header">
+                    <span class="status-pill ${isDirectError ? 'status-err' : (isErrorPath ? 'status-err' : 'status-ok')}">
+                        ${isDirectError ? 'CRITICAL' : (isErrorPath ? 'TRACE ERR' : 'OK')}
+                    </span>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        ${noteIndicatorHTML}
+                        ${hasChildren ? `<span style="font-size:10px; color:var(--primary-soft);">${isExpanded ? '▼' : '▶'}</span>` : ''}
+                    </div>
+                </div>
+                <div style="font-weight:600; font-size:13px; color:white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${step.text}</div>
+                ${isDirectError && customErrorMsg ? `<div style="font-size:11px; color:#fca5a5; margin-top:2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">↳ ${customErrorMsg}</div>` : ''}
+                
+                <div class="step-meta-row">
+                    ${checklistHTML}
+                    <span>⏱️ ${step.duration || '0ms'}</span>
+                </div>
+                ${noteTooltipHTML}
+            `;
+
+            stepDiv.onclick = (e) => {
+                e.stopPropagation(); selectedStepGlobal = step; selectedNodeGlobal = null;
+                if(e.target.closest('.status-header span') || e.target.closest('.note-indicator') || e.target.closest('.status-header div')) {
+                    if(expandedSteps[step.id]) delete expandedSteps[step.id]; else expandedSteps[step.id] = true;
+                }
+                openStepEditor(step); renderMainCanvasOnly();
+            };
+            viewport.appendChild(stepDiv);
+
+            if (isExpanded && hasChildren) {
+                calculateLevelPositions(step.children, currentX + 310, stepTop + (BLOCK_H / 2), currentX + 250, stepTop + (BLOCK_H / 2));
+            }
+            currentY += sh + GAP_Y;
+        });
+    }
+
+    function editCurrentSystem() {
+        const node = nodes.find(n => n.id === currentSystemId);
+        if(node) { selectedNodeGlobal = node; selectedStepGlobal = null; openProgramEditor(node); }
+    }
+
+    function openStepEditor(step) {
+        panel.classList.add('open');
+        document.getElementById('panel-title').innerHTML = `📝 Алхам Тохиргоо`;
+        if(!step.checklist) step.checklist = [];
+        if(!step.comment) step.comment = "";
+        
+        const totalChecks = step.checklist.length;
+        const completedChecks = step.checklist.filter(c=>c.checked).length;
+        const hasUncheckedError = totalChecks > completedChecks;
+
+        let html = `
+            <div class="section-box" style="border-color: ${(step.status==='error' || hasUncheckedError) ? 'var(--error)' : 'var(--border)'};">
+                <div class="form-group">
+                    <label>Үйлдлийн нэр</label>
+                    <input type="text" class="edit-input" value="${step.text}" oninput="updateFieldSilently('text', this.value)">
+                </div>
+                
+                <div style="display:flex; gap:10px;" class="form-group">
+                    <div style="flex:1;">
+                        <label>Цикл хугацаа</label>
+                        <input type="text" class="edit-input" value="${step.duration || '30ms'}" placeholder="Жишээ: 120ms" oninput="updateFieldSilently('duration', this.value)">
+                    </div>
+                    <div style="flex:1;">
+                        <label>Цагийн тамга</label>
+                        <input type="text" class="edit-input" value="${step.time || '11:33'}" placeholder="Жишээ: 11:33" oninput="updateFieldSilently('time', this.value)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #60a5fa;">Шалгах тайлбар оруулах (Алдааны лог)</label>
+                    <textarea class="edit-textarea" placeholder="Өглөө илрүүлсэн алдааны тайлбараа энд бичнэ үү..." oninput="updateFieldSilently('comment', this.value)">${step.comment}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Төлөв удирдлага</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn ${step.status === 'ok' ? 'active-ok' : ''}" onclick="changeStepStatusDirect('ok')">ХЭВИЙН</button>
+                        <button class="toggle-btn ${step.status === 'error' ? 'active-err' : ''}" onclick="changeStepStatusDirect('error')">АЛДААТАЙ</button>
+                    </div>
+                </div>
+                ${step.status === 'error' ? `
+                <div class="form-group">
+                    <label style="color:var(--error);">Алдааны систем мессеж</label>
+                    <input type="text" class="edit-input" style="border-color:var(--error);" value="${step.errorMsg || ''}" placeholder="Жишээ: Шалгах талбар дутуу" oninput="updateFieldSilently('errorMsg', this.value)">
+                </div>` : ''}
+            </div>
+
+            <div class="section-box" style="background: rgba(0,0,0,0.2); font-size:11px;">
+                <label style="color:var(--primary-soft); font-weight:700; margin-bottom:6px; display:block;">⏱️ ХУГАЦААНЫ БҮРТГЭЛҮҮД</label>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <div>• Анх нэмэгдсэн: <span style="font-family:monospace; color:#fff">${step.created_at || 'Бүртгэгдээгүй'}</span></div>
+                    <div>• Алдаа илрүүлсэн: <span style="font-family:monospace; color:var(--error)">${step.detected_at || 'Алдаа илрүүлээгүй'}</span></div>
+                    <div>• Чеклэж зассан: <span style="font-family:monospace; color:var(--success)">${step.checked_at || 'Шийдвэрлэгдээгүй'}</span></div>
+                </div>
+            </div>
+
+            <div class="section-box" style="border-top: 2px solid ${hasUncheckedError ? 'var(--error)' : 'var(--success)'};">
+                <label style="font-size:12px; font-weight:700; color:${hasUncheckedError ? 'var(--error)' : 'var(--success)'}; display:flex; justify-content:space-between;">
+                    <span>📋 ӨГӨГДӨЛ ИЛГЭЭЛТИЙН ЧЕК ЛИСТ</span>
+                    <span>${completedChecks}/${totalChecks}</span>
+                </label>
+                <div style="margin-top:12px;" id="checklist-container">
+                    ${step.checklist.map((item, index) => `
+                        <div class="check-item-row" style="${!item.checked ? 'border-color: rgba(239, 68, 68, 0.4); background: #241919;' : ''}">
+                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCheckItem(${index}, this.checked)">
+                            <input type="text" class="chk-text" value="${item.text}" oninput="updateCheckItemText(${index}, this.value)">
+                            <button class="btn-danger-text" onclick="deleteCheckItem(${index})">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-outline btn-sm" style="width:100%;" onclick="addCustomCheckItem()">+ Шалгах талбар нэмэх</button>
+            </div>
+
+            <div class="section-box">
+                <label style="font-size:11px; font-weight:700; color:var(--primary-soft); text-transform:uppercase;">Дэд алхмууд (${(step.children || []).length})</label>
+                <div class="task-list-scroll">
+                    ${(step.children || []).map((child, i) => `
+                        <div class="task-row">
+                            <input type="text" class="edit-input" value="${child.text}" oninput="updateChildData(${child.id}, this.value)">
+                            <button class="btn-danger-text" onclick="deleteChildItemConfirm(${child.id}, '${child.text.replace(/'/g, "\\'")}')">Устгах</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-outline btn-sm" style="width:100%; margin-top:10px;" onclick="addChildToStep()">+ Дэд алхам салаалах</button>
+            </div>
+            <button class="btn btn-danger-text" style="width:100%; margin-top:10px; border: 1px solid var(--error);" onclick="deleteStepConfirm(${step.id}, '${step.text.replace(/'/g, "\\'")}')">Алхмыг бүрмөсөн устгах</button>
+        `;
+        content.innerHTML = html;
+    }
+
+    function changeStepStatusDirect(newStatus) {
+        if (!selectedStepGlobal) return;
+        pushToUndoHistory();
+        
+        selectedStepGlobal.status = newStatus;
+        const now = getFormattedTimestamp();
+
+        if (newStatus === 'error') {
+            if (!selectedStepGlobal.detected_at) {
+                selectedStepGlobal.detected_at = now; 
+            }
+            selectedStepGlobal.checked_at = null; 
+        } else {
+            const allChecked = !selectedStepGlobal.checklist || selectedStepGlobal.checklist.every(c => c.checked);
+            if (allChecked) {
+                selectedStepGlobal.checked_at = now;
+            }
+        }
+
+        save();
+        openStepEditor(selectedStepGlobal);
+    }
+
+    function toggleCheckItem(index, isChecked) { 
+        if(selectedStepGlobal) { 
+            pushToUndoHistory(); 
+            selectedStepGlobal.checklist[index].checked = isChecked; 
+            
+            const now = getFormattedTimestamp();
+            const totalChecks = selectedStepGlobal.checklist.length;
+            const completedChecks = selectedStepGlobal.checklist.filter(c => c.checked).length;
+            
+            if (completedChecks < totalChecks) {
+                if (!selectedStepGlobal.detected_at) {
+                    selectedStepGlobal.detected_at = now;
+                }
+                selectedStepGlobal.checked_at = null; 
+            } else if (completedChecks === totalChecks && selectedStepGlobal.status === 'ok') {
+                selectedStepGlobal.checked_at = now;
+            }
+
+            save(); 
+            openStepEditor(selectedStepGlobal); 
+        } 
+    }
+    
+    function updateCheckItemText(index, text) { 
+        if(selectedStepGlobal && selectedStepGlobal.checklist && selectedStepGlobal.checklist[index]) { 
+            selectedStepGlobal.checklist[index].text = text; 
+            // Хэт их хүсэлт Firebase рүү шидэхгүйн тулд зөвхөн Local-д хадгалж, засагдаж дуусахад бааз руу save() хийнэ
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
+        } 
+    }
+    
+    function deleteCheckItem(index) { if(selectedStepGlobal) { pushToUndoHistory(); selectedStepGlobal.checklist.splice(index, 1); save(); openStepEditor(selectedStepGlobal); } }
+    
+    function addCustomCheckItem() { 
+        if(selectedStepGlobal) { 
+            pushToUndoHistory(); 
+            const now = getFormattedTimestamp();
+            selectedStepGlobal.checklist.push({ id: Date.now(), text: "Шинэ шалгах талбар", checked: false }); 
+            
+            if (!selectedStepGlobal.detected_at) {
+                selectedStepGlobal.detected_at = now;
+            }
+            selectedStepGlobal.checked_at = null;
+
+            save(); 
+            openStepEditor(selectedStepGlobal); 
+        } 
+    }
+
+    function openProgramEditor(node) {
+        panel.classList.add('open'); 
+        document.getElementById('panel-title').innerHTML = `⚙️ Систем (Page) Тохиргоо`;
+        let html = `
+            <div class="section-box">
+                <div class="form-group"><label>Системийн нэр</label><input type="text" class="edit-input" value="${node.name}" oninput="updateFieldSilently('name', this.value)"></div>
+                <div class="form-group"><label>Ангилал / Бүлэг</label><input type="text" class="edit-input" value="${node.category || ''}" placeholder="Жишээ: Зээл, Захиргаа, Fintech" oninput="updateFieldSilently('category', this.value)"></div>
+                <div class="form-group"><label>Хариуцах хэлтэс</label><input type="text" class="edit-input" value="${node.dept || ''}" oninput="updateFieldSilently('dept', this.value)"></div>
+            </div>
+            <div class="section-box">
+                <label style="font-size:11px; font-weight:700; color:var(--primary-soft); text-transform:uppercase;">Үндсэн урсгалууд (${(node.children || []).length})</label>
+                <div class="task-list-scroll">
+                    ${(node.children || []).map((child, i) => `
+                        <div class="task-row">
+                            <input type="text" class="edit-input" value="${child.text}" oninput="updateChildData(${child.id}, this.value)">
+                            <button class="btn-danger-text" onclick="deleteChildItemConfirm(${child.id}, '${child.text.replace(/'/g, "\\'")}')">Устгах</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-primary btn-sm" style="width:100%; margin-top:10px;" onclick="addFirstLevelStep()">+ Үндсэн урсгал үүсгэх</button>
+            </div>
+            <button class="btn btn-danger-text" style="width:100%; margin-top:10px; border: 1px solid var(--error);" onclick="deleteSystemNodeConfirm(${node.id}, '${node.name.replace(/'/g, "\\'")}')">Энэ хуудсыг бүрмөсөн устгах</button>
+        `;
+        content.innerHTML = html;
+    }
+
+    function addChildToStep() { 
+        if(selectedStepGlobal) { 
+            pushToUndoHistory(); 
+            const now = getFormattedTimestamp();
+            if(!selectedStepGlobal.children) selectedStepGlobal.children = []; 
+            selectedStepGlobal.children.push({ 
+                id: Date.now(), 
+                text: "Шинэ дэд алхам", 
+                status: "ok", 
+                duration: "20ms", 
+                time: "11:33", 
+                created_at: now, 
+                detected_at: null, 
+                checked_at: now, 
+                comment: "", 
+                checklist: [], 
+                children: [] 
+            }); 
+            expandedSteps[selectedStepGlobal.id] = true; 
+            save();
+            openStepEditor(selectedStepGlobal); 
+        } 
+    }
+
+    function addFirstLevelStep() { 
+        const node = nodes.find(n => n.id === currentSystemId); 
+        if(node) { 
+            pushToUndoHistory(); 
+            const now = getFormattedTimestamp();
+            if(!node.children) node.children = []; 
+            node.children.push({ 
+                id: Date.now(), 
+                text: "Шинэ урсгал", 
+                status: "ok", 
+                duration: "30ms", 
+                time: "11:33", 
+                created_at: now, 
+                detected_at: null, 
+                checked_at: now, 
+                comment: "", 
+                checklist: [], 
+                children: [] 
+            }); 
+            save(); 
+            openProgramEditor(node); 
+        } 
+    }
+    
+    function updateChildData(id, val) { 
+        const node = nodes.find(n => n.id === currentSystemId);
+        if(!node) return;
+        const allSteps = flattenSteps(node.children);
+        const target = allSteps.find(c => c.id === id);
+        if(target) { 
+            target.text = val; 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
+            renderMainCanvasOnly(); 
+        }
+    }
+    
+    function deleteChildItemConfirm(id, name) {
+        const node = nodes.find(n => n.id === currentSystemId);
+        if(!node) return;
+        
+        let foundParentList = null;
+        if(node.children.some(c => c.id === id)) { foundParentList = node; } 
+        else {
+            const allSteps = flattenSteps(node.children);
+            const stepParent = allSteps.find(s => s.children && s.children.some(c => c.id === id));
+            if(stepParent) foundParentList = stepParent;
+        }
+
+        if(foundParentList) {
+            if(confirm(`"${name}" алхмыг устгах уу?`)) {
+                pushToUndoHistory();
+                foundParentList.children = foundParentList.children.filter(c => c.id !== id);
+                save();
+                if (selectedStepGlobal) openStepEditor(selectedStepGlobal);
+                else openProgramEditor(node);
+            }
+        }
+    }
+
+    function deleteStepConfirm(id, name) {
+        if(confirm(`"${name}" алхмыг устгах уу?`)) {
+            pushToUndoHistory();
+            deleteStepFromTree(nodes, id);
+            closePanel();
+            save();
+        }
+    }
+
+    function deleteSystemNodeConfirm(id, name) {
+        if(confirm(`"${name}" системийг устгавал доторх бүх урсгал устахыг анхаарна уу!`)) {
+            pushToUndoHistory();
+            nodes = nodes.filter(n => n.id !== id);
+            currentSystemId = nodes.length > 0 ? nodes[0].id : null;
+            closePanel();
+            save();
+        }
+    }
+
+    function deleteStepFromTree(items, id) { for(let i=0; i<items.length; i++) { if(items[i].id === id) { items.splice(i, 1); return true; } if(items[i].children && deleteStepFromTree(items[i].children, id)) return true; } return false; }
+
+    function startDrag(e, node) {
+        if(e.target.closest('.step-block')) return;
+        const div = e.currentTarget; let startX = e.clientX, startY = e.clientY;
+        const onMove = (ev) => {
+            if (Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3) { 
+                viewport.style.transition = 'none'; 
+                div.dataset.dragged = "true"; 
+                node.x += ev.movementX / zoom; 
+                node.y += ev.movementY / zoom; 
+                renderMainCanvasOnly(); 
+            }
+        };
+        const onUp = () => {
+            window.removeEventListener('mousemove', onMove);
+            if (div.dataset.dragged === "true") {
+                save(); // Зөөж дуусахад координат хадгална
+            }
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp, { once: true });
+    }
+
+    function addNewNode() { 
+        pushToUndoHistory(); 
+        const newId = Date.now();
+        const n = { id: newId, name: "Шинэ Систем", x: 50, y: 150, dept: "Хэлтэс", category: selectedCategory || "Ерөнхий", isOpen: true, children: [] }; 
+        nodes.push(n); 
+        currentSystemId = newId;
+        selectedNodeGlobal = n; 
+        selectedStepGlobal = null; 
+        save();
+        openProgramEditor(n); 
+    }
+    
+    function closePanel() { panel.classList.remove('open'); selectedStepGlobal = null; selectedNodeGlobal = null; renderMainCanvasOnly(); }
+    function clearData() { if(confirm("Бүх хуудас, системүүд устах тул зөвшөөрөх үү?")) { localStorage.clear(); location.reload(); } }
+
+    // Хамгийн анхны рендерийг Firebase onValue өөрөө удирдана
+</script>
 </body>
 </html>
