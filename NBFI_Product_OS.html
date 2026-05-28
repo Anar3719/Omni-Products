@@ -236,7 +236,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="tbtn prim" onclick="openModal('add-project',{})">+ Add project</button>
     <button class="tbtn" id="team-btn" onclick="toggleTeam()">&#128101; Team</button>
     <button class="tbtn" onclick="exportData()">&#8659; Export JSON</button>
-    <button class="tbtn" style="background: var(--bg3); font-weight: 600;" onclick="$('json-file-input').click()">&#8657; Import JSON</button>
+    
+    <button class="tbtn" style="background: var(--bg3); font-weight: 600;" onclick="document.getElementById('json-file-input').click()">&#8657; Import JSON</button>
     <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="importData(event)">
   </div>
   <div class="team-bar" id="team-bar" style="display:none"></div>
@@ -260,7 +261,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
-  // Төслийн тохиргоо
   const firebaseConfig = {
     apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
     authDomain: "omni-products.firebaseapp.com",
@@ -272,12 +272,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     measurementId: "G-KQND2ECQ33"
   };
 
-  // Firebase Инициализаци
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
   const analytics = getAnalytics(app);
-
-  // Firebase reference үүсгэх
   const dbRef = ref(database, 'product_os_data');
 
   /* ── UTILS ── */
@@ -329,7 +326,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
   }
 
-  /* ── ШИНЭЭР НЭМЭГДСЭН JSON IMPORT ФУНКЦ ── */
+  /* ── ЗАССАН JSON IMPORT ФУНКЦ ── */
   window.importData = function(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -339,15 +336,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       try {
         const parsedData = JSON.parse(e.target.result);
         
-        // Файлын бүтцийг энгийнээр баталгаажуулах
         if (!parsedData.projects) {
-          alert("Алдаа: Сонгосон файлын бүтэц буруу эсвэл Product OS-ийн дата биш байна!");
+          alert("Алдаа: Сонгосон файлын бүтэц буруу байна!");
           return;
         }
 
-        if (confirm("Та локал файлаас бүх өгөгдлийг (Бүтээгдэхүүн, Таск, Рөүдмап) Firebase сервер рүү хуулж шинэчлэхдээ итгэлтэй байна уу?")) {
+        if (confirm("Та локал файлаас бүх өгөгдлийг Firebase сервер рүү хуулж шинэчлэхдээ итгэлтэй байна уу?")) {
           window.D = parsedData;
-          window.save(); // Шууд Firebase руу live синхрончлох
+          window.save();
           
           if (window.projs().length > 0) {
             window.ui.sel = window.projs()[0].id;
@@ -360,7 +356,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       }
     };
     reader.readAsText(file);
-    // Ижил файлыг дахин сонгоход ажиллахын тулд утгыг цэвэрлэнэ
     event.target.value = '';
   }
 
@@ -428,12 +423,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(data && data.projects) {
       window.D = data;
     } else {
-      // Хэрэв өгөгдлийн сан хоосон бол default датаг оруулах
       window.D = defaultData();
       window.save();
     }
     
-    // Анх удаа ачааллах үед select хийх
     if(!window.ui.sel && window.projs().length > 0){
       window.ui.sel = window.projs()[0].id;
     }
@@ -789,7 +782,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
          '<div class="mfld"><label>Relationship / Sync Interface Protocol</label><input type="text" id="nc_rel" placeholder="e.g. gRPC Core Sync, API, webhook" value="'+esc(window.ui.nc.rel)+'" onchange="window.ui.nc.rel=this.value"></div>'+
          '<div class="mfld"><label>Target System Node</label><select onchange="window.ncSet(\'tp\',this.value)">'+p2Opts+'</select></div>'+
          '<div class="mfld"><label>Target Sub-feature (Optional)</label><select onchange="window.ncSet(\'ti\',this.value)">'+f2Opts+'</select></div>'+
-         '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\ 'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
+         '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
          '</div></div>'+
          '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="window.addConn()">Form Structural Interface</button></div>';
     }else if(k==='reset'){
