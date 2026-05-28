@@ -67,7 +67,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab{padding:8px 13px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;user-select:none}
 .tab:hover{color:var(--text)}.tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
 .mbody{flex:1;overflow-y:auto;padding:15px 18px}
-.tmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
+.tmeta">display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
 .clr{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:0}
 .clr:hover{color:var(--text2);text-decoration:underline}
 .prog{height:3px;background:var(--bg3);border-radius:999px;margin-bottom:11px;overflow:hidden}
@@ -83,7 +83,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .titem:hover{border-color:var(--border)}
 .chk{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .chk.ck{background:var(--green);border-color:var(--green)}
-.chk.chk::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
+.chk.ck::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
 .ttxt{flex:1;font-size:13px;color:var(--text);line-height:1.4}
 .ttxt.dn{color:var(--text3);text-decoration:line-through}
 .atag{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:2px 7px;white-space:nowrap}
@@ -236,7 +236,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="tbtn prim" onclick="openModal('add-project',{})">+ Add project</button>
     <button class="tbtn" id="team-btn" onclick="toggleTeam()">&#128101; Team</button>
     <button class="tbtn" onclick="exportData()">&#8659; Export JSON</button>
-    
     <button class="tbtn" style="background: var(--bg3); font-weight: 600;" onclick="document.getElementById('json-file-input').click()">&#8657; Import JSON</button>
     <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="importData(event)">
   </div>
@@ -261,8 +260,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
+  // Таны өгсөн Firebase тохиргооны объект
   const firebaseConfig = {
-    apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
+    apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
     authDomain: "omni-products.firebaseapp.com",
     databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
     projectId: "omni-products",
@@ -272,6 +272,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     measurementId: "G-KQND2ECQ33"
   };
 
+  // Инициализаци
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
   const analytics = getAnalytics(app);
@@ -288,7 +289,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.LANES=['now','next','later'];
   window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
 
-  /* ── STATE ── */
+  /* ── STATE (Төлөв) ── */
   window.D={};
   window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
   window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
@@ -311,12 +312,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
       '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
 
-  /* ── LIVE SAVE TO FIREBASE ── */
+  /* ── FIREBASE SAVE (Сервер лүү шууд хадгалах) ── */
   window.save = function(){
     try{
       set(dbRef, window.D);
     }catch(e){
-      console.error('Firebase save error',e);
+      console.error('Firebase хадгалалтын алдаа:',e);
     }
   }
 
@@ -326,40 +327,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
   }
 
-  /* ── ЗАССАН JSON IMPORT ФУНКЦ ── */
   window.importData = function(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
         const parsedData = JSON.parse(e.target.result);
-        
         if (!parsedData.projects) {
-          alert("Алдаа: Сонгосон файлын бүтэц буруу байна!");
+          alert("Алдаа: Бүтэц буруу файл байна!");
           return;
         }
-
-        if (confirm("Та локал файлаас бүх өгөгдлийг Firebase сервер рүү хуулж шинэчлэхдээ итгэлтэй байна уу?")) {
+        if (confirm("Энэ файлыг Firebase рүү хуулж, бүх хүмүүсийн датаг шинэчлэх үү?")) {
           window.D = parsedData;
           window.save();
-          
-          if (window.projs().length > 0) {
-            window.ui.sel = window.projs()[0].id;
-          }
+          if (window.projs().length > 0) window.ui.sel = window.projs()[0].id;
           window.render();
-          alert("Бүх датаг сервер рүү амжилттай импортлон сэргээлээ!");
         }
       } catch (err) {
-        alert("Файлыг уншихад алдаа гарлаа: " + err.message);
+        alert("Уншихад алдаа гарлаа: " + err.message);
       }
     };
     reader.readAsText(file);
     event.target.value = '';
   }
 
-  /* ── DEFAULT DATA ── */
+  /* ── SEED / DEFAULT DATA ── */
   function defaultData(){
     const tasks={},road={},conns={};
     [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false},
@@ -417,7 +410,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     };
   }
 
-  /* ── FIREBASE LISTEN & INITIALIZE ── */
+  /* ── FIREBASE REALTIME LISTEN (Бодит хугацааны синхрончлол) ── */
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     if(data && data.projects) {
@@ -426,11 +419,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       window.D = defaultData();
       window.save();
     }
-    
     if(!window.ui.sel && window.projs().length > 0){
       window.ui.sel = window.projs()[0].id;
     }
-    
     window.render();
   });
 
