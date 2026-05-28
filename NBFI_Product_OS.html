@@ -1,1139 +1,526 @@
 <!DOCTYPE html>
-<html lang="mn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Системийн Архитектур & Телеметр Процесс v24.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0f172a; 
-            --surface: #1e293b;
-            --surface-light: #334155;
-            --primary: #f8fafc;
-            --primary-soft: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --error: #ef4444;
-            --error-bg: rgba(239, 68, 68, 0.2);
-            --error-path-bg: rgba(239, 68, 68, 0.08);
-            --success: #10b981;
-            --success-bg: rgba(16, 185, 129, 0.1);
-            --border: #334155;
-            --line: #475569;
-        }
-
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; overflow: hidden; color: var(--primary); }
-        
-        /* Дээд навигаци ба KPI */
-        .top-nav {
-            position: absolute; top: 0; left: 0; width: 100%; background: var(--surface);
-            border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column;
-        }
-        .nav-header {
-            display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-bottom: 1px solid var(--border);
-        }
-        .nav-header h1 { font-size: 16px; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        
-        .kpi-board { display: flex; gap: 20px; padding: 12px 24px; background: rgba(15, 23, 42, 0.5); align-items: center; }
-        .kpi-card { background: var(--surface-light); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; min-width: 140px; }
-        .kpi-value { font-size: 20px; font-weight: 700; color: var(--primary); }
-        .kpi-label { font-size: 11px; color: var(--primary-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-        .kpi-value.err-text { color: var(--error); }
-        .kpi-value.succ-text { color: var(--success); }
-
-        /* Ангилал болон Сонгох хэсэг */
-        .filter-section {
-            display: flex; gap: 12px; align-items: center; margin-left: auto; margin-right: 12px;
-        }
-        .node-selector {
-            background: var(--bg); color: white; border: 1px solid var(--border);
-            padding: 8px 12px; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; min-width: 160px;
-        }
-        .node-selector:focus { border-color: var(--accent); }
-        .node-selector option { background: var(--surface); color: white; }
-
-        /* Системийн ТАВ (Хуудаслалт) */
-        .system-tabs {
-            display: flex; gap: 6px; padding: 0 24px; background: rgba(15, 23, 42, 0.3); overflow-x: auto; border-bottom: 1px solid var(--border);
-        }
-        .sys-tab {
-            padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--primary-soft); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; white-space: nowrap;
-        }
-        .sys-tab:hover { color: white; background: rgba(255,255,255,0.02); }
-        .sys-tab.active-tab { color: var(--accent); border-bottom-color: var(--accent); background: rgba(59, 130, 246, 0.05); }
-        .sys-tab.has-error { border-bottom-color: var(--error); color: #fca5a5; }
-
-        /* Ажлын талбар */
-        #canvas { 
-            width: 100vw; height: 100vh; position: absolute; top:0; left:0; 
-            background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 24px 24px; cursor: grab;
-        }
-        #canvas:active { cursor: grabbing; }
-        
-        #viewport {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0;
-            padding-top: 180px; pointer-events: none; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        
-        #svg-canvas { 
-            position: absolute; top: 0; left: 0; width: 10000px; height: 10000px; pointer-events: none; z-index: 0; 
-        }
-
-        /* Үндсэн Систем блок */
-        .node { 
-            position: absolute; width: 260px; background: var(--surface); border: 1px solid var(--border); 
-            border-radius: 12px; padding: 16px; cursor: grab; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); 
-            z-index: 10; transition: border-color 0.2s, box-shadow 0.2s; user-select: none; pointer-events: auto;
-        }
-        .node:hover { border-color: var(--accent); }
-        .node.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
-        .node.has-err-trace { border-color: var(--error); box-shadow: 0 0 15px rgba(239, 68, 68, 0.25); }
-        .node-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
-        .node-dept { font-size: 12px; color: var(--primary-soft); display: flex; align-items: center; gap:4px; }
-        .node-health { font-size: 10px; padding: 2px 6px; border-radius: 4px; color: white; font-weight: bold; }
-
-        /* Процессын алхмуудын блок */
-        .step-block {
-            position: absolute; width: 250px; background: var(--surface); border: 1px solid var(--border);
-            border-radius: 10px; padding: 12px; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-            z-index: 10; transition: transform 0.2s, border-color 0.2s; cursor: pointer; user-select: none; pointer-events: auto;
-        }
-        .step-block:hover { border-color: var(--accent); transform: translateY(-1px); }
-        .step-block.active-step { border-color: var(--accent); background: var(--surface-light); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
-        
-        @keyframes pulse-critical { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .step-block.err-direct { border-color: var(--error); background: #311c1c; animation: pulse-critical 2s infinite; border-width: 1.5px; }
-        
-        @keyframes pulse-trace-border { 0% { border-color: rgba(239, 68, 68, 0.4); } 50% { border-color: rgba(239, 68, 68, 1); } 100% { border-color: rgba(239, 68, 68, 0.4); } }
-        .step-block.err-propagated { border-color: var(--error); background: var(--error-path-bg); animation: pulse-trace-border 2.5s infinite; }
-        
-        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; position: relative; }
-        .status-pill { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status-ok { background: var(--success-bg); color: var(--success); }
-        .status-err { background: var(--error-bg); color: var(--error); }
-        
-        .note-indicator { font-size: 11px; cursor: help; opacity: 0.8; margin-left: 6px; transition: 0.2s; }
-        .note-indicator:hover { opacity: 1; transform: scale(1.2); }
-        
-        .step-block .custom-note-tooltip {
-            position: absolute; top: -10px; left: 105%; width: 240px;
-            background: #ffffff; color: #334155; padding: 12px 16px;
-            border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.12);
-            border: 1px solid #cbd5e1; font-size: 13px; font-weight: 500; line-height: 1.5;
-            white-space: normal; word-wrap: break-word; z-index: 1000; display: none; pointer-events: none;
-        }
-        .step-block .custom-note-tooltip::before {
-            content: ""; position: absolute; top: 18px; left: -6px;
-            border-width: 6px 6px 6px 0; border-style: solid; border-color: transparent #ffffff transparent transparent;
-        }
-        .step-block:hover .custom-note-tooltip { display: block; }
-
-        .step-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--primary-soft); margin-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 4px; }
-        .checklist-indicator { font-weight: 500; font-size: 11px; }
-        .checklist-indicator.done { color: var(--success); font-weight: 600; }
-        .checklist-indicator.has-unchecked { color: var(--error); font-weight: 600; }
-        
-        /* Удирдлагын самбар */
-        .side-panel { 
-            position: fixed; right: -500px; top: 0; width: 480px; background: var(--surface); 
-            height: 100vh; box-shadow: -10px 0 30px rgba(0,0,0,0.3); 
-            display: flex; flex-direction: column; z-index: 101; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid var(--border);
-        }
-        .side-panel.open { right: 0; }
-        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-light); }
-        .panel-header h3 { margin: 0; font-size: 16px; font-weight: 700; color: white; }
-        .btn-close-icon { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary-soft); }
-        .btn-close-icon:hover { color: white; }
-        
-        .panel-body { padding: 24px; overflow-y: auto; flex: 1; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--primary-soft); margin-bottom: 8px; text-transform: uppercase; }
-        
-        .edit-input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px; font-family: inherit; }
-        .edit-input:focus { outline: none; border-color: var(--accent); }
-        .edit-textarea { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 70px; }
-        .edit-textarea:focus { outline: none; border-color: var(--accent); }
-        
-        .section-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
-        .toggle-group { display: flex; background: var(--bg); border-radius: 6px; padding: 4px; border: 1px solid var(--border); }
-        .toggle-btn { flex: 1; padding: 8px 14px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: transparent; color: var(--primary-soft); transition: 0.2s; }
-        .toggle-btn.active-ok { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .toggle-btn.active-err { background: var(--error); color: white; }
-
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; transition: 0.2s; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--primary); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-sm { padding: 8px 12px; font-size: 12px; }
-        .btn-danger-text { background: none; color: var(--error); border: none; cursor: pointer; font-size: 12px; font-weight: 600; }
-        
-        .task-list-scroll { max-height: 250px; overflow-y: auto; margin-top: 10px; padding-right: 5px;}
-        .task-row { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
-
-        .check-item-row { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; }
-        .check-item-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--success); }
-        .check-item-row .chk-text { flex: 1; background: transparent; border: none; color: white; font-size: 13px; }
-        .check-item-row .chk-text:focus { outline: none; border-bottom: 1px solid var(--accent); }
-
-        /* Лог ба Тайлангийн хэсэг */
-        .log-item { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; }
-        .log-item-header { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 6px; }
-        .log-text { color: #ffffff; font-weight: 600; font-size: 13px; margin-bottom: 6px;}
-        .log-time-row { display: flex; flex-direction: column; gap: 3px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.04); margin-top: 6px; }
-        .log-time-lbl { font-size: 11px; color: var(--primary-soft); display: flex; justify-content: space-between; }
-        .log-time-lbl b { color: #f8fafc; font-family: monospace; }
-        .log-comment { font-style: italic; color: #cbd5e1; background: rgba(59, 130, 246, 0.15); border-left: 2px solid var(--accent); padding: 6px 10px; border-radius: 0 4px 4px 0; margin-top: 6px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBFI · Product OS</title>
+<style>
+:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--green:#639922;--green-bg:#EAF3DE;--green-text:#3B6D11;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#A32D2D;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#854F0B;--r:8px;--rl:12px}\n@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.16)}}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{background:var(--bg);color:var(--text);font-size:13px;line-height:1.4;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+header{height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:between;padding:0 16px;background:var(--bg);flex-shrink:0;z-index:10}
+.logo{font-weight:600;font-size:14px;letter-spacing:-0.2px;display:flex;align-items:center;gap:6px}
+.logo span{color:var(--text3);font-weight:400}
+.nav-modes{display:flex;background:var(--bg2);padding:2px;border-radius:6px;border:1px solid var(--border)}
+.nav-btn{padding:4px 10px;border-radius:4px;border:none;background:none;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer}
+.nav-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+.main-layout{display:flex;flex:1;overflow:hidden;position:relative}
+.sidebar{width:240px;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-sec{padding:12px 8px}
+.sb-title{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--text3);padding:0 8px 6px 8px;letter-spacing:0.5px}
+.sb-item{display:flex;align-items:center;justify-content:between;padding:6px 8px;border-radius:var(--r);color:var(--text2);text-decoration:none;cursor:pointer;margin-bottom:1px;font-weight:500}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.04);border:1px solid var(--border)}
+.sb-count{font-size:11px;color:var(--text3);background:var(--border);padding:1px 5px;border-radius:10px;font-weight:400}
+.content{flex:1;overflow-y:auto;background:var(--bg);position:relative;display:flex;flex-direction:column}
+.view-pane{padding:24px 32px;max-width:1000px;width:100%;margin:0 auto;display:none;flex:1}
+.view-pane.active{display:block}
+.p-header{margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:16px}
+.p-title{font-size:22px;font-weight:700;letter-spacing:-0.4px;margin-bottom:4px}
+.p-desc{color:var(--text2);font-size:13px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02)}
+.card-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:12px;display:flex;align-items:center;justify-content:between}
+.meta-row{display:flex;margin-bottom:8px;font-size:13px;align-items:center}
+.meta-label{width:120px;color:var(--text2);flex-shrink:0}
+.meta-val{color:var(--text);font-weight:500}
+.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.badge.green{background:var(--green-bg);color:var(--green-text)}
+.badge.blue{background:var(--blue-bg);color:var(--blue-text)}
+.badge.red{background:var(--red-bg);color:var(--red-text)}
+.badge.amber{background:var(--amber-bg);color:var(--amber-text)}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px}
+.tag{background:var(--bg2);border:1px solid var(--border);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.tag-del{cursor:pointer;color:var(--text3);font-size:10px;margin-left:2px}
+.tag-del:hover{color:var(--red)}
+.tag-add{background:none;border:1px dashed var(--border2);cursor:pointer;font-weight:500}
+.tag-add:hover{background:var(--bg2);border-color:var(--text3)}
+.list-item{display:flex;align-items:center;justify-content:between;padding:8px 0;border-bottom:1px solid var(--border)}
+.list-item:last-child{border-bottom:none}
+.li-name{font-weight:500;display:flex;align-items:center;gap:6px}
+.li-del{color:var(--text3);cursor:pointer;opacity:0}
+.list-item:hover .li-del{opacity:1}
+.li-del:hover{color:var(--red)}
+.inp-group{display:flex;gap:6px;margin-top:12px}
+.inp{flex:1;background:var(--bg2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;color:var(--text);font-size:12px}
+.inp:focus{outline:none;border-color:var(--border2);background:var(--bg)}
+.btn{background:var(--text);color:var(--bg);border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}
+.btn:hover{opacity:0.9}
+.matrix-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.matrix-cell{border:1px solid var(--border);border-radius:var(--rl);background:var(--bg2);padding:12px;min-height:160px;display:flex;flex-direction:column}
+.matrix-cell.c-core{background:var(--blue-bg);border-color:rgba(55,138,221,0.2)}
+.matrix-cell.c-core .mc-title{color:var(--blue-text)}
+.matrix-cell.c-supp{background:var(--green-bg);border-color:rgba(99,153,34,0.2)}
+.matrix-cell.c-supp .mc-title{color:var(--green-text)}
+.matrix-cell.c-chan{background:var(--amber-bg);border-color:rgba(186,117,23,0.2)}
+.matrix-cell.c-chan .mc-title{color:var(--amber-text)}
+.matrix-cell.c-mana{background:var(--red-bg);border-color:rgba(226,75,74,0.2)}
+.matrix-cell.c-mana .mc-title{color:var(--red-text)}
+.mc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.mc-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.m-card{background:var(--bg);border:1px solid var(--border);padding:6px 8px;border-radius:6px;font-weight:500;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,0.02);cursor:pointer;display:flex;justify-content:between;align-items:center}
+.m-card:hover{border-color:var(--border2)}
+.m-card.active{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
+.mc-count{font-size:10px;color:var(--text3);font-weight:400}
+.matrix-view{display:flex;flex-direction:column;height:100%}
+.matrix-container{flex:1;overflow-y:auto;padding:24px 32px}
+.conn-view{display:flex;flex-direction:column;height:100%}
+.conn-container{flex:1;overflow-y:auto;padding:24px 32px;max-width:1000px;width:100%;margin:0 auto}
+.conn-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}
+.conn-table th{text-align:left;padding:8px;border-bottom:2px solid var(--border);color:var(--text3);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.5px}
+.conn-table td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.conn-table tr:hover td{background:var(--bg2)}
+.p-pill{display:inline-flex;align-items:center;background:var(--bg2);border:1px solid var(--border);padding:2px 8px;border-radius:12px;font-weight:500;font-size:11px;gap:4px}
+.p-dot{width:6px;height:6px;border-radius:50%}
+.p-dot.core{background:var(--blue)}
+.p-dot.supp{background:var(--green)}
+.p-dot.chan{background:var(--amber)}
+.p-dot.mana{background:var(--red)}
+.c-rel{font-weight:600;color:var(--text2);font-size:11px;text-transform:uppercase}
+.sel-box{padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);width:100%}
+.sel-box:focus{outline:none;border-color:var(--border2)}
+</style>
 </head>
 <body>
 
-<div class="top-nav">
-    <div class="nav-header">
-        <h1><span>⚡</span> System Architecture & Telemetry Tracker v24.0</h1>
-        <div class="filter-section">
-            <select id="category-filter" class="node-selector" onchange="onCategoryFilterChange(this.value)">
-                <option value="">📁 Бүх ангилал...</option>
-            </select>
-            
-            <button class="btn btn-outline btn-sm" style="border-color: var(--accent); color: white; background: rgba(59, 130, 246, 0.1);" onclick="centerCanvas()">🎯 Голлуулах</button>
-            <button class="btn btn-outline btn-sm" style="border-color: #eab308; color: #fde047; background: rgba(234, 179, 8, 0.1);" onclick="viewSystemLogs()">📋 Лог & Тайлан Харах</button>
+<header>
+  <div class="logo">NBFI <span>· Product OS</span></div>
+  <div class="nav-modes">
+    <button class="nav-btn active" id="m_mat" onclick="setMode('matrix')">Architecture Matrix</button>
+    <button class="nav-btn" id="m_con" onclick="setMode('conn')">Connections</button>
+  </div>
+  <div style="width:120px"></div>
+</header>
 
-            <button id="undo-btn" class="btn btn-outline btn-sm" style="display:none; background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: var(--accent);" onclick="triggerUndo()">↺ Буцаах (Undo)</button>
-            <button class="btn btn-success btn-sm" onclick="exportData()">📤 Дата Экспорт</button>
-            <label class="btn btn-outline btn-sm" style="cursor:pointer;">
-                📥 Дата Импорт
-                <input type="file" id="import-file" style="display:none;" onchange="importData(event)">
-            </label>
-            <button class="btn btn-outline btn-sm" style="border-color: rgba(239, 68, 68, 0.4); color: var(--error);" onclick="clearData()">⚠️ Цэвэрлэх</button>
-            <button class="btn btn-primary btn-sm" onclick="addNewNode()">+ Шинэ Систем (Page)</button>
+<div class="main-layout">
+  
+  <div class="sidebar" id="sb_matrix">
+    <div class="sb-sec">
+      <div class="sb-title">Core Systems</div>
+      <div id="sb_core"></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-title">Supporting Systems</div>
+      <div id="sb_supp"></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-title">Channels & touchpoints</div>
+      <div id="sb_chan"></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-title">Management & Analytics</div>
+      <div id="sb_mana"></div>
+    </div>
+  </div>
+
+  <div class="content">
+    
+    <div class="matrix-view" id="v_matrix_root">
+      <div class="matrix-container">
+        <div class="p-header">
+          <div class="p-title">Enterprise Architecture Matrix</div>
+          <div class="p-desc">Four-quadrant functional mapping of non-banking financial institution digital assets, platforms, and services.</div>
         </div>
+        <div class="matrix-grid">
+          <div class="matrix-cell c-core">
+            <div class="mc-title">Core Systems</div>
+            <div class="mc-body" id="mx_core"></div>
+          </div>
+          <div class="matrix-cell c-supp">
+            <div class="mc-title">Supporting Systems</div>
+            <div class="mc-body" id="mx_supp"></div>
+          </div>
+          <div class="matrix-cell c-chan">
+            <div class="mc-title">Channels & Touchpoints</div>
+            <div class="mc-body" id="mx_chan"></div>
+          </div>
+          <div class="matrix-cell c-mana">
+            <div class="mc-title">Management & Analytics</div>
+            <div class="mc-body" id="mx_mana"></div>
+          </div>
+        </div>
+        
+        <div id="project_panel" style="display:none">
+          <div class="p-header" style="margin-bottom:16px; padding-bottom:12px">
+            <div style="display:flex; justify-content:between; align-items:start">
+              <div>
+                <div class="p-title" id="vp_title" style="font-size:18px">Project Name</div>
+                <div class="p-desc" id="vp_id" style="font-size:11px; font-family:monospace; color:var(--text3)">ID</div>
+              </div>
+              <div id="vp_layer"></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Assigned Developers</div>
+              <div class="tag-list" id="vp_devs"></div>
+              <div class="inp-group">
+                <input type="text" class="inp" id="dev_inp" placeholder="Developer name...">
+                <button class="btn" onclick="addDev()">Add</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Functional Scope & Modules</div>
+              <div id="vp_items"></div>
+              <div class="inp-group">
+                <input type="text" class="inp" id="fi_inp" placeholder="Add scope module...">
+                <button class="btn" onclick="addItem('feature')">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <div class="system-tabs" id="system-tabs-container"></div>
-
-    <div class="kpi-board">
-        <div class="kpi-card">
-            <span class="kpi-value" id="kpi-total">0</span>
-            <span class="kpi-label">Идэвхтэй алхам</span>
+    <div class="conn-view" id="v_conn_root" style="display:none">
+      <div class="conn-container">
+        <div class="p-header">
+          <div class="p-title">System Interconnections</div>
+          <div class="p-desc">Map dependencies, data integrations, flows, and API relations between core, support, and channel platforms.</div>
         </div>
-        <div class="kpi-card">
-            <span class="kpi-value err-text" id="kpi-errors">0</span>
-            <span class="kpi-label">Гэмтэлтэй (Critical)</span>
+        
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Create New System Connection</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 80px; gap:12px; align-items:end">
+            <div>
+              <div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px">Source Project</div>
+              <select class="sel-box" id="nc_fp" onchange="ncSet('fp',this.value)"></select>
+            </div>
+            <div>
+              <div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px">Target Project</div>
+              <select class="sel-box" id="nc_tp" onchange="ncSet('tp',this.value)"></select>
+            </div>
+            <div>
+              <div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px">Relation Type / Protocol</div>
+              <input type="text" class="inp" style="width:100%" placeholder="e.g. REST API, gRPC, Sync" id="nc_st" oninput="ncSetSt(this.value)">
+            </div>
+            <button class="btn" style="width:100%; height:30px" onclick="addConn()">Link</button>
+          </div>
         </div>
-        <div class="kpi-card">
-            <span class="kpi-value succ-text" id="kpi-health">100%</span>
-            <span class="kpi-label">Системийн эрүүл мэнд</span>
+
+        <div class="card">
+          <div class="card-title">Active Data Map</div>
+          <table class="conn-table">
+            <thead>
+              <tr>
+                <th>Source Platform</th>
+                <th></th>
+                <th>Target Platform</th>
+                <th>Integration Type</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="conn_tbody"></tbody>
+          </table>
         </div>
-        <button class="btn btn-outline btn-sm" id="edit-current-sys-btn" style="margin-left: auto; font-size:12px;" onclick="editCurrentSystem()">⚙️ Энэ хуудасны тохиргоо</button>
+      </div>
     </div>
-</div>
 
-<div id="canvas">
-    <div id="viewport">
-        <svg id="svg-canvas"></svg>
-    </div>
-</div>
-
-<div id="side-panel" class="side-panel">
-    <div class="panel-header">
-        <h3 id="panel-title">⚙️ Удирдлага</h3>
-        <button class="btn-close-icon" onclick="closePanel()">×</button>
-    </div>
-    <div id="panel-content" class="panel-body"></div>
+  </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
-        authDomain: "omni-products.firebaseapp.com",
-        databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
-        projectId: "omni-products",
-        storageBucket: "omni-products.firebasestorage.app",
-        messagingSenderId: "879805024712",
-        appId: "1:879805024712:web:9b694019cf8388953998fd",
-        measurementId: "G-KQND2ECQ33"
+  const firebaseConfig = {
+    apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
+    authDomain: "omni-products.firebaseapp.com",
+    databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
+    projectId: "omni-products",
+    storageBucket: "omni-products.firebasestorage.app",
+    messagingSenderId: "879805024712",
+    appId: "1:879805024712:web:9b694019cf8388953998fd",
+    measurementId: "G-KQND2ECQ33"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+  const analytics = getAnalytics(app);
+
+  // Модуль доторх функцуудыг глобал болгох (Inline onclick ажиллахын тулд)
+  window.database = database;
+  window.ref = ref;
+  window.set = set;
+
+  window.$ = function(id) { return document.getElementById(id); };
+  window.uid = function() { return Math.random().toString(36).substr(2,4).toUpperCase(); };
+
+  // Анхны State өгөгдөл (Хэрэв Firebase хоосон байвал ашиглагдана)
+  window.defaultData = function() {
+    return {
+      projects: [
+        {id:'p1',name:'Core Banking System',layer:'core'},
+        {id:'p2',name:'Loan Origination Engine',layer:'core'},
+        {id:'p3',name:'Collateral Valuation Service',layer:'core'},
+        {id:'p4',name:'Payment & Ledger Gateway',layer:'core'},
+        {id:'p5',name:'Scoring & Decision Service',layer:'supp'},
+        {id:'p6',name:'User Auth & IAM',layer:'supp'},
+        {id:'p7',name:'Notification Center',layer:'supp'},
+        {id:'p8',name:'Document Storage Cluster',layer:'supp'},
+        {id:'p9',name:'Retail Mobile App',layer:'chan'},
+        {id:'p10',name:'Corporate Web Portal',layer:'chan'},
+        {id:'p11',name:'Collection Call Center App',layer:'chan'},
+        {id:'p12',name:'Agent / Branch Terminal',layer:'chan'},
+        {id:'p13',name:'Executive BI Dashboard',layer:'mana'},
+        {id:'p14',name:'Risk Analytics Warehouse',layer:'mana'},
+        {id:'p15',name:'Regulatory Reporting Tool',layer:'mana'},
+        {id:'p16',name:'Audit & Logging Vault',layer:'mana'}
+      ],
+      pmeta: {},
+      connections: [
+        {id:'c1',from:'p9',to:'p6',type:'OIDC / OAuth2'},
+        {id:'c2',from:'p9',to:'p2',type:'REST / JSON'},
+        {id:'c3',from:'p2',to:'p5',type:'gRPC'},
+        {id:'c4',from:'p2',to:'p1',type:'SOAP / XML'},
+        {id:'c5',from:'p11',to:'p1',type:'REST API'},
+        {id:'c6',from:'p1',to:'p13',type:'ETL Batch'},
+        {id:'c7',from:'p14',to:'p5',type:'Model Sync'}
+      ]
     };
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+  window.D = window.defaultData();
 
-    // Гаднаас дуудаж ашиглах Firebase функцуудыг Глобал болгох
-    window.fbDatabase = database;
-    window.fbRef = ref;
-    window.fbSet = set;
+  window.ui = {
+    mode: 'matrix', 
+    sel: 'p1',       
+    nc: { fp:'', tp:'', st:'' } 
+  };
 
-    // Firebase Realtime Баазаас датаг Live сонсож ачаалах
-    const telemetryRef = ref(database, 'sys_telemetry_nodes');
-    onValue(telemetryRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data && Array.isArray(data)) {
-            nodes = data;
-            // Хэрэв идэвхтэй хуудас байхгүй эсвэл устсан бол эхний хуудсыг сонгоно
-            if (!currentSystemId && nodes.length > 0) {
-                currentSystemId = nodes[0].id;
-            }
-            if (currentSystemId && !nodes.some(n => n.id === currentSystemId) && nodes.length > 0) {
-                currentSystemId = nodes[0].id;
-            }
-            renderTabs();
-            updateCategoryDropdown();
-            renderMainCanvasOnly();
-            updateDashboardKPIs();
-        } else if (!data) {
-            // Хэрэв Firebase бүрэн хоосон бол Анхны демо өгөгдлийг үүсгэнэ
-            const initialDemo = generateDefaultDemoData();
-            nodes = initialDemo;
-            currentSystemId = nodes[0].id;
-            set(telemetryRef, nodes);
-        }
+  /* ── БҮХ ЛОГИК ФУНКЦУУД (ТАНЫ АНХНЫ КОДНООС ХАСАЛГҮЙ ГЛОБАЛ БОЛГОСОН) ── */
+  window.save = function() {
+    try {
+      set(ref(database, 'nbfi_product_os'), D);
+    } catch(e) {
+      console.error('Firebase Save error:', e);
+    }
+  };
+
+  window.setMode = function(m) {
+    ui.mode = m;
+    $('m_mat').classList.toggle('active', m==='matrix');
+    $('m_con').classList.toggle('active', m==='conn');
+    $('sb_matrix').style.display = m==='matrix'?'flex':'none';
+    $('v_matrix_root').style.display = m==='matrix'?'block':'none';
+    $('v_conn_root').style.display = m==='conn'?'flex':'none';
+    renderMain();
+  };
+
+  window.selectProject = function(id) {
+    ui.sel = id;
+    $('project_panel').style.display = 'block';
+    render();
+  };
+
+  window.getMeta = function(pid) {
+    return (D.pmeta && D.pmeta[pid]) ? D.pmeta[pid] : { devs:[], items:[] };
+  };
+
+  window.addDev = function() {
+    const inp = $('dev_inp');
+    const name = (inp?inp.value:'').trim();
+    if(!name) return;
+    if(!D.pmeta) D.pmeta = {};
+    const m = getMeta(ui.sel);
+    if(!(m.devs || []).includes(name)){
+      D.pmeta[ui.sel] = { ...m, devs: [...(m.devs || []), name] };
+      save();
+      render();
+    }
+    if(inp) inp.value = '';
+  };
+
+  window.removeDev = function(i) {
+    if(!D.pmeta) return;
+    const m = getMeta(ui.sel);
+    const d = [...(m.devs || [])];
+    d.splice(i,1);
+    D.pmeta[ui.sel] = { ...m, devs: d };
+    save();
+    render();
+  };
+
+  window.addItem = function(kind) {
+    const inp = $(kind==='feature'?'fi_inp':'si_inp');
+    const name = (inp?inp.value:'').trim();
+    if(!name) return;
+    if(!D.pmeta) D.pmeta = {};
+    const m = getMeta(ui.sel);
+    D.pmeta[ui.sel] = { ...m, items: [...(m.items || []), {id:'i'+uid(),name,kind}] };
+    if(inp) inp.value = '';
+    save();
+    render();
+  };
+
+  window.removeItem = function(iid) {
+    if(!D.pmeta) return;
+    const m = getMeta(ui.sel);
+    D.pmeta[ui.sel] = { ...m, items: (m.items || []).filter(i=>i.id!==iid) };
+    save();
+    render();
+  };
+
+  window.ncSet = function(key,val) {
+    ui.nc[key] = val;
+    if(key==='fp') ui.nc.fi = '';
+    if(key==='tp') ui.nc.ti = '';
+    renderMain();
+  };
+
+  window.ncSetSt = function(val) {
+    ui.nc.st = val;
+    renderMain();
+  };
+
+  window.addConn = function() {
+    if(!ui.nc.fp || !ui.nc.tp){
+      alert('Select both projects.');
+      return;
+    }
+    const rel = ($('nc_st') ? $('nc_st').value : '').trim() || 'Sync';
+    if(!D.connections) D.connections = [];
+    D.connections.push({
+      id: 'c'+uid(),
+      from: ui.nc.fp,
+      to: ui.nc.tp,
+      type: rel
     });
-</script>
+    ui.nc.st = '';
+    const stInp = $('nc_st'); if(stInp) stInp.value = '';
+    save();
+    renderMain();
+  };
 
-<script>
-    const canvas = document.getElementById('canvas');
-    const viewport = document.getElementById('viewport');
-    const svgCanvas = document.getElementById('svg-canvas');
-    const panel = document.getElementById('side-panel');
-    const content = document.getElementById('panel-content');
-    const categoryFilter = document.getElementById('category-filter');
-    const tabsContainer = document.getElementById('system-tabs-container');
+  window.removeConn = function(cid) {
+    if(!D.connections) return;
+    D.connections = D.connections.filter(c=>c.id!==cid);
+    save();
+    renderMain();
+  };
 
-    const STORAGE_KEY = 'sys_admin_telemetry_v24';
-    let undoHistory = [];
+  /* ── RENDER ENGINE (ДЭЛГЭЦ ЗУРАХ КОР ФУНКЦУҮД БҮРЭН ЭХЭЭРЭЭ) ── */
+  window.renderMain = function() {
+    const layers = { core:[], supp:[], chan:[], mana:[] };
+    (D.projects || []).forEach(p=>{ if(layers[p.layer]) layers[p.layer].push(p); });
     
-    let panX = 100;
-    let panY = 50;
-    let zoom = 1;
-    let isPanning = false;
-    let startPanX = 0;
-    let startPanY = 0;
-
-    let currentSystemId = null;
-    let selectedCategory = "";
-    let nodes = []; // Firebase-ээс live дүүрнэ
-
-    function getFormattedTimestamp() {
-        const d = new Date();
-        const pad = (n) => n.toString().padStart(2, '0');
-        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    }
-
-    function calculateDuration(startStr, endStr) {
-        if (!startStr || !endStr) return null;
-        const start = new Date(startStr.replace(' ', 'T'));
-        const end = new Date(endStr.replace(' ', 'T'));
-        if (isNaN(start) || Math.isNaN(end)) return null;
+    Object.keys(layers).forEach(lkey=>{
+      const sb = $('sb_'+lkey);
+      const mx = $('mx_'+lkey);
+      let sbHtml = '';
+      let mxHtml = '';
+      
+      layers[lkey].forEach(p=>{
+        const m = getMeta(p.id);
+        const iCount = (m.items||[]).length;
+        const act = ui.sel === p.id ? 'active' : '';
         
-        const diffMs = end - start;
-        if (diffMs < 0) return "0м";
-        
-        const diffMins = Math.floor(diffMs / 60000);
-        const hrs = Math.floor(diffMins / 60);
-        const mins = diffMins % 60;
-        
-        if (hrs > 0) return `${hrs}ц ${mins}м`;
-        return `${mins}м`;
-    }
-
-    function generateDefaultDemoData() {
-        const timeNow = getFormattedTimestamp();
-        return [
-            { id: 1, name: "Хугацаа хэтэрсэн төлөлт", x: 50, y: 150, dept: "Зээлийн газар", category: "Зээлийн алба", isOpen: true, children: [
-                { id: 101, text: "Үндсэн зээлийн төлөлт", status: "ok", duration: "120ms", time: "11:33", created_at: timeNow, detected_at: null, checked_at: timeNow, comment: "Хүсэлт амжилттай баталгаажсан", children: [], checklist: [] },
-                { id: 103, text: "Алданги тооцоолол хэсэг", status: "error", errorMsg: "Шалгах талбар дутуу", duration: "850ms", time: "09:15", created_at: "2026-05-27 21:30:00", detected_at: "2026-05-28 09:15:00", checked_at: null, checklist: [
-                    { id: 1, text: "Алдангийн хувь хэмжээ тулгалт", checked: true },
-                    { id: 2, text: "Бодогдсон үлдэгдэл шалгах", checked: false }
-                ], children: [] }
-            ]}
-        ];
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.node') || e.target.closest('.step-block') || e.target.closest('#side-panel') || e.target.closest('.top-nav')) return;
-        viewport.style.transition = 'none';
-        isPanning = true;
-        startPanX = e.clientX - panX;
-        startPanY = e.clientY - panY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-        if (!isPanning) return;
-        panX = e.clientX - startPanX;
-        panY = e.clientY - startPanY;
-        applyTransform();
-    });
-
-    window.addEventListener('mouseup', () => { isPanning = false; });
-
-    canvas.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        viewport.style.transition = 'none';
-        const zoomIntensity = 0.05;
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-        const zoomFactor = e.deltaY < 0 ? (1 + zoomIntensity) : (1 - zoomIntensity);
-        
-        if (zoom * zoomFactor < 0.2 || zoom * zoomFactor > 1.8) return;
-
-        panX = mouseX - (mouseX - panX) * zoomFactor;
-        panY = mouseY - (mouseY - panY) * zoomFactor;
-        zoom *= zoomFactor;
-        
-        applyTransform();
-    }, { passive: false });
-
-    function applyTransform() {
-        viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
-        canvas.style.backgroundPosition = `${panX}px ${panY}px`;
-    }
-
-    function centerCanvas() {
-        viewport.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        const node = nodes.find(n => n.id === currentSystemId);
-        if (node) {
-            zoom = 1;
-            panX = 120 - node.x;
-            panY = 120 - node.y;
-        } else {
-            panX = 100;
-            panY = 50;
-            zoom = 1;
-        }
-        applyTransform();
-    }
-
-    function viewSystemLogs() {
-        const node = nodes.find(n => n.id === currentSystemId);
-        if (!node) return;
-
-        panel.classList.add('open');
-        document.getElementById('panel-title').innerHTML = `📋 Системийн Лог & Тайлан: ${node.name}`;
-        
-        const allSteps = flattenSteps(node.children || []);
-        
-        if (allSteps.length === 0) {
-            content.innerHTML = `<div style="text-align:center; color:var(--primary-soft); padding: 40px 0;">Бүртгэгдсэн алхам, урсгал одоогоор байхгүй байна.</div>`;
-            return;
-        }
-
-        let logsHTML = `<div class="section-box" style="margin-bottom:12px; background: rgba(59, 130, 246, 0.05);">
-            <div style="font-size:12px; color:var(--primary-soft);">Нийт <b>${allSteps.length}</b> алхмын хугацааны мөчлөгийг доор нэгтгэв.</div>
+        sbHtml += `<div class="sb-item ${act}" onclick="selectProject('${p.id}')">
+          <span>${p.name}</span>
+          ${iCount?`<span class="sb-count">${iCount}</span>`:''}
         </div>`;
-
-        allSteps.forEach(step => {
-            const isDirectError = isStepDirectError(step);
-            const statusText = isDirectError ? "CRITICAL (Засагдаагүй)" : "OK / ЧЕКЛЭГДСЭН";
-            const statusColor = isDirectError ? "var(--error)" : "var(--success)";
-            const statusBg = isDirectError ? "var(--error-bg)" : "var(--success-bg)";
-            
-            const resolveTimeText = calculateDuration(step.detected_at, step.checked_at);
-
-            logsHTML += `
-                <div class="log-item" style="border-left: 4px solid ${statusColor};">
-                    <div class="log-item-header">
-                        <span style="color: ${statusColor}; background: ${statusBg}; padding: 2px 6px; border-radius:4px; font-size:10px; font-weight:700;">${statusText}</span>
-                        <span style="color: var(--primary-soft);">⏱️ Сүүлийн цикл: ${step.duration || '0ms'}</span>
-                    </div>
-                    <div class="log-text">${step.text}</div>
-                    
-                    <div class="log-time-row">
-                        <div class="log-time-lbl">➕ Бүртгэгдсэн цаг: <b>${step.created_at || 'Тодорхойгүй'}</b></div>
-                        <div class="log-time-lbl">⚠️ Алдаа илрүүлсэн цаг: <b>${step.detected_at || 'Алдаа гараагүй'}</b></div>
-                        <div class="log-time-lbl">✅ Чеклэж хаасан цаг: <b>${step.checked_at || (isDirectError ? 'Шийдвэрлэгдээгүй байна' : 'Хэвийн хаагдсан')}</b></div>
-                        ${resolveTimeText ? `<div class="log-time-lbl" style="color: #67e8f9; font-weight:600; margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;">⚡ Засалтын нийт хурд: <span>${resolveTimeText}</span></div>` : ''}
-                    </div>
-
-                    ${step.status === 'error' && step.errorMsg ? `<div style="color:#fca5a5; font-size:11px; margin-top:6px; font-weight:500;">❌ Алдааны тайлбар: ${step.errorMsg}</div>` : ''}
-                    ${step.comment && step.comment.trim() !== '' ? `<div class="log-comment">💬 Таны оруулсан тайлбар: <br>${step.comment}</div>` : ''}
-                </div>
-            `;
-        });
-
-        content.innerHTML = `<div style="display:flex; flex-direction:column; gap:2px;">${logsHTML}</div>`;
-    }
-
-    function pushToUndoHistory() {
-        undoHistory.push(JSON.stringify(nodes));
-        if (undoHistory.length > 20) undoHistory.shift(); 
-        updateUndoButtonVisibility();
-    }
-
-    function triggerUndo() {
-        if (undoHistory.length === 0) return;
-        nodes = JSON.parse(undoHistory.pop());
-        closePanel();
-        save();
-        updateUndoButtonVisibility();
-    }
-
-    function updateUndoButtonVisibility() {
-        document.getElementById('undo-btn').style.display = undoHistory.length > 0 ? 'inline-flex' : 'none';
-    }
-
-    window.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); triggerUndo(); }
+        
+        mxHtml += `<div class="m-card ${act}" onclick="selectProject('${p.id}')">
+          <span>${p.name}</span>
+          ${iCount?`<span class="mc-count">${iCount} items</span>`:''}
+        </div>`;
+      });
+      
+      if(sb) sb.innerHTML = sbHtml;
+      if(mx) mx.innerHTML = mxHtml;
     });
 
-    // ХУУЧИН LOCALSTORAGE-ООС ЭХЛЭХЭД УНШИХ (БААЗ ХООСОН ҮЕД АШИГЛАХАД ЗОРИУЛЖ БҮТЭН БЭЛДЭВ)
-    let rawSavedData = localStorage.getItem(STORAGE_KEY);
-    if (rawSavedData && rawSavedData !== '[]' && nodes.length === 0) {
-        try { nodes = JSON.parse(rawSavedData); } catch(e){}
+    const fpSel = $('nc_fp'), tpSel = $('nc_tp');
+    if(fpSel && tpSel) {
+      let fpOpt = '<option value="">-- Source --</option>';
+      let tpOpt = '<option value="">-- Target --</option>';
+      (D.projects || []).forEach(p=>{
+        fpOpt += `<option value="${p.id}" ${ui.nc.fp===p.id?'selected':''}>${p.name}</option>`;
+        tpOpt += `<option value="${p.id}" ${ui.nc.tp===p.id?'selected':''}>${p.name}</option>`;
+      });
+      fpSel.innerHTML = fpOpt;
+      tpSel.innerHTML = tpOpt;
     }
 
-    let expandedSteps = { 103: true }; 
-    let selectedStepGlobal = null; 
-    let selectedNodeGlobal = null;
-
-    function exportData() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(nodes, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", `moni_pages_backup_${new Date().toISOString().slice(0,10)}.json`);
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+    const tbody = $('conn_tbody');
+    if(tbody) {
+      let tHtml = '';
+      (D.connections || []).forEach(c=>{
+        const fProj = (D.projects||[]).find(p=>p.id===c.from) || {name:c.from, layer:'core'};
+        const tProj = (D.projects||[]).find(p=>p.id===c.to) || {name:c.to, layer:'core'};
+        tHtml += `<tr>
+          <td><div class="p-pill"><span class="p-dot ${fProj.layer}"></span>${fProj.name}</div></td>
+          <td class="c-rel">➔</td>
+          <td><div class="p-pill"><span class="p-dot ${tProj.layer}"></span>${tProj.name}</div></td>
+          <td><span style="font-family:monospace; font-weight:600">${c.type}</span></td>
+          <td><span class="li-del" style="opacity:1; cursor:pointer" onclick="removeConn('${c.id}')">✕</span></td>
+        </tr>`;
+      });
+      tbody.innerHTML = tHtml || `<tr><td colspan="5" style="text-align:center; color:var(--text3); padding:20px">No system connections mapped yet.</td></tr>`;
     }
+  };
 
-    function updateFieldSilently(key, value) {
-        let itemToUpdate = selectedStepGlobal || selectedNodeGlobal;
-        if (!itemToUpdate) return;
-        
-        itemToUpdate[key] = value;
-
-        if (selectedStepGlobal && key === 'comment' && value.trim() !== '') {
-            if (!selectedStepGlobal.detected_at) {
-                selectedStepGlobal.detected_at = getFormattedTimestamp();
-            }
-        }
-
-        save(); // Local + Firebase рүү зэрэг хадгална
-    }
-
-    function importData(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const imported = JSON.parse(e.target.result);
-                if (Array.isArray(imported)) { 
-                    pushToUndoHistory(); 
-                    nodes = imported; 
-                    if(nodes.length > 0) currentSystemId = nodes[0].id;
-                    save(); 
-                    alert("✅ Дата амжилттай сэргээгдлээ!"); 
-                } else { alert("❌ Буруу файлын бүтэц!"); }
-            } catch (err) { alert("❌ Файлыг уншиж чадсангүй!"); }
-        };
-        reader.readAsText(file);
-        event.target.value = '';
-    }
-
-    // ХАДГАЛАХ СИСТЕМ: Firebase Realtime Database руу Live түлхэнэ
-    function save() { 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes)); 
-        updateDashboardKPIs(); 
-        
-        if (window.fbSet && window.fbDatabase && window.fbRef) {
-            window.fbSet(window.fbRef(window.fbDatabase, 'sys_telemetry_nodes'), nodes)
-                .catch(err => console.error("Firebase live save error:", err));
-        }
-    }
-
-    function flattenSteps(items) {
-        let all = []; if (!items) return all;
-        items.forEach(i => { all.push(i); if(i.children) all = all.concat(flattenSteps(i.children)); });
-        return all;
-    }
-
-    function isStepDirectError(step) {
-        if (!step) return false;
-        if (step.status === 'error') return true;
-        if (step.checklist && step.checklist.length > 0) {
-            return step.checklist.some(c => !c.checked);
-        }
-        return false;
-    }
-
-    function checkHasErrorRecursive(step) {
-        if (!step) return false;
-        if (isStepDirectError(step)) return true;
-        if (step.children && step.children.length > 0) {
-            return step.children.some(child => checkHasErrorRecursive(child));
-        }
-        return false;
-    }
-
-    function updateCategoryDropdown() {
-        const categories = new Set();
-        nodes.forEach(n => { if(n.category) categories.add(n.category); });
-        
-        const prevValue = categoryFilter.value;
-        categoryFilter.innerHTML = '<option value="">📁 Бүх ангилал...</option>';
-        categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat; opt.innerText = `📂 ${cat}`;
-            categoryFilter.appendChild(opt);
-        });
-        categoryFilter.value = prevValue;
-    }
-
-    function onCategoryFilterChange(val) {
-        selectedCategory = val;
-        renderTabs();
-        const filtered = nodes.filter(n => !selectedCategory || n.category === selectedCategory);
-        if(filtered.length > 0 && !filtered.some(n => n.id === currentSystemId)) {
-            switchPage(filtered[0].id);
-        } else if(filtered.length === 0) {
-            currentSystemId = null;
-            renderMainCanvasOnly();
-        }
-    }
-
-    function renderTabs() {
-        tabsContainer.innerHTML = '';
-        const filteredNodes = nodes.filter(n => !selectedCategory || n.category === selectedCategory);
-        
-        filteredNodes.forEach(node => {
-            const btn = document.createElement('button');
-            const steps = flattenSteps(node.children || []);
-            const hasErr = steps.some(s => checkHasErrorRecursive(s));
-            
-            btn.className = `sys-tab ${currentSystemId === node.id ? 'active-tab' : ''} ${hasErr ? 'has-error' : ''}`;
-            btn.innerHTML = `💻 ${node.name} ${hasErr ? '⚠️' : ''}`;
-            btn.onclick = () => switchPage(node.id);
-            tabsContainer.appendChild(btn);
-        });
-    }
-
-    function switchPage(id) {
-        currentSystemId = id;
-        selectedStepGlobal = null;
-        selectedNodeGlobal = nodes.find(n => n.id === id);
-        closePanel();
-        renderTabs();
-        renderMainCanvasOnly();
-        updateDashboardKPIs();
-    }
-
-    function updateDashboardKPIs() {
-        const currentNode = nodes.find(n => n.id === currentSystemId);
-        if(!currentNode) {
-            document.getElementById('kpi-total').innerText = 0;
-            document.getElementById('kpi-errors').innerText = 0;
-            document.getElementById('kpi-health').innerText = "100%";
-            return;
-        }
-        let totalSteps = 0; let errors = 0;
-        const steps = flattenSteps(currentNode.children || []);
-        totalSteps = steps.length;
-        steps.forEach(s => { if(isStepDirectError(s)) errors++; });
-
-        document.getElementById('kpi-total').innerText = totalSteps;
-        document.getElementById('kpi-errors').innerText = errors;
-        let health = totalSteps === 0 ? 100 : Math.round(((totalSteps - errors) / totalSteps) * 100);
-        document.getElementById('kpi-health').innerText = `${health}%`;
-        document.getElementById('kpi-health').className = `kpi-value ${health < 90 ? 'err-text' : 'succ-text'}`;
-    }
-
-    function drawLine(x1, y1, x2, y2, isErrorPath) {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        const dx = Math.abs(x2 - x1) * 0.4;
-        const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-        path.setAttribute("d", d);
-        path.setAttribute("stroke", isErrorPath ? "var(--error)" : "var(--line)");
-        path.setAttribute("stroke-width", isErrorPath ? "2.5" : "1.8");
-        path.setAttribute("fill", "none");
-        
-        if(isErrorPath) {
-            path.setAttribute("stroke-dasharray", "6,4");
-            const animate = document.createElementNS("http://www.w3.org/2000/svg", "animate");
-            animate.setAttribute("attributeName", "stroke-dashoffset");
-            animate.setAttribute("values", "20;0");
-            animate.setAttribute("dur", "0.6s");
-            animate.setAttribute("repeatCount", "indefinite");
-            path.appendChild(animate);
-        }
-        svgCanvas.appendChild(path);
-    }
-
-    const BLOCK_H = 92; const GAP_Y = 24;
-
-    function getSubtreeHeight(step) {
-        if (!expandedSteps[step.id] || !step.children || step.children.length === 0) return BLOCK_H;
-        let h = 0;
-        step.children.forEach((c, i) => { h += getSubtreeHeight(c); if (i > 0) h += GAP_Y; });
-        return Math.max(BLOCK_H, h);
-    }
-
-    let linesToDraw = [];
-
-    function renderMainCanvasOnly() {
-        viewport.querySelectorAll('.node, .step-block').forEach(n => n.remove());
-        svgCanvas.innerHTML = '';
-        linesToDraw = []; 
-
-        const node = nodes.find(n => n.id === currentSystemId);
-        if (!node) return;
-
-        const div = document.createElement('div');
-        const nodeSteps = flattenSteps(node.children || []);
-        const hasErrorInSystem = nodeSteps.some(s => checkHasErrorRecursive(s));
-
-        div.className = `node ${selectedNodeGlobal && selectedNodeGlobal.id === node.id && !selectedStepGlobal ? 'active' : ''} ${hasErrorInSystem ? 'has-err-trace' : ''}`;
-        div.style.left = node.x + 'px'; div.style.top = node.y + 'px';
-        div.innerHTML = `
-            <div class="node-title">${node.name} <span class="node-health" style="background:${hasErrorInSystem ? 'var(--error)' : 'var(--success)'};">${hasErrorInSystem ? 'АЛДААТАЙ' : 'ХЭВИЙН'}</span></div>
-            <div class="node-dept">🏢 ${node.dept || 'Салбаргүй'} ${node.category ? `• [${node.category}]` : ''}</div>
-        `;
-        div.onmousedown = (e) => { e.stopPropagation(); startDrag(e, node); };
-        div.onclick = (e) => { 
-            if(!div.dataset.dragged) { selectedStepGlobal = null; selectedNodeGlobal = node; editCurrentSystem(); renderMainCanvasOnly(); }
-            delete div.dataset.dragged;
-        };
-        viewport.appendChild(div);
-
-        if (node.children && node.children.length > 0) {
-            calculateLevelPositions(node.children, node.x + 320, node.y + 36, node.x + 260, node.y + 36);
-        }
-
-        linesToDraw.forEach(line => {
-            drawLine(line.x1, line.y1, line.x2, line.y2, line.isErrorPath);
-        });
-    }
-
-    function calculateLevelPositions(steps, currentX, parentCenterY, parentOutX, parentOutY) {
-        if (!steps || steps.length === 0) return;
-        let totalHeight = 0;
-        steps.forEach((step, i) => { totalHeight += getSubtreeHeight(step); if (i > 0) totalHeight += GAP_Y; });
-        let currentY = parentCenterY - (totalHeight / 2);
-
-        steps.forEach((step) => {
-            const sh = getSubtreeHeight(step);
-            const stepCenterY = currentY + (sh / 2);
-            const stepTop = stepCenterY - (BLOCK_H / 2);
-            const isExpanded = expandedSteps[step.id];
-            
-            const isDirectError = isStepDirectError(step); 
-            const isErrorPath = checkHasErrorRecursive(step); 
-
-            linesToDraw.push({
-                x1: parentOutX,
-                y1: parentOutY,
-                x2: currentX,
-                y2: stepTop + (BLOCK_H / 2),
-                isErrorPath: isErrorPath
-            });
-
-            const stepDiv = document.createElement('div');
-            let errorStyleClass = isDirectError ? 'err-direct' : (isErrorPath ? 'err-propagated' : '');
-
-            stepDiv.className = `step-block ${errorStyleClass} ${selectedStepGlobal && selectedStepGlobal.id === step.id ? 'active-step' : ''}`;
-            stepDiv.style.left = currentX + 'px'; stepDiv.style.top = stepTop + 'px'; stepDiv.style.height = BLOCK_H + 'px';
-
-            const hasChildren = step.children && step.children.length > 0;
-            const chkList = step.checklist || [];
-            const totalChecks = chkList.length;
-            const completedChecks = chkList.filter(c => c.checked).length;
-            let checklistHTML = '';
-            if (totalChecks > 0) {
-                const isAllDone = totalChecks === completedChecks;
-                checklistHTML = `<span class="checklist-indicator ${isAllDone ? 'done' : 'has-unchecked'}">📋 Өгөгдөл: ${completedChecks}/${totalChecks}</span>`;
-            } else {
-                checklistHTML = `<span style="opacity:0.3;">📋 Үл үзэгдэх</span>`;
-            }
-
-            let customErrorMsg = step.errorMsg || '';
-            if (step.status === 'ok' && totalChecks > completedChecks) {
-                customErrorMsg = "Шалгах талбар дутуу";
-            }
-
-            let noteIndicatorHTML = '';
-            let noteTooltipHTML = '';
-            if (step.comment && step.comment.trim() !== '') {
-                noteIndicatorHTML = `<span class="note-indicator">📄</span>`;
-                noteTooltipHTML = `<div class="custom-note-tooltip">
-                    <b>Тэмдэглэл:</b><br>${step.comment.replace(/\n/g, '<br>')}
-                    ${step.detected_at ? `<br><small style="color:#94a3b8; font-size:10px;">⚠️ Илрүүлсэн: ${step.detected_at}</small>` : ''}
-                </div>`;
-            }
-
-            stepDiv.innerHTML = `
-                <div class="status-header">
-                    <span class="status-pill ${isDirectError ? 'status-err' : (isErrorPath ? 'status-err' : 'status-ok')}">
-                        ${isDirectError ? 'CRITICAL' : (isErrorPath ? 'TRACE ERR' : 'OK')}
-                    </span>
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        ${noteIndicatorHTML}
-                        ${hasChildren ? `<span style="font-size:10px; color:var(--primary-soft);">${isExpanded ? '▼' : '▶'}</span>` : ''}
-                    </div>
-                </div>
-                <div style="font-weight:600; font-size:13px; color:white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${step.text}</div>
-                ${isDirectError && customErrorMsg ? `<div style="font-size:11px; color:#fca5a5; margin-top:2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">↳ ${customErrorMsg}</div>` : ''}
-                
-                <div class="step-meta-row">
-                    ${checklistHTML}
-                    <span>⏱️ ${step.duration || '0ms'}</span>
-                </div>
-                ${noteTooltipHTML}
-            `;
-
-            stepDiv.onclick = (e) => {
-                e.stopPropagation(); selectedStepGlobal = step; selectedNodeGlobal = null;
-                if(e.target.closest('.status-header span') || e.target.closest('.note-indicator') || e.target.closest('.status-header div')) {
-                    if(expandedSteps[step.id]) delete expandedSteps[step.id]; else expandedSteps[step.id] = true;
-                }
-                openStepEditor(step); renderMainCanvasOnly();
-            };
-            viewport.appendChild(stepDiv);
-
-            if (isExpanded && hasChildren) {
-                calculateLevelPositions(step.children, currentX + 310, stepTop + (BLOCK_H / 2), currentX + 250, stepTop + (BLOCK_H / 2));
-            }
-            currentY += sh + GAP_Y;
-        });
-    }
-
-    function editCurrentSystem() {
-        const node = nodes.find(n => n.id === currentSystemId);
-        if(node) { selectedNodeGlobal = node; selectedStepGlobal = null; openProgramEditor(node); }
-    }
-
-    function openStepEditor(step) {
-        panel.classList.add('open');
-        document.getElementById('panel-title').innerHTML = `📝 Алхам Тохиргоо`;
-        if(!step.checklist) step.checklist = [];
-        if(!step.comment) step.comment = "";
-        
-        const totalChecks = step.checklist.length;
-        const completedChecks = step.checklist.filter(c=>c.checked).length;
-        const hasUncheckedError = totalChecks > completedChecks;
-
-        let html = `
-            <div class="section-box" style="border-color: ${(step.status==='error' || hasUncheckedError) ? 'var(--error)' : 'var(--border)'};">
-                <div class="form-group">
-                    <label>Үйлдлийн нэр</label>
-                    <input type="text" class="edit-input" value="${step.text}" oninput="updateFieldSilently('text', this.value)">
-                </div>
-                
-                <div style="display:flex; gap:10px;" class="form-group">
-                    <div style="flex:1;">
-                        <label>Цикл хугацаа</label>
-                        <input type="text" class="edit-input" value="${step.duration || '30ms'}" placeholder="Жишээ: 120ms" oninput="updateFieldSilently('duration', this.value)">
-                    </div>
-                    <div style="flex:1;">
-                        <label>Цагийн тамга</label>
-                        <input type="text" class="edit-input" value="${step.time || '11:33'}" placeholder="Жишээ: 11:33" oninput="updateFieldSilently('time', this.value)">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="color: #60a5fa;">Шалгах тайлбар оруулах (Алдааны лог)</label>
-                    <textarea class="edit-textarea" placeholder="Өглөө илрүүлсэн алдааны тайлбараа энд бичнэ үү..." oninput="updateFieldSilently('comment', this.value)">${step.comment}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Төлөв удирдлага</label>
-                    <div class="toggle-group">
-                        <button class="toggle-btn ${step.status === 'ok' ? 'active-ok' : ''}" onclick="changeStepStatusDirect('ok')">ХЭВИЙН</button>
-                        <button class="toggle-btn ${step.status === 'error' ? 'active-err' : ''}" onclick="changeStepStatusDirect('error')">АЛДААТАЙ</button>
-                    </div>
-                </div>
-                ${step.status === 'error' ? `
-                <div class="form-group">
-                    <label style="color:var(--error);">Алдааны систем мессеж</label>
-                    <input type="text" class="edit-input" style="border-color:var(--error);" value="${step.errorMsg || ''}" placeholder="Жишээ: Шалгах талбар дутуу" oninput="updateFieldSilently('errorMsg', this.value)">
-                </div>` : ''}
-            </div>
-
-            <div class="section-box" style="background: rgba(0,0,0,0.2); font-size:11px;">
-                <label style="color:var(--primary-soft); font-weight:700; margin-bottom:6px; display:block;">⏱️ ХУГАЦААНЫ БҮРТГЭЛҮҮД</label>
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <div>• Анх нэмэгдсэн: <span style="font-family:monospace; color:#fff">${step.created_at || 'Бүртгэгдээгүй'}</span></div>
-                    <div>• Алдаа илрүүлсэн: <span style="font-family:monospace; color:var(--error)">${step.detected_at || 'Алдаа илрүүлээгүй'}</span></div>
-                    <div>• Чеклэж зассан: <span style="font-family:monospace; color:var(--success)">${step.checked_at || 'Шийдвэрлэгдээгүй'}</span></div>
-                </div>
-            </div>
-
-            <div class="section-box" style="border-top: 2px solid ${hasUncheckedError ? 'var(--error)' : 'var(--success)'};">
-                <label style="font-size:12px; font-weight:700; color:${hasUncheckedError ? 'var(--error)' : 'var(--success)'}; display:flex; justify-content:space-between;">
-                    <span>📋 ӨГӨГДӨЛ ИЛГЭЭЛТИЙН ЧЕК ЛИСТ</span>
-                    <span>${completedChecks}/${totalChecks}</span>
-                </label>
-                <div style="margin-top:12px;" id="checklist-container">
-                    ${step.checklist.map((item, index) => `
-                        <div class="check-item-row" style="${!item.checked ? 'border-color: rgba(239, 68, 68, 0.4); background: #241919;' : ''}">
-                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCheckItem(${index}, this.checked)">
-                            <input type="text" class="chk-text" value="${item.text}" oninput="updateCheckItemText(${index}, this.value)">
-                            <button class="btn-danger-text" onclick="deleteCheckItem(${index})">✕</button>
-                        </div>
-                    `).join('')}
-                </div>
-                <button class="btn btn-outline btn-sm" style="width:100%;" onclick="addCustomCheckItem()">+ Шалгах талбар нэмэх</button>
-            </div>
-
-            <div class="section-box">
-                <label style="font-size:11px; font-weight:700; color:var(--primary-soft); text-transform:uppercase;">Дэд алхмууд (${(step.children || []).length})</label>
-                <div class="task-list-scroll">
-                    ${(step.children || []).map((child, i) => `
-                        <div class="task-row">
-                            <input type="text" class="edit-input" value="${child.text}" oninput="updateChildData(${child.id}, this.value)">
-                            <button class="btn-danger-text" onclick="deleteChildItemConfirm(${child.id}, '${child.text.replace(/'/g, "\\'")}')">Устгах</button>
-                        </div>
-                    `).join('')}
-                </div>
-                <button class="btn btn-outline btn-sm" style="width:100%; margin-top:10px;" onclick="addChildToStep()">+ Дэд алхам салаалах</button>
-            </div>
-            <button class="btn btn-danger-text" style="width:100%; margin-top:10px; border: 1px solid var(--error);" onclick="deleteStepConfirm(${step.id}, '${step.text.replace(/'/g, "\\'")}')">Алхмыг бүрмөсөн устгах</button>
-        `;
-        content.innerHTML = html;
-    }
-
-    function changeStepStatusDirect(newStatus) {
-        if (!selectedStepGlobal) return;
-        pushToUndoHistory();
-        
-        selectedStepGlobal.status = newStatus;
-        const now = getFormattedTimestamp();
-
-        if (newStatus === 'error') {
-            if (!selectedStepGlobal.detected_at) {
-                selectedStepGlobal.detected_at = now; 
-            }
-            selectedStepGlobal.checked_at = null; 
-        } else {
-            const allChecked = !selectedStepGlobal.checklist || selectedStepGlobal.checklist.every(c => c.checked);
-            if (allChecked) {
-                selectedStepGlobal.checked_at = now;
-            }
-        }
-
-        save();
-        openStepEditor(selectedStepGlobal);
-    }
-
-    function toggleCheckItem(index, isChecked) { 
-        if(selectedStepGlobal) { 
-            pushToUndoHistory(); 
-            selectedStepGlobal.checklist[index].checked = isChecked; 
-            
-            const now = getFormattedTimestamp();
-            const totalChecks = selectedStepGlobal.checklist.length;
-            const completedChecks = selectedStepGlobal.checklist.filter(c => c.checked).length;
-            
-            if (completedChecks < totalChecks) {
-                if (!selectedStepGlobal.detected_at) {
-                    selectedStepGlobal.detected_at = now;
-                }
-                selectedStepGlobal.checked_at = null; 
-            } else if (completedChecks === totalChecks && selectedStepGlobal.status === 'ok') {
-                selectedStepGlobal.checked_at = now;
-            }
-
-            save(); 
-            openStepEditor(selectedStepGlobal); 
-        } 
+  window.render = function() {
+    renderMain();
+    const p = (D.projects||[]).find(x=>x.id===ui.sel);
+    if(!p) {
+      $('project_panel').style.display = 'none';
+      return;
     }
     
-    function updateCheckItemText(index, text) { 
-        if(selectedStepGlobal && selectedStepGlobal.checklist && selectedStepGlobal.checklist[index]) { 
-            selectedStepGlobal.checklist[index].text = text; 
-            // Хэт их хүсэлт Firebase рүү шидэхгүйн тулд зөвхөн Local-д хадгалж, засагдаж дуусахад бааз руу save() хийнэ
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
-        } 
-    }
+    $('vp_title').innerText = p.name;
+    $('vp_id').innerText = `SYSTEM IDENTIFIER: ${p.id.toUpperCase()}`;
     
-    function deleteCheckItem(index) { if(selectedStepGlobal) { pushToUndoHistory(); selectedStepGlobal.checklist.splice(index, 1); save(); openStepEditor(selectedStepGlobal); } }
+    const layerBadges = {
+      core: '<span class="badge blue">Core Layer</span>',
+      supp: '<span class="badge green">Supporting Layer</span>',
+      chan: '<span class="badge amber">Channel Layer</span>',
+      mana: '<span class="badge red">Management Layer</span>'
+    };
+    $('vp_layer').innerHTML = layerBadges[p.layer] || '';
     
-    function addCustomCheckItem() { 
-        if(selectedStepGlobal) { 
-            pushToUndoHistory(); 
-            const now = getFormattedTimestamp();
-            selectedStepGlobal.checklist.push({ id: Date.now(), text: "Шинэ шалгах талбар", checked: false }); 
-            
-            if (!selectedStepGlobal.detected_at) {
-                selectedStepGlobal.detected_at = now;
-            }
-            selectedStepGlobal.checked_at = null;
-
-            save(); 
-            openStepEditor(selectedStepGlobal); 
-        } 
-    }
-
-    function openProgramEditor(node) {
-        panel.classList.add('open'); 
-        document.getElementById('panel-title').innerHTML = `⚙️ Систем (Page) Тохиргоо`;
-        let html = `
-            <div class="section-box">
-                <div class="form-group"><label>Системийн нэр</label><input type="text" class="edit-input" value="${node.name}" oninput="updateFieldSilently('name', this.value)"></div>
-                <div class="form-group"><label>Ангилал / Бүлэг</label><input type="text" class="edit-input" value="${node.category || ''}" placeholder="Жишээ: Зээл, Захиргаа, Fintech" oninput="updateFieldSilently('category', this.value)"></div>
-                <div class="form-group"><label>Хариуцах хэлтэс</label><input type="text" class="edit-input" value="${node.dept || ''}" oninput="updateFieldSilently('dept', this.value)"></div>
-            </div>
-            <div class="section-box">
-                <label style="font-size:11px; font-weight:700; color:var(--primary-soft); text-transform:uppercase;">Үндсэн урсгалууд (${(node.children || []).length})</label>
-                <div class="task-list-scroll">
-                    ${(node.children || []).map((child, i) => `
-                        <div class="task-row">
-                            <input type="text" class="edit-input" value="${child.text}" oninput="updateChildData(${child.id}, this.value)">
-                            <button class="btn-danger-text" onclick="deleteChildItemConfirm(${child.id}, '${child.text.replace(/'/g, "\\'")}')">Устгах</button>
-                        </div>
-                    `).join('')}
-                </div>
-                <button class="btn btn-primary btn-sm" style="width:100%; margin-top:10px;" onclick="addFirstLevelStep()">+ Үндсэн урсгал үүсгэх</button>
-            </div>
-            <button class="btn btn-danger-text" style="width:100%; margin-top:10px; border: 1px solid var(--error);" onclick="deleteSystemNodeConfirm(${node.id}, '${node.name.replace(/'/g, "\\'")}')">Энэ хуудсыг бүрмөсөн устгах</button>
-        `;
-        content.innerHTML = html;
-    }
-
-    function addChildToStep() { 
-        if(selectedStepGlobal) { 
-            pushToUndoHistory(); 
-            const now = getFormattedTimestamp();
-            if(!selectedStepGlobal.children) selectedStepGlobal.children = []; 
-            selectedStepGlobal.children.push({ 
-                id: Date.now(), 
-                text: "Шинэ дэд алхам", 
-                status: "ok", 
-                duration: "20ms", 
-                time: "11:33", 
-                created_at: now, 
-                detected_at: null, 
-                checked_at: now, 
-                comment: "", 
-                checklist: [], 
-                children: [] 
-            }); 
-            expandedSteps[selectedStepGlobal.id] = true; 
-            save();
-            openStepEditor(selectedStepGlobal); 
-        } 
-    }
-
-    function addFirstLevelStep() { 
-        const node = nodes.find(n => n.id === currentSystemId); 
-        if(node) { 
-            pushToUndoHistory(); 
-            const now = getFormattedTimestamp();
-            if(!node.children) node.children = []; 
-            node.children.push({ 
-                id: Date.now(), 
-                text: "Шинэ урсгал", 
-                status: "ok", 
-                duration: "30ms", 
-                time: "11:33", 
-                created_at: now, 
-                detected_at: null, 
-                checked_at: now, 
-                comment: "", 
-                checklist: [], 
-                children: [] 
-            }); 
-            save(); 
-            openProgramEditor(node); 
-        } 
-    }
+    const m = getMeta(p.id);
     
-    function updateChildData(id, val) { 
-        const node = nodes.find(n => n.id === currentSystemId);
-        if(!node) return;
-        const allSteps = flattenSteps(node.children);
-        const target = allSteps.find(c => c.id === id);
-        if(target) { 
-            target.text = val; 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
-            renderMainCanvasOnly(); 
-        }
-    }
+    let dHtml = '';
+    (m.devs || []).forEach((d,idx)=>{
+      dHtml += `<div class="tag"><span>${d}</span><span class="tag-del" onclick="removeDev(${idx})">✕</span></div>`;
+    });
+    $('vp_devs').innerHTML = dHtml || '<div style="color:var(--text3); font-size:12px; italic">No developers assigned.</div>';
     
-    function deleteChildItemConfirm(id, name) {
-        const node = nodes.find(n => n.id === currentSystemId);
-        if(!node) return;
-        
-        let foundParentList = null;
-        if(node.children.some(c => c.id === id)) { foundParentList = node; } 
-        else {
-            const allSteps = flattenSteps(node.children);
-            const stepParent = allSteps.find(s => s.children && s.children.some(c => c.id === id));
-            if(stepParent) foundParentList = stepParent;
-        }
+    let iHtml = '';
+    (m.items || []).forEach(i=>{
+      iHtml += `<div class="list-item">
+        <div class="li-name"><span style="color:var(--text3)">▪</span> ${i.name}</div>
+        <div class="li-del" onclick="removeItem('${i.id}')">✕</div>
+      </div>`;
+    });
+    $('vp_items').innerHTML = iHtml || '<div style="color:var(--text3); font-size:12px; padding:8px 0; italic">No functional modules specified.</div>';
+  };
 
-        if(foundParentList) {
-            if(confirm(`"${name}" алхмыг устгах уу?`)) {
-                pushToUndoHistory();
-                foundParentList.children = foundParentList.children.filter(c => c.id !== id);
-                save();
-                if (selectedStepGlobal) openStepEditor(selectedStepGlobal);
-                else openProgramEditor(node);
-            }
-        }
+  /* ── FIREBASE REALTIME LISTEN (ШУУД УНШИХ) ── */
+  onValue(ref(database, 'nbfi_product_os'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      window.D = data;
+    } else {
+      window.D = defaultData();
+      window.save();
     }
+    render();
+  });
 
-    function deleteStepConfirm(id, name) {
-        if(confirm(`"${name}" алхмыг устгах уу?`)) {
-            pushToUndoHistory();
-            deleteStepFromTree(nodes, id);
-            closePanel();
-            save();
-        }
-    }
-
-    function deleteSystemNodeConfirm(id, name) {
-        if(confirm(`"${name}" системийг устгавал доторх бүх урсгал устахыг анхаарна уу!`)) {
-            pushToUndoHistory();
-            nodes = nodes.filter(n => n.id !== id);
-            currentSystemId = nodes.length > 0 ? nodes[0].id : null;
-            closePanel();
-            save();
-        }
-    }
-
-    function deleteStepFromTree(items, id) { for(let i=0; i<items.length; i++) { if(items[i].id === id) { items.splice(i, 1); return true; } if(items[i].children && deleteStepFromTree(items[i].children, id)) return true; } return false; }
-
-    function startDrag(e, node) {
-        if(e.target.closest('.step-block')) return;
-        const div = e.currentTarget; let startX = e.clientX, startY = e.clientY;
-        const onMove = (ev) => {
-            if (Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3) { 
-                viewport.style.transition = 'none'; 
-                div.dataset.dragged = "true"; 
-                node.x += ev.movementX / zoom; 
-                node.y += ev.movementY / zoom; 
-                renderMainCanvasOnly(); 
-            }
-        };
-        const onUp = () => {
-            window.removeEventListener('mousemove', onMove);
-            if (div.dataset.dragged === "true") {
-                save(); // Зөөж дуусахад координат хадгална
-            }
-        };
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp, { once: true });
-    }
-
-    function addNewNode() { 
-        pushToUndoHistory(); 
-        const newId = Date.now();
-        const n = { id: newId, name: "Шинэ Систем", x: 50, y: 150, dept: "Хэлтэс", category: selectedCategory || "Ерөнхий", isOpen: true, children: [] }; 
-        nodes.push(n); 
-        currentSystemId = newId;
-        selectedNodeGlobal = n; 
-        selectedStepGlobal = null; 
-        save();
-        openProgramEditor(n); 
-    }
-    
-    function closePanel() { panel.classList.remove('open'); selectedStepGlobal = null; selectedNodeGlobal = null; renderMainCanvasOnly(); }
-    function clearData() { if(confirm("Бүх хуудас, системүүд устах тул зөвшөөрөх үү?")) { localStorage.clear(); location.reload(); } }
-
-    // Хамгийн анхны рендерийг Firebase onValue өөрөө удирдана
 </script>
 </body>
 </html>
