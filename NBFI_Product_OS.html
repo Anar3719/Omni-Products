@@ -767,5 +767,29 @@ function delConn(id){delete D.conns[id];save();render();}
   render();
 })();
 </script>
+  </div> <script type="module">
+        // Firebase SDK-уудыг CDN-ээс татаж авах
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        // Таны Omni Products төслийн тохиргоо
+        const firebaseConfig = {
+            apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
+            authDomain: "omni-products.firebaseapp.com",
+            databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
+            projectId: "omni-products",
+            storageBucket: "omni-products.firebasestorage.app",
+            messagingSenderId: "879805024712",
+            appId: "1:879805024712:web:9b694019cf8388953998fd",
+            measurementId: "G-KQND2ECQ33"
+        };
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
+        console.log("Firebase Realtime Database амжилттай холбогдлоо!");
+    </script>
+</body>
+</html>
 </body>
 </html>
