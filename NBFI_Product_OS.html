@@ -5,236 +5,260 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NBFI · Product OS</title>
 <style>
-:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--green:#639922;--green-bg:#EAF3DE;--green-text:#3B6D11;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#A32D2D;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#854F0B;--r:8px;--rl:12px}\n@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.16)}}
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-body{background:var(--bg);color:var(--text);font-size:13px;line-height:1.4;overflow:hidden;height:100vh;display:flex;flex-direction:column}
-header{height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:between;padding:0 16px;background:var(--bg);flex-shrink:0;z-index:10}
-.logo{font-weight:600;font-size:14px;letter-spacing:-0.2px;display:flex;align-items:center;gap:6px}
-.logo span{color:var(--text3);font-weight:400}
-.nav-modes{display:flex;background:var(--bg2);padding:2px;border-radius:6px;border:1px solid var(--border)}
-.nav-btn{padding:4px 10px;border-radius:4px;border:none;background:none;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer}
-.nav-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
-.main-layout{display:flex;flex:1;overflow:hidden;position:relative}
-.sidebar{width:240px;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-.sb-sec{padding:12px 8px}
-.sb-title{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--text3);padding:0 8px 6px 8px;letter-spacing:0.5px}
-.sb-item{display:flex;align-items:center;justify-content:between;padding:6px 8px;border-radius:var(--r);color:var(--text2);text-decoration:none;cursor:pointer;margin-bottom:1px;font-weight:500}
-.sb-item:hover{background:var(--bg3);color:var(--text)}
-.sb-item.active{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.04);border:1px solid var(--border)}
-.sb-count{font-size:11px;color:var(--text3);background:var(--border);padding:1px 5px;border-radius:10px;font-weight:400}
-.content{flex:1;overflow-y:auto;background:var(--bg);position:relative;display:flex;flex-direction:column}
-.view-pane{padding:24px 32px;max-width:1000px;width:100%;margin:0 auto;display:none;flex:1}
-.view-pane.active{display:block}
-.p-header{margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:16px}
-.p-title{font-size:22px;font-weight:700;letter-spacing:-0.4px;margin-bottom:4px}
-.p-desc{color:var(--text2);font-size:13px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
-.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02)}
-.card-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:12px;display:flex;align-items:center;justify-content:between}
-.meta-row{display:flex;margin-bottom:8px;font-size:13px;align-items:center}
-.meta-label{width:120px;color:var(--text2);flex-shrink:0}
-.meta-val{color:var(--text);font-weight:500}
-.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
-.badge.green{background:var(--green-bg);color:var(--green-text)}
-.badge.blue{background:var(--blue-bg);color:var(--blue-text)}
-.badge.red{background:var(--red-bg);color:var(--red-text)}
-.badge.amber{background:var(--amber-bg);color:var(--amber-text)}
-.tag-list{display:flex;flex-wrap:wrap;gap:6px}
-.tag{background:var(--bg2);border:1px solid var(--border);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
-.tag-del{cursor:pointer;color:var(--text3);font-size:10px;margin-left:2px}
-.tag-del:hover{color:var(--red)}
-.tag-add{background:none;border:1px dashed var(--border2);cursor:pointer;font-weight:500}
-.tag-add:hover{background:var(--bg2);border-color:var(--text3)}
-.list-item{display:flex;align-items:center;justify-content:between;padding:8px 0;border-bottom:1px solid var(--border)}
-.list-item:last-child{border-bottom:none}
-.li-name{font-weight:500;display:flex;align-items:center;gap:6px}
-.li-del{color:var(--text3);cursor:pointer;opacity:0}
-.list-item:hover .li-del{opacity:1}
-.li-del:hover{color:var(--red)}
-.inp-group{display:flex;gap:6px;margin-top:12px}
-.inp{flex:1;background:var(--bg2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;color:var(--text);font-size:12px}
-.inp:focus{outline:none;border-color:var(--border2);background:var(--bg)}
-.btn{background:var(--text);color:var(--bg);border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}
-.btn:hover{opacity:0.9}
-.matrix-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.matrix-cell{border:1px solid var(--border);border-radius:var(--rl);background:var(--bg2);padding:12px;min-height:160px;display:flex;flex-direction:column}
-.matrix-cell.c-core{background:var(--blue-bg);border-color:rgba(55,138,221,0.2)}
-.matrix-cell.c-core .mc-title{color:var(--blue-text)}
-.matrix-cell.c-supp{background:var(--green-bg);border-color:rgba(99,153,34,0.2)}
-.matrix-cell.c-supp .mc-title{color:var(--green-text)}
-.matrix-cell.c-chan{background:var(--amber-bg);border-color:rgba(186,117,23,0.2)}
-.matrix-cell.c-chan .mc-title{color:var(--amber-text)}
-.matrix-cell.c-mana{background:var(--red-bg);border-color:rgba(226,75,74,0.2)}
-.matrix-cell.c-mana .mc-title{color:var(--red-text)}
-.mc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
-.mc-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
-.m-card{background:var(--bg);border:1px solid var(--border);padding:6px 8px;border-radius:6px;font-weight:500;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,0.02);cursor:pointer;display:flex;justify-content:between;align-items:center}
-.m-card:hover{border-color:var(--border2)}
-.m-card.active{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
-.mc-count{font-size:10px;color:var(--text3);font-weight:400}
-.matrix-view{display:flex;flex-direction:column;height:100%}
-.matrix-container{flex:1;overflow-y:auto;padding:24px 32px}
-.conn-view{display:flex;flex-direction:column;height:100%}
-.conn-container{flex:1;overflow-y:auto;padding:24px 32px;max-width:1000px;width:100%;margin:0 auto}
-.conn-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}
-.conn-table th{text-align:left;padding:8px;border-bottom:2px solid var(--border);color:var(--text3);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.5px}
-.conn-table td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
-.conn-table tr:hover td{background:var(--bg2)}
-.p-pill{display:inline-flex;align-items:center;background:var(--bg2);border:1px solid var(--border);padding:2px 8px;border-radius:12px;font-weight:500;font-size:11px;gap:4px}
-.p-dot{width:6px;height:6px;border-radius:50%}
-.p-dot.core{background:var(--blue)}
-.p-dot.supp{background:var(--green)}
-.p-dot.chan{background:var(--amber)}
-.p-dot.mana{background:var(--red)}
-.c-rel{font-weight:600;color:var(--text2);font-size:11px;text-transform:uppercase}
-.sel-box{padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);width:100%}
-.sel-box:focus{outline:none;border-color:var(--border2)}
+:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--green:#639922;--green-bg:#EAF3DE;--green-text:#3B6D11;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#A32D2D;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#854F0B;--r:8px;--rl:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--green-bg:#1a2e0a;--green-text:#97C459;--blue-bg:#0a1e35;--blue-text:#85B7EB;--red-bg:#2e0a0a;--red-text:#F09595;--amber-bg:#2e1e0a;--amber-text:#EF9F27}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.brand{font-size:14px;font-weight:600;color:var(--text)}.brand span{font-weight:400;color:var(--text3)}
+.spacer{flex:1}
+.tbtn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap}
+.tbtn:hover,.tbtn.on{background:var(--bg);color:var(--text)}
+.tbtn.prim{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.tbtn.prim:hover{opacity:.9}
+.team-bar{padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tlbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0}
+.mchip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);color:var(--text2);background:var(--bg)}
+.mchip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
+.mchip button:hover{color:var(--red)}
+.minp{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text);outline:none;width:120px}
+.layout{display:flex;flex:1;overflow:hidden}
+.sb{width:185px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.sb-head{padding:12px 13px 9px;border-bottom:1px solid var(--border)}
+.sb-org{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.09em}
+.sb-title{font-size:15px;font-weight:600;color:var(--text);margin-top:2px}
+.sb-scroll{flex:1;overflow-y:auto;padding:4px 0 6px}
+.sb-sec{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px 3px;display:flex;align-items:center;justify-content:space-between}
+.sb-add{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0}
+.sb-add:hover{color:var(--text)}
+.pitem{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;border-radius:6px;margin:1px 5px;position:relative}
+.pitem:hover{background:var(--bg)}.pitem.on{background:var(--bg);font-weight:600}
+.pname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--text2)}
+.pitem.on .pname{color:var(--text)}
+.pitem-act{display:none;gap:2px}
+.pitem:hover .pitem-act{display:flex}
+.piabtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 3px;border-radius:4px;line-height:1}
+.piabtn:hover{background:var(--bg3);color:var(--text)}.piabtn.del:hover{color:var(--red)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dl{background:var(--green)}.dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
+.pcnt{font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0 5px;min-width:18px;text-align:center;flex-shrink:0}
+.sb-foot{border-top:1px solid var(--border);padding:5px}
+.gbtn{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;color:var(--text2);cursor:pointer;border-radius:6px}
+.gbtn:hover,.gbtn.on{background:var(--bg);color:var(--text);font-weight:600}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.phdr{padding:13px 18px 0;border-bottom:1px solid var(--border);flex-shrink:0}
+.ptrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.pt{font-size:18px;font-weight:700;color:var(--text)}
+.plocal{font-size:13px;color:var(--text3);font-weight:400}
+.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600;cursor:pointer;position:relative}
+.bl{background:var(--green-bg);color:var(--green-text)}.bp{background:var(--blue-bg);color:var(--blue-text)}.bb{background:var(--red-bg);color:var(--red-text)}.bpl{background:var(--amber-bg);color:var(--amber-text)}
+.ptype{font-size:12px;color:var(--text3);margin-left:auto}
+.smenu{position:absolute;top:calc(100% + 4px);left:0;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:4px;z-index:100;min-width:130px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.sopt{display:flex;align-items:center;gap:7px;padding:6px 9px;font-size:12px;cursor:pointer;border-radius:5px;color:var(--text2)}
+.sopt:hover{background:var(--bg2)}
+.pmeta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px;padding:7px 10px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border)}
+.pmeta-g{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.pmeta-l{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.pmeta-v{font-size:12px;color:var(--text);font-weight:500}
+.pmeta-c{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
+.pmeta-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0}
+.tabs{display:flex}
+.tab{padding:8px 13px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;user-select:none}
+.tab:hover{color:var(--text)}.tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
+.mbody{flex:1;overflow-y:auto;padding:15px 18px}
+.tmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
+.clr{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:0}
+.clr:hover{color:var(--text2);text-decoration:underline}
+.prog{height:3px;background:var(--bg3);border-radius:999px;margin-bottom:11px;overflow:hidden}
+.pfill{height:100%;background:var(--green);border-radius:999px;transition:width .3s}
+.ar{display:flex;gap:6px;margin-bottom:11px}
+.ar input,.ar select{font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:7px 9px;background:var(--bg2);color:var(--text);outline:none}
+.ar input{flex:1}.ar select{max-width:125px}
+.ar input:focus,.ar select:focus{border-color:var(--blue)}
+.ar button{display:inline-flex;align-items:center;gap:4px;font-size:13px;padding:7px 11px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer;flex-shrink:0}
+.ar button:hover{background:var(--bg2)}
+.tlist{display:flex;flex-direction:column;gap:4px}
+.titem{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:var(--r);border:1px solid transparent}
+.titem:hover{border-color:var(--border)}
+.chk{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.chk.ck{background:var(--green);border-color:var(--green)}
+.chk.chk::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
+.ttxt{flex:1;font-size:13px;color:var(--text);line-height:1.4}
+.ttxt.dn{color:var(--text3);text-decoration:line-through}
+.atag{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:2px 7px;white-space:nowrap}
+.xbtn{background:none;border:none;font-size:15px;color:var(--text3);cursor:pointer;opacity:0;flex-shrink:0;line-height:1;padding:0}
+.titem:hover .xbtn{opacity:1}.xbtn:hover{color:var(--red)}
+.donesec{margin-top:11px;border-top:1px solid var(--border);padding-top:9px}
+.dnhdr{font-size:12px;color:var(--text3);margin-bottom:6px}
+.muted{font-size:13px;color:var(--text3);padding:6px 0}
+.rcols{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.rcol{background:var(--bg2);border-radius:var(--rl);padding:11px}
+.rch{display:flex;align-items:center;gap:5px;margin-bottom:9px}
+.rct{font-size:13px;font-weight:600;color:var(--text)}
+.rcc{font-size:11px;color:var(--text3);background:var(--bg);border-radius:999px;padding:1px 6px;border:1px solid var(--border)}
+.rlist{min-height:28px;display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
+.rcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--text);display:flex;align-items:flex-start;gap:3px;line-height:1.5}
+.rcard-t{flex:1;min-width:0;word-break:break-word}
+.mvb,.rxb{background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;opacity:0;flex-shrink:0;line-height:1.5;padding:0}
+.rcard:hover .mvb,.rcard:hover .rxb{opacity:.7}
+.mvb:hover{opacity:1!important;color:var(--text)}.rxb:hover{opacity:1!important;color:var(--red)}
+.radd{display:flex;gap:4px}
+.radd input{flex:1;min-width:0;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 7px;background:var(--bg);color:var(--text);outline:none}
+.radd input:focus{border-color:var(--blue)}
+.radd button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;flex-shrink:0}
+.radd button:hover{background:var(--bg2)}
+.stitle{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;margin-top:15px}
+.stitle:first-child{margin-top:0}
+.idesc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:13px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--border2);color:var(--text2)}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:4px}
+.ps-col{background:var(--bg2);border-radius:var(--rl);padding:11px}
+.ps-col-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.ps-items{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
+.ps-item{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);font-size:12px;color:var(--text)}
+.ps-item-name{flex:1}
+.ps-xbtn{background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;opacity:0;line-height:1;padding:0}
+.ps-item:hover .ps-xbtn{opacity:1}.ps-xbtn:hover{color:var(--red)}
+.ps-add{display:flex;gap:4px}
+.ps-add input{flex:1;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 7px;background:var(--bg);color:var(--text);outline:none}
+.ps-add input:focus{border-color:var(--blue)}
+.ps-add button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer}
+.ps-add button:hover{background:var(--bg)}
+.team-sec{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-bottom:5px}
+.tf{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+.tf:last-child{margin-bottom:0}
+.tfl{font-size:12px;color:var(--text3);width:75px;flex-shrink:0}
+.tf select{font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
+.dev-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.dev-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text2);background:var(--bg)}
+.dev-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
+.dev-chip button:hover{color:var(--red)}
+.dev-add-sel{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text2);outline:none;cursor:pointer}
+.conn-row{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;background:var(--bg2);border-radius:var(--r);margin-bottom:3px;flex-wrap:wrap}
+.cproj{font-weight:600;color:var(--text)}.citem{color:var(--text2)}
+.crel{font-size:10px;padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--text3);background:var(--bg)}
+.carr{color:var(--text3);font-size:11px}
+.csa{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--green-bg);color:var(--green-text);font-weight:600}
+.csp{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--amber-bg);color:var(--amber-text);font-weight:600}
+.cdel{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;opacity:0;padding:0;margin-left:auto}
+.conn-row:hover .cdel{opacity:1}.cdel:hover{color:var(--red)}
+.ghdr{padding:14px 18px 13px;border-bottom:1px solid var(--border);flex-shrink:0}
+.gtitle{font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px}
+.gsub{font-size:13px;color:var(--text2)}
+.filter-bar{display:flex;gap:5px;padding:9px 18px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.fbtn{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer}
+.fbtn:hover{background:var(--bg2)}.fbtn.on{background:var(--bg2);border-color:var(--border2);color:var(--text);font-weight:600}
+.scrollbody{flex:1;overflow-y:auto;padding:15px 18px}
+.lsec{margin-bottom:17px}
+.lhdr{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.llbl{font-size:14px;font-weight:600;color:var(--text)}
+.lcnt{font-size:11px;color:var(--text3);background:var(--bg2);border-radius:999px;padding:1px 6px;border:1px solid var(--border)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:7px}
+.lcard{background:var(--bg2);border-radius:var(--r);padding:8px 10px;cursor:pointer}
+.lcard:hover{background:var(--bg3)}
+.lcard-n{font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.05em}
+.lcard-cnt{font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0}
+.litem{font-size:12px;color:var(--text2);padding:2px 0;display:flex;align-items:flex-start;gap:4px;line-height:1.4}
+.litem::before{content:"\00B7";color:var(--text3);flex-shrink:0}
+.add-conn-form{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-top:3px}
+.acr{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.acr select,.acr input{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
+.stog{display:flex;border:1px solid var(--border2);border-radius:var(--r);overflow:hidden}
+.stog button{font-size:11px;padding:5px 9px;border:none;background:transparent;color:var(--text2);cursor:pointer}
+.stog button.on{background:var(--blue);color:#fff}
+.acr button.primary{font-size:12px;padding:5px 11px;border:1px solid var(--blue);border-radius:var(--r);background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
+.ov-body{flex:1;overflow-y:auto;padding:18px}
+.ov-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ov-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
+.ov-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:20px}
+.sc{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;border:1px solid var(--border)}
+.sv{font-size:26px;font-weight:700;color:var(--text);margin-bottom:2px}
+.sl{font-size:12px;color:var(--text2)}
+.sc.green .sv{color:var(--green)}.sc.blue .sv{color:var(--blue)}.sc.red .sv{color:var(--red)}.sc.amber .sv{color:var(--amber)}
+.ov-sec{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:9px;margin-bottom:20px}
+.opc{background:var(--bg2);border-radius:var(--rl);padding:11px 13px;cursor:pointer;border:1px solid var(--border)}
+.opc:hover{border-color:var(--border2)}
+.opc-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.opc-name{font-size:13px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opc-type{font-size:11px;color:var(--text3);margin-bottom:7px}
+.opc-row{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px}
+.opc-prog{height:3px;background:var(--bg3);border-radius:999px;margin-top:7px;overflow:hidden}
+.opc-pfill{height:100%;background:var(--green);border-radius:999px}
+.ov-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.opc-chip{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);color:var(--text3)}
+.opc-chip.warn{color:var(--amber-text);border-color:var(--amber)}
+.eco-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg2)}
+.eco-legend{position:absolute;bottom:13px;left:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:11px;z-index:10}
+.eco-legend-title{font-weight:600;color:var(--text);margin-bottom:6px}
+.eco-lr{display:flex;align-items:center;gap:5px;color:var(--text2);margin-bottom:3px}
+.eco-lr:last-child{margin-bottom:0}
+.eco-hint{position:absolute;top:13px;right:13px;font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;z-index:10}
+.eco-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:12px;z-index:20;max-width:220px;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none}
+.eco-tt-name{font-weight:700;color:var(--text);font-size:13px;margin-bottom:3px}
+.eco-tt-type{color:var(--text3);font-size:11px;margin-bottom:6px}
+.eco-tt-row{display:flex;gap:7px;font-size:11px;color:var(--text2);margin-bottom:2px}
+.eco-tt-key{color:var(--text3);min-width:70px}
+.modal-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
+.modal-box{position:relative;background:var(--bg);border-radius:var(--rl);border:1px solid var(--border2);width:100%;max-width:500px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal-box.sm{max-width:380px}
+.modal-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:16px;font-weight:700;color:var(--text)}
+.modal-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.modal-body{flex:1;overflow-y:auto;padding:16px 20px}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.mfld{margin-bottom:14px}
+.mfld:last-child{margin-bottom:0}
+.mfld label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.mfld input,.mfld textarea,.mfld select{width:100%;font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:8px 10px;background:var(--bg2);color:var(--text);outline:none;font-family:inherit}
+.mfld textarea{resize:vertical;min-height:70px;line-height:1.5}
+.mfld input:focus,.mfld textarea:focus,.mfld select:focus{border-color:var(--blue)}
+.tag-inp-wrap{display:flex;flex-direction:column;gap:6px}
+.tag-chips{display:flex;flex-wrap:wrap;gap:5px}
+.tag-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
+.tag-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
+.tag-chip button:hover{color:var(--red)}
+.mbtn{font-size:13px;padding:7px 14px;border-radius:var(--r);cursor:pointer;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--text2)}
+.mbtn:hover{background:var(--bg2)}.mbtn.prim{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.mbtn.prim:hover{opacity:.9}.mbtn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.del-warn{font-size:13px;color:var(--text2);line-height:1.6}.del-warn strong{color:var(--text)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">NBFI <span>· Product OS</span></div>
-  <div class="nav-modes">
-    <button class="nav-btn active" id="m_mat" onclick="setMode('matrix')">Architecture Matrix</button>
-    <button class="nav-btn" id="m_con" onclick="setMode('conn')">Connections</button>
+<div class="app">
+  <div class="topbar">
+    <span class="brand">NBFI <span>&middot; Product OS</span></span>
+    <div class="spacer"></div>
+    <button class="tbtn prim" onclick="openModal('add-project',{})">+ Add project</button>
+    <button class="tbtn" id="team-btn" onclick="toggleTeam()">&#128101; Team</button>
+    <button class="tbtn" onclick="exportData()">&#8659; Export</button>
   </div>
-  <div style="width:120px"></div>
-</header>
-
-<div class="main-layout">
-  
-  <div class="sidebar" id="sb_matrix">
-    <div class="sb-sec">
-      <div class="sb-title">Core Systems</div>
-      <div id="sb_core"></div>
+  <div class="team-bar" id="team-bar" style="display:none"></div>
+  <div class="layout">
+    <div class="sb">
+      <div class="sb-head"><div class="sb-org">NBFI</div><div class="sb-title">Product OS</div></div>
+      <div class="sb-scroll" id="sb-scroll"></div>
+      <div class="sb-foot" id="sb-foot"></div>
     </div>
-    <div class="sb-sec">
-      <div class="sb-title">Supporting Systems</div>
-      <div id="sb_supp"></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-title">Channels & touchpoints</div>
-      <div id="sb_chan"></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-title">Management & Analytics</div>
-      <div id="sb_mana"></div>
-    </div>
-  </div>
-
-  <div class="content">
-    
-    <div class="matrix-view" id="v_matrix_root">
-      <div class="matrix-container">
-        <div class="p-header">
-          <div class="p-title">Enterprise Architecture Matrix</div>
-          <div class="p-desc">Four-quadrant functional mapping of non-banking financial institution digital assets, platforms, and services.</div>
-        </div>
-        <div class="matrix-grid">
-          <div class="matrix-cell c-core">
-            <div class="mc-title">Core Systems</div>
-            <div class="mc-body" id="mx_core"></div>
-          </div>
-          <div class="matrix-cell c-supp">
-            <div class="mc-title">Supporting Systems</div>
-            <div class="mc-body" id="mx_supp"></div>
-          </div>
-          <div class="matrix-cell c-chan">
-            <div class="mc-title">Channels & Touchpoints</div>
-            <div class="mc-body" id="mx_chan"></div>
-          </div>
-          <div class="matrix-cell c-mana">
-            <div class="mc-title">Management & Analytics</div>
-            <div class="mc-body" id="mx_mana"></div>
-          </div>
-        </div>
-        
-        <div id="project_panel" style="display:none">
-          <div class="p-header" style="margin-bottom:16px; padding-bottom:12px">
-            <div style="display:flex; justify-content:between; align-items:start">
-              <div>
-                <div class="p-title" id="vp_title" style="font-size:18px">Project Name</div>
-                <div class="p-desc" id="vp_id" style="font-size:11px; font-family:monospace; color:var(--text3)">ID</div>
-              </div>
-              <div id="vp_layer"></div>
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="card">
-              <div class="card-title">Assigned Developers</div>
-              <div class="tag-list" id="vp_devs"></div>
-              <div class="inp-group">
-                <input type="text" class="inp" id="dev_inp" placeholder="Developer name...">
-                <button class="btn" onclick="addDev()">Add</button>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title">Functional Scope & Modules</div>
-              <div id="vp_items"></div>
-              <div class="inp-group">
-                <input type="text" class="inp" id="fi_inp" placeholder="Add scope module...">
-                <button class="btn" onclick="addItem('feature')">Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="conn-view" id="v_conn_root" style="display:none">
-      <div class="conn-container">
-        <div class="p-header">
-          <div class="p-title">System Interconnections</div>
-          <div class="p-desc">Map dependencies, data integrations, flows, and API relations between core, support, and channel platforms.</div>
-        </div>
-        
-        <div class="card" style="margin-bottom:20px">
-          <div class="card-title">Create New System Connection</div>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 80px; gap:12px; align-items:end">
-            <div>
-              <div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px">Source Project</div>
-              <select class="sel-box" id="nc_fp" onchange="ncSet('fp',this.value)"></select>
-            </div>
-            <div>
-              <div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px">Target Project</div>
-              <select class="sel-box" id="nc_tp" onchange="ncSet('tp',this.value)"></select>
-            </div>
-            <div>
-              <div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px">Relation Type / Protocol</div>
-              <input type="text" class="inp" style="width:100%" placeholder="e.g. REST API, gRPC, Sync" id="nc_st" oninput="ncSetSt(this.value)">
-            </div>
-            <button class="btn" style="width:100%; height:30px" onclick="addConn()">Link</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Active Data Map</div>
-          <table class="conn-table">
-            <thead>
-              <tr>
-                <th>Source Platform</th>
-                <th></th>
-                <th>Target Platform</th>
-                <th>Integration Type</th>
-                <th style="width:40px"></th>
-              </tr>
-            </thead>
-            <tbody id="conn_tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
+    <div class="main" id="main"></div>
   </div>
 </div>
+<div id="modal-overlay" class="modal-overlay" style="display:none">
+  <div class="modal-bg" id="modal-bg"></div>
+  <div class="modal-box" id="modal-box"></div>
+</div>
+<div class="eco-tooltip" id="eco-tt"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
+  // Төслийн тохиргоо
   const firebaseConfig = {
     apiKey: "AIzaSyAshzmrzBPPhADwrASmQQAUnTqdnd5MM4",
     authDomain: "omni-products.firebaseapp.com",
@@ -246,281 +270,519 @@ header{height:44px;border-bottom:1px solid var(--border);display:flex;align-item
     measurementId: "G-KQND2ECQ33"
   };
 
+  // Firebase Инициализаци
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
   const analytics = getAnalytics(app);
 
-  // Модуль доторх функцуудыг глобал болгох (Inline onclick ажиллахын тулд)
-  window.database = database;
-  window.ref = ref;
-  window.set = set;
+  // Firebase reference үүсгэх
+  const dbRef = ref(database, 'product_os_data');
 
-  window.$ = function(id) { return document.getElementById(id); };
-  window.uid = function() { return Math.random().toString(36).substr(2,4).toUpperCase(); };
+  /* ── UTILS ── */
+  window.$ = function(id){return document.getElementById(id);}
+  window.esc = function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  window.uid = function(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+  window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
 
-  // Анхны State өгөгдөл (Хэрэв Firebase хоосон байвал ашиглагдана)
-  window.defaultData = function() {
+  /* ── CONSTANTS ── */
+  window.SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
+  window.LANES=['now','next','later'];
+  window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
+
+  /* ── STATE ── */
+  window.D={};
+  window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
+  window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
+
+  /* ── DATA HELPERS ── */
+  window.projs = function(){return Object.values(window.D.projects||{});}
+  window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
+  window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
+  window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
+  window.getMeta = function(pid){return(window.D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
+  window.getItems = function(pid){return getMeta(pid).items||[];}
+  window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
+  window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
+  window.badge = function(s,click){const m=window.SM[s]||window.SM.progress;return '<span class="bdg '+m.b+'"'+(click?' onclick="toggleSmenu(event)" title="Click to change"':'')+'>'+sdot(s)+m.l+'</span>';}
+  window.connRow = function(c,del){
+    const arr=c.st==='active'?'\u2192':'\u2194';
+    const sb=c.st==='active'?'<span class="csa">active</span>':'<span class="csp">planned</span>';
+    const db=del?'<button class="cdel" onclick="delConn(\''+c.id+'\')">&#10005;</button>':'';
+    return'<div class="conn-row"><span class="cproj">'+esc(pName(c.fp))+'</span>'+(c.fi?'<span class="citem">/ '+esc(c.fi)+'</span>':'')+
+      '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
+      '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
+
+  /* ── LIVE SAVE TO FIREBASE ── */
+  window.save = function(){
+    try{
+      set(dbRef, window.D);
+    }catch(e){
+      console.error('Firebase save error',e);
+    }
+  }
+
+  window.exportData = function(){
+    const blob=new Blob([JSON.stringify(window.D,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  }
+
+  /* ── DEFAULT DATA ── */
+  function defaultData(){
+    const tasks={},road={},conns={};
+    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false},
+     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false},
+     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false},
+     {id:'t4',p:'los',txt:'Complete business requirements document',a:'',done:false},
+     {id:'t5',p:'los',txt:'Review loan origination process flow',a:'',done:false},
+     {id:'t6',p:'los',txt:'Sprint planning with dev team',a:'',done:false},
+     {id:'t7',p:'khurimtlal',txt:'Finalize UX/UI in Figma',a:'',done:false},
+     {id:'t8',p:'khurimtlal',txt:'Write savings product requirements',a:'',done:false},
+     {id:'t9',p:'khurimtlal',txt:'Define Keep integration scope',a:'',done:false},
+     {id:'t10',p:'omnicars',txt:'Document all known bugs',a:'',done:false},
+     {id:'t11',p:'omnicars',txt:'Bug fix prioritization with devs',a:'',done:false},
+     {id:'t12',p:'omnicars',txt:'Test car evaluation flow end-to-end',a:'',done:false},
+     {id:'t13',p:'omnipay',txt:'Define merchant onboarding flow',a:'',done:false},
+     {id:'t14',p:'omnipay',txt:'Review BNPL checkout requirements',a:'',done:false},
+     {id:'t15',p:'omnipay',txt:'Add new ticket sale categories',a:'',done:false},
+     {id:'t16',p:'keep',txt:'Define Khurimtlal integration scope',a:'',done:false},
+     {id:'t17',p:'keep',txt:'Review current app analytics',a:'',done:false}
+    ].forEach(t=>tasks[t.id]=t);
+    [{id:'r1',p:'moni',txt:'eSIM Boxo integration',lane:'now'},{id:'r2',p:'moni',txt:'OmniPay BNPL checkout',lane:'now'},
+     {id:'r3',p:'moni',txt:'Loyalty system MVP',lane:'next'},{id:'r4',p:'moni',txt:'Expanded merchant ecosystem',lane:'later'},
+     {id:'r5',p:'los',txt:'Core loan origination flow',lane:'now'},{id:'r6',p:'los',txt:'Omnicars integration flow',lane:'next'},
+     {id:'r7',p:'khurimtlal',txt:'Figma designs complete',lane:'now'},{id:'r8',p:'khurimtlal',txt:'Pilot launch with selected users',lane:'next'},
+     {id:'r9',p:'omnicars',txt:'Production bug resolution',lane:'now'},{id:'r10',p:'omnicars',txt:'Automated evaluation trigger',lane:'next'},
+     {id:'r11',p:'omnipay',txt:'Merchant QR onboarding flow',lane:'now'},{id:'r12',p:'omnipay',txt:'In-app marketplace MVP',lane:'next'}
+    ].forEach(r=>road[r.id]=r);
+    [{id:'c1',fp:'moni',fi:'',tp:'omnipay',ti:'',rel:'integration',st:'active'},
+     {id:'c2',fp:'moni',fi:'',tp:'keep',ti:'',rel:'data-sync',st:'active'},
+     {id:'c3',fp:'moni',fi:'',tp:'khurimtlal',ti:'',rel:'ui-embed',st:'planned'},
+     {id:'c4',fp:'los',fi:'',tp:'omnipay',ti:'',rel:'disbursement',st:'active'},
+     {id:'c5',fp:'los',fi:'',tp:'omnicars',ti:'',rel:'collateral-check',st:'active'},
+     {id:'c6',fp:'los',fi:'',tp:'erp',ti:'',rel:'accounting',st:'active'},
+     {id:'c7',fp:'los',fi:'',tp:'crm',ti:'',rel:'leads',st:'planned'}
+    ].forEach(c=>conns[c.id]=c);
     return {
-      projects: [
-        {id:'p1',name:'Core Banking System',layer:'core'},
-        {id:'p2',name:'Loan Origination Engine',layer:'core'},
-        {id:'p3',name:'Collateral Valuation Service',layer:'core'},
-        {id:'p4',name:'Payment & Ledger Gateway',layer:'core'},
-        {id:'p5',name:'Scoring & Decision Service',layer:'supp'},
-        {id:'p6',name:'User Auth & IAM',layer:'supp'},
-        {id:'p7',name:'Notification Center',layer:'supp'},
-        {id:'p8',name:'Document Storage Cluster',layer:'supp'},
-        {id:'p9',name:'Retail Mobile App',layer:'chan'},
-        {id:'p10',name:'Corporate Web Portal',layer:'chan'},
-        {id:'p11',name:'Collection Call Center App',layer:'chan'},
-        {id:'p12',name:'Agent / Branch Terminal',layer:'chan'},
-        {id:'p13',name:'Executive BI Dashboard',layer:'mana'},
-        {id:'p14',name:'Risk Analytics Warehouse',layer:'mana'},
-        {id:'p15',name:'Regulatory Reporting Tool',layer:'mana'},
-        {id:'p16',name:'Audit & Logging Vault',layer:'mana'}
-      ],
-      pmeta: {},
-      connections: [
-        {id:'c1',from:'p9',to:'p6',type:'OIDC / OAuth2'},
-        {id:'c2',from:'p9',to:'p2',type:'REST / JSON'},
-        {id:'c3',from:'p2',to:'p5',type:'gRPC'},
-        {id:'c4',from:'p2',to:'p1',type:'SOAP / XML'},
-        {id:'c5',from:'p11',to:'p1',type:'REST API'},
-        {id:'c6',from:'p1',to:'p13',type:'ETL Batch'},
-        {id:'c7',from:'p14',to:'p5',type:'Model Sync'}
-      ]
+      projects:{
+        moni:{id:'moni',name:'Moni App',local:'Moni',type:'customer',status:'live',desc:'Main consumer financial app offering micro-loans, wallet services, and utility payments.',tags:['Core','B2C','Mobile']},
+        omnipay:{id:'omnipay',name:'OmniPay',local:'OmniPay',type:'platform',status:'progress',desc:'Payment gateway ecosystem handling merchant QR, settlements, and BNPL configurations.',tags:['Payments','Infrastructure','B2B']},
+        'moni-transfer':{id:'moni-transfer',name:'Moni Transfer',local:'Transfer',type:'service',status:'live',desc:'Internal ledger service routing real-time peer-to-peer and bank transactions.',tags:['Backend','Core']},
+        keep:{id:'keep',name:'Keep Fin',local:'Keep',type:'customer',status:'live',desc:'Wealth management tracker helping users balance expense budgets and simple investments.',tags:['Savings','PFM']},
+        khurimtlal:{id:'khurimtlal',name:'Khurimtlal',local:'Khurimtlal',type:'customer',status:'progress',desc:'Micro-savings setup incentivizing automated rounded-up deposits from daily transactions.',tags:['Savings','Gamification']},
+        los:{id:'los',name:'Loan Origination',local:'LOS',type:'internal',status:'progress',desc:'Internal automated scoring and underwriting desk managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']},
+        omnicars:{id:'omnicars',name:'OmniCars',local:'OmniCars',type:'customer',status:'bugs',desc:'Auto-financing interface supporting vehicle inspection checklist and appraisal pricing.',tags:['Automotive','Loans']},
+        erp:{id:'erp',name:'Core ERP',local:'ERP',type:'internal',status:'live',desc:'Central ledger system managing regulatory charts, cash journals, and payroll audits.',tags:['Backoffice','Finance']},
+        crm:{id:'crm',name:'Omni CRM',local:'CRM',type:'internal',status:'planned',desc:'Support pipeline distributing customer service tickets and tele-collection queues.',tags:['Support','Collections']}
+      },
+      tasks,road,conns,
+      pmeta:{
+        moni:{leader:'bat',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'},{id:'i2',name:'Loyalty Engine',kind:'feature'}]},
+        los:{leader:'dulguun',devs:['Sukhbat'],items:[{id:'i3',name:'Scoring Model v2',kind:'feature'},{id:'i4',name:'SignDoc Engine',kind:'feature'}]},
+        omnipay:{leader:'ganzorig',devs:['Anand','Ondrakh'],items:[{id:'i5',name:'Split Settlement',kind:'feature'}]}
+      },
+      eco:JSON.parse(JSON.stringify(window.DEF_ECO))
     };
-  };
+  }
 
-  window.D = window.defaultData();
-
-  window.ui = {
-    mode: 'matrix', 
-    sel: 'p1',       
-    nc: { fp:'', tp:'', st:'' } 
-  };
-
-  /* ── БҮХ ЛОГИК ФУНКЦУУД (ТАНЫ АНХНЫ КОДНООС ХАСАЛГҮЙ ГЛОБАЛ БОЛГОСОН) ── */
-  window.save = function() {
-    try {
-      set(ref(database, 'nbfi_product_os'), D);
-    } catch(e) {
-      console.error('Firebase Save error:', e);
-    }
-  };
-
-  window.setMode = function(m) {
-    ui.mode = m;
-    $('m_mat').classList.toggle('active', m==='matrix');
-    $('m_con').classList.toggle('active', m==='conn');
-    $('sb_matrix').style.display = m==='matrix'?'flex':'none';
-    $('v_matrix_root').style.display = m==='matrix'?'block':'none';
-    $('v_conn_root').style.display = m==='conn'?'flex':'none';
-    renderMain();
-  };
-
-  window.selectProject = function(id) {
-    ui.sel = id;
-    $('project_panel').style.display = 'block';
-    render();
-  };
-
-  window.getMeta = function(pid) {
-    return (D.pmeta && D.pmeta[pid]) ? D.pmeta[pid] : { devs:[], items:[] };
-  };
-
-  window.addDev = function() {
-    const inp = $('dev_inp');
-    const name = (inp?inp.value:'').trim();
-    if(!name) return;
-    if(!D.pmeta) D.pmeta = {};
-    const m = getMeta(ui.sel);
-    if(!(m.devs || []).includes(name)){
-      D.pmeta[ui.sel] = { ...m, devs: [...(m.devs || []), name] };
-      save();
-      render();
-    }
-    if(inp) inp.value = '';
-  };
-
-  window.removeDev = function(i) {
-    if(!D.pmeta) return;
-    const m = getMeta(ui.sel);
-    const d = [...(m.devs || [])];
-    d.splice(i,1);
-    D.pmeta[ui.sel] = { ...m, devs: d };
-    save();
-    render();
-  };
-
-  window.addItem = function(kind) {
-    const inp = $(kind==='feature'?'fi_inp':'si_inp');
-    const name = (inp?inp.value:'').trim();
-    if(!name) return;
-    if(!D.pmeta) D.pmeta = {};
-    const m = getMeta(ui.sel);
-    D.pmeta[ui.sel] = { ...m, items: [...(m.items || []), {id:'i'+uid(),name,kind}] };
-    if(inp) inp.value = '';
-    save();
-    render();
-  };
-
-  window.removeItem = function(iid) {
-    if(!D.pmeta) return;
-    const m = getMeta(ui.sel);
-    D.pmeta[ui.sel] = { ...m, items: (m.items || []).filter(i=>i.id!==iid) };
-    save();
-    render();
-  };
-
-  window.ncSet = function(key,val) {
-    ui.nc[key] = val;
-    if(key==='fp') ui.nc.fi = '';
-    if(key==='tp') ui.nc.ti = '';
-    renderMain();
-  };
-
-  window.ncSetSt = function(val) {
-    ui.nc.st = val;
-    renderMain();
-  };
-
-  window.addConn = function() {
-    if(!ui.nc.fp || !ui.nc.tp){
-      alert('Select both projects.');
-      return;
-    }
-    const rel = ($('nc_st') ? $('nc_st').value : '').trim() || 'Sync';
-    if(!D.connections) D.connections = [];
-    D.connections.push({
-      id: 'c'+uid(),
-      from: ui.nc.fp,
-      to: ui.nc.tp,
-      type: rel
-    });
-    ui.nc.st = '';
-    const stInp = $('nc_st'); if(stInp) stInp.value = '';
-    save();
-    renderMain();
-  };
-
-  window.removeConn = function(cid) {
-    if(!D.connections) return;
-    D.connections = D.connections.filter(c=>c.id!==cid);
-    save();
-    renderMain();
-  };
-
-  /* ── RENDER ENGINE (ДЭЛГЭЦ ЗУРАХ КОР ФУНКЦУҮД БҮРЭН ЭХЭЭРЭЭ) ── */
-  window.renderMain = function() {
-    const layers = { core:[], supp:[], chan:[], mana:[] };
-    (D.projects || []).forEach(p=>{ if(layers[p.layer]) layers[p.layer].push(p); });
-    
-    Object.keys(layers).forEach(lkey=>{
-      const sb = $('sb_'+lkey);
-      const mx = $('mx_'+lkey);
-      let sbHtml = '';
-      let mxHtml = '';
-      
-      layers[lkey].forEach(p=>{
-        const m = getMeta(p.id);
-        const iCount = (m.items||[]).length;
-        const act = ui.sel === p.id ? 'active' : '';
-        
-        sbHtml += `<div class="sb-item ${act}" onclick="selectProject('${p.id}')">
-          <span>${p.name}</span>
-          ${iCount?`<span class="sb-count">${iCount}</span>`:''}
-        </div>`;
-        
-        mxHtml += `<div class="m-card ${act}" onclick="selectProject('${p.id}')">
-          <span>${p.name}</span>
-          ${iCount?`<span class="mc-count">${iCount} items</span>`:''}
-        </div>`;
-      });
-      
-      if(sb) sb.innerHTML = sbHtml;
-      if(mx) mx.innerHTML = mxHtml;
-    });
-
-    const fpSel = $('nc_fp'), tpSel = $('nc_tp');
-    if(fpSel && tpSel) {
-      let fpOpt = '<option value="">-- Source --</option>';
-      let tpOpt = '<option value="">-- Target --</option>';
-      (D.projects || []).forEach(p=>{
-        fpOpt += `<option value="${p.id}" ${ui.nc.fp===p.id?'selected':''}>${p.name}</option>`;
-        tpOpt += `<option value="${p.id}" ${ui.nc.tp===p.id?'selected':''}>${p.name}</option>`;
-      });
-      fpSel.innerHTML = fpOpt;
-      tpSel.innerHTML = tpOpt;
-    }
-
-    const tbody = $('conn_tbody');
-    if(tbody) {
-      let tHtml = '';
-      (D.connections || []).forEach(c=>{
-        const fProj = (D.projects||[]).find(p=>p.id===c.from) || {name:c.from, layer:'core'};
-        const tProj = (D.projects||[]).find(p=>p.id===c.to) || {name:c.to, layer:'core'};
-        tHtml += `<tr>
-          <td><div class="p-pill"><span class="p-dot ${fProj.layer}"></span>${fProj.name}</div></td>
-          <td class="c-rel">➔</td>
-          <td><div class="p-pill"><span class="p-dot ${tProj.layer}"></span>${tProj.name}</div></td>
-          <td><span style="font-family:monospace; font-weight:600">${c.type}</span></td>
-          <td><span class="li-del" style="opacity:1; cursor:pointer" onclick="removeConn('${c.id}')">✕</span></td>
-        </tr>`;
-      });
-      tbody.innerHTML = tHtml || `<tr><td colspan="5" style="text-align:center; color:var(--text3); padding:20px">No system connections mapped yet.</td></tr>`;
-    }
-  };
-
-  window.render = function() {
-    renderMain();
-    const p = (D.projects||[]).find(x=>x.id===ui.sel);
-    if(!p) {
-      $('project_panel').style.display = 'none';
-      return;
-    }
-    
-    $('vp_title').innerText = p.name;
-    $('vp_id').innerText = `SYSTEM IDENTIFIER: ${p.id.toUpperCase()}`;
-    
-    const layerBadges = {
-      core: '<span class="badge blue">Core Layer</span>',
-      supp: '<span class="badge green">Supporting Layer</span>',
-      chan: '<span class="badge amber">Channel Layer</span>',
-      mana: '<span class="badge red">Management Layer</span>'
-    };
-    $('vp_layer').innerHTML = layerBadges[p.layer] || '';
-    
-    const m = getMeta(p.id);
-    
-    let dHtml = '';
-    (m.devs || []).forEach((d,idx)=>{
-      dHtml += `<div class="tag"><span>${d}</span><span class="tag-del" onclick="removeDev(${idx})">✕</span></div>`;
-    });
-    $('vp_devs').innerHTML = dHtml || '<div style="color:var(--text3); font-size:12px; italic">No developers assigned.</div>';
-    
-    let iHtml = '';
-    (m.items || []).forEach(i=>{
-      iHtml += `<div class="list-item">
-        <div class="li-name"><span style="color:var(--text3)">▪</span> ${i.name}</div>
-        <div class="li-del" onclick="removeItem('${i.id}')">✕</div>
-      </div>`;
-    });
-    $('vp_items').innerHTML = iHtml || '<div style="color:var(--text3); font-size:12px; padding:8px 0; italic">No functional modules specified.</div>';
-  };
-
-  /* ── FIREBASE REALTIME LISTEN (ШУУД УНШИХ) ── */
-  onValue(ref(database, 'nbfi_product_os'), (snapshot) => {
+  /* ── FIREBASE LISTEN & INITIALIZE ── */
+  onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
-    if (data) {
+    if(data && data.projects) {
       window.D = data;
     } else {
+      // Хэрэв өгөгдлийн сан хоосон бол default датаг оруулах
       window.D = defaultData();
       window.save();
     }
-    render();
+    
+    // Анх удаа ачааллах үед select хийх
+    if(!window.ui.sel && window.projs().length > 0){
+      window.ui.sel = window.projs()[0].id;
+    }
+    
+    window.render();
   });
 
+  /* ── RENDER ENGINE ── */
+  window.render = function(){
+    renderSb();
+    renderTeamBar();
+    renderMain();
+  }
+  
+  function renderSb(){
+    let h='<div class="sb-sec"><span>Projects</span></div>';
+    projs().forEach(p=>{
+      const sel=window.ui.sel===p.id?' on':'';
+      const ot=openTasks(p.id);
+      const cnt=ot?'<span class="pcnt">'+ot+'</span>':'';
+      h+='<div class="pitem'+sel+'" onclick="selProj(\''+p.id+'\')">'+
+         sdot(p.status)+'<span class="pname">'+esc(p.name)+'</span>'+cnt+
+         '<div class="pitem-act"><button class="piabtn del" onclick="event.stopPropagation();openModal(\'del-project\',{pid:\''+p.id+'\'})">&#10005;</button></div>'+
+         '</div>';
+    });
+    h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
+       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
+       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
+       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
+    $('sb-scroll').innerHTML=h;
+    $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
+  }
+
+  function renderTeamBar(){
+    const tb=$('team-bar');
+    if(!window.ui.showTeam){tb.style.display='none';$('team-btn').classList.remove('on');return;}
+    tb.style.display='flex';$('team-btn').classList.add('on');
+    let m=new Set();projs().forEach(p=>{const meta=getMeta(p.id);if(meta.leader)m.add(meta.leader);(meta.devs||[]).forEach(d=>m.add(d));});
+    let h='<span class="tlbl">&#128100; Roster:</span>';
+    if(m.size===0)h+='<span class="muted" style="font-size:12px;padding:0">No team members allocated.</span>';
+    else m.forEach(name=>h+='<span class="mchip">'+esc(name)+'</span>');
+    tb.innerHTML=h;
+  }
+
+  function renderMain(){
+    const m=$('main');
+    if(window.ui.gview!=='project'){renderGlobalView(m);return;}
+    const p=(window.D.projects||{})[window.ui.sel];
+    if(!p){m.innerHTML='<div class="muted" style="padding:20px">Project not found.</div>';return;}
+    const meta=getMeta(p.id);const tasks=pTasks(p.id);const dn=tasks.filter(t=>t.done).length;const tot=tasks.length;const pct=tot?Math.round((dn/tot)*100):0;
+    let h='<div class="phdr"><div class="ptrow"><span class="pt">'+esc(p.name)+'</span>';
+    if(p.local)h+='<span class="plocal">('+esc(p.local)+')</span>';
+    h+=badge(p.status,true)+'<span class="ptype">'+esc(p.type).toUpperCase()+'</span></div>'+
+       '<div class="pmeta-row">'+
+       '<div class="pmeta-g"><span class="pmeta-l">Lead:</span><span class="pmeta-v">'+esc(meta.leader||'Unassigned')+'</span></div>'+
+       '<div class="pmeta-sep"></div><div class="pmeta-g"><span class="pmeta-l">Devs:</span>';
+    if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
+    else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
+    h+='</div></div><div class="tabs">'+
+       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
+       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
+       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
+       '</div></div><div class="mbody">';
+    if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
+    else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
+    else h+=renderProjectMeta(p,meta);
+    h+'</div>';m.innerHTML=h;
+    if(window.ui.statusMenu)renderStatusMenu(p);
+  }
+
+  function renderStatusMenu(p){
+    let div=$('smenu-box');if(!div){div=document.createElement('div');div.id='smenu-box';div.className='smenu';document.body.appendChild(div);}
+    let h='';Object.entries(window.SM).forEach(([k,v])=>{h+='<div class="sopt" onclick="setProjStatus(\''+p.id+'\',\''+k+'\')">'+sdot(k)+' '+v.l+'</div>';});
+    div.innerHTML=h;const b=document.querySelector('.bdg');if(b){const r=b.getBoundingClientRect();div.style.top=(r.bottom+window.scrollY)+'px';div.style.left=(r.left+window.scrollX)+'px';div.style.display='block';}
+  }
+
+  function renderProjectTasks(p,tasks,dn,tot,pct){
+    let h='<div class="tmeta"><span>'+pct+'% Complete ('+dn+'/'+tot+' tasks)</span>'+(dn>0?'<button class="clr" onclick="clearDone(\''+p.id+'\')">Clear completed</button>':'')+'</div>'+
+       '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
+       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
+       '<select id="t_tag"><option value="">No context item</option>';
+    getItems(p.id).forEach(i=>h+='<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>');
+    h+='</select><button onclick="addTask(\''+p.id+'\')">+ Add</button></div>';
+    const active=tasks.filter(t=>!t.done);const done=tasks.filter(t=>t.done);
+    h+='<div class="tlist">';
+    if(active.length===0&&done.length===0)h+='<div class="muted">No scope items created yet.</div>';
+    else{
+      active.forEach(t=>h+=taskRow(t));
+      if(done.length>0){h+='<div class="donesec"><div class="dnhdr">Completed</div>';done.forEach(t=>h+=taskRow(t));h+='</div>';}
+    }
+    return h+'</div>';
+  }
+
+  function taskRow(t){
+    const ck=t.done?' ck':'';const dn=t.done?' dn':'';
+    return'<div class="titem"><div class="chk'+ck+'" onclick="toggleTask(\''+t.p+'\',\''+t.id+'\')"></div>'+
+       '<span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+(t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
+       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';}
+
+  function renderProjectRoadmap(p){
+    const items=roadItems(p.id);
+    let h='<div class="rcols">';
+    window.LANES.forEach(l=>{
+      const li=items.filter(i=>i.lane===l);
+      h+='<div class="rcol"><div class="rch"><span class="rct" style="text-transform:uppercase">'+l+'</span><span class="rcc">'+li.length+'</span></div><div class="rlist">';
+      if(li.length===0)h+='<div class="muted" style="font-size:11px">Empty</div>';
+      else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
+         '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
+         '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
+      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
+         '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
+    });
+    return h+'</div>';
+  }
+
+  function renderProjectMeta(p,meta){
+    let h='<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
+       '<div class="stitle">Tags</div><div class="tags">';
+    if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
+    else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
+    h+='</div><div class="ps-grid">'+
+       '<div class="ps-col"><div class="ps-col-title">Context & Core Architecture Items</div><div class="ps-items" id="meta-items-list">';
+    const items=meta.items||[];
+    if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
+    else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
+    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
+       '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
+       '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
+    ['bat','dulguun','ganzorig','namuun'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
+    h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
+    (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
+    h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
+    ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
+    return h+'</select></div></div></div></div></div>';
+  }
+
+  function renderGlobalView(m){
+    if(window.ui.gview==='overview')renderOverview(m);
+    else if(window.ui.gview==='ecosystem')renderEcosystem(m);
+    else renderMatrix(m);
+  }
+
+  function renderOverview(m){
+    let tot=projs().length;let live=projs().filter(p=>p.status==='live').length;let prog=projs().filter(p=>p.status==='progress').length;let bug=projs().filter(p=>p.status==='bugs').length;
+    let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
+       '<div class="ov-stats">'+
+       '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
+       '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
+       '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
+       '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
+       '</div><div class="ov-sec">Product Catalog</div><div class="ov-grid">';
+    projs().forEach(p=>{
+      const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
+      h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
+         '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
+         '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
+         '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
+         '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="opc-meta">';
+      (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
+      h+='</div></div>';
+    });
+    m.innerHTML=h+'</div></div>';
+  }
+
+  function renderEcosystem(m){
+    let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
+       '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
+       '</div><div class="eco-wrap" id="eco-wrap" style="height:100%">'+
+       '<div class="eco-legend"><div class="eco-legend-title">System Class</div>'+
+       '<div class="eco-lr"><span class="dot dl"></span> Live Core</div>'+
+       '<div class="eco-lr"><span class="dot dp"></span> Progress</div>'+
+       '<div class="eco-lr"><span class="dot db"></span> Impacted / Bugs</div>'+
+       '<div class="eco-lr"><span class="dot dpl"></span> Pipeline</div>'+
+       '</div><div class="eco-hint">Drag platforms to map dependencies dynamically</div>'+
+       '<svg id="eco-svg" style="width:100%;height:100%;position:absolute;inset:0;z-index:1"></svg>';
+    projs().forEach(p=>{
+      const coord=(window.D.eco||{})[p.id]||window.DEF_ECO[p.id]||{x:150,y:150};const dotM=window.SM[p.status]||window.SM.progress;
+      h+='<div class="pitem" id="node-'+p.id+'" style="position:absolute;left:'+coord.x+'px;top:'+coord.y+'px;z-index:5;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:6px 11px;cursor:move;user-select:none;margin:0;display:flex;align-items:center;gap:6px" onmousedown="dragNode(event,\''+p.id+'\')">'+
+         '<span class="dot '+dotM.d+'"></span><span style="font-size:12px;font-weight:600">'+esc(p.name)+'</span></div>';
+    });
+    m.innerHTML=h+'</div>';drawConnections();
+  }
+
+  function drawConnections(){
+    const svg=$('eco-svg');if(!svg)return;let h='';const wrap=$('eco-wrap');if(!wrap)return;const rect=wrap.getBoundingClientRect();
+    Object.values(window.D.conns||{}).forEach(c=>{
+      if(window.ui.roadFilter!=='all'&&c.st!==window.ui.roadFilter)return;
+      const n1=$('node-'+c.fp);const n2=$('node-'+c.tp);if(!n1||!n2)return;
+      const x1=n1.offsetLeft+(n1.offsetWidth/2);const y1=n1.offsetTop+(n1.offsetHeight/2);
+      const x2=n2.offsetLeft+(n2.offsetWidth/2);const y2=n2.offsetTop+(n2.offsetHeight/2);
+      const col=c.st==='active'?'var(--blue)':'var(--amber)';const dash=c.st==='active'?'':' stroke-dasharray="4,4"';
+      h+='<g class="edge" style="cursor:pointer" onclick="openConnModal(\''+c.id+'\')">'+
+         '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="2" opacity="0.35"'+dash+'/>'+
+         '<circle cx="'+((x1+x2)/2)+'" cy="'+((y1+y2)/2)+'" r="4" fill="'+col+'" opacity="0.8"/>'+
+         '</g>';
+    });
+    svg.innerHTML=h;
+  }
+
+  window.dragNode = function(e,pid){
+    e.preventDefault();const n=$('node-'+pid);if(!n)return;const wrap=$('eco-wrap');if(!wrap)return;
+    const sx=e.clientX-n.offsetLeft;const sy=e.clientY-n.offsetTop;
+    document.onmousemove=function(ev){
+      let x=ev.clientX-sx;let y=ev.clientY-sy;
+      x=Math.max(10,Math.min(wrap.offsetWidth-n.offsetWidth-10,x));y=Math.max(10,Math.min(wrap.offsetHeight-n.offsetHeight-10,y));
+      n.style.left=x+'px';n.style.top=y+'px';drawConnections();
+      if(!window.D.eco)window.D.eco={};window.D.eco[pid]={x,y};
+    };
+    document.onmouseup=function(){document.onmousemove=null;document.onmouseup=null;window.save();};
+  }
+
+  function renderMatrix(m){
+    let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap Matrix</div><div class="gsub">Consolidated multi-product sprint lanes</div></div><div class="scrollbody">';
+    window.LANES.forEach(lane=>{
+      let items=[];projs().forEach(p=>{roadItems(p.id).filter(r=>r.lane===lane).forEach(r=>{items.push({p:p.id,txt:r.txt});});});
+      h+='<div class="lsec"><div class="lhdr"><span class="llbl" style="text-transform:uppercase">'+lane+'</span><span class="lcnt">'+items.length+'</span></div><div class="lgrid">';
+      if(items.length===0)h+='<div class="muted">No deliverables slotted.</div>';
+      else{
+        let grouped={};items.forEach(i=>{if(!grouped[i.p])grouped[i.p]=[];grouped[i.p].push(i.txt);});
+        Object.entries(grouped).forEach(([pid,txts])=>{
+          h+='<div class="lcard" onclick="selProj(\''+pid+'\')"><div class="lcard-n">'+esc(pName(pid))+'<span class="lcard-cnt">'+txts.length+'</span></div>';
+          txts.forEach(t=>h+='<div class="litem">'+esc(t)+'</div>');
+          h+='</div>';
+        });
+      }
+      h+='</div></div>';
+    });
+    h+='<div class="ov-sec" style="margin-top:20px;margin-bottom:8px">System Dependency Register</div>'+
+       '<div class="tbtn prim" style="margin-bottom:10px" onclick="window.ncSet(\'fp\',\'\');openModal(\'add-conn\',{})">+ Establish Relationship Link</div>'+
+       '<div id="conn-matrix-list">';
+    const conns=Object.values(window.D.conns||{});
+    if(conns.length===0)h+='<div class="muted">No structural interfaces defined.</div>';
+    else conns.forEach(c=>h+=window.connRow(c,true));
+    m.innerHTML=h+'</div></div>';
+  }
+
+  /* ── INTERACTIONS ── */
+  window.selProj = function(id){window.ui.sel=id;window.ui.gview='project';window.ui.statusMenu=false;window.render();}
+  window.selGview = function(v){window.ui.gview=v;window.ui.statusMenu=false;window.render();}
+  window.selTab = function(t){window.ui.tab=t;window.render();}
+  window.toggleTeam = function(){window.ui.showTeam=!window.ui.showTeam;window.render();}
+  window.setRoadFilter = function(f){window.ui.roadFilter=f;window.render();}
+  window.toggleSmenu = function(e){e.stopPropagation();window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
+  function closeSmenu(){window.ui.statusMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
+  
+  window.setProjStatus = function(pid,st){
+    if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
+  }
+
+  /* ── MUTATIONS ── */
+  window.addTask = function(pid){
+    const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
+    const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
+    if(!window.D.tasks)window.D.tasks={};window.D.tasks[id]={id,p:pid,txt,a:tagVal,done:false};
+    if(inp)inp.value='';window.save();window.render();
+  }
+  window.toggleTask = function(pid,tid){
+    if(window.D.tasks[tid]){window.D.tasks[tid].done=!window.D.tasks[tid].done;window.save();window.render();}
+  }
+  window.delTask = function(pid,tid){
+    if(window.D.tasks[tid]){delete window.D.tasks[tid];window.save();window.render();}
+  }
+  window.clearDone = function(pid){
+    Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid&&t.done)delete window.D.tasks[t.id];});
+    window.save();window.render();
+  }
+
+  window.addRoad = function(pid,lane){
+    const inp=$('r_inp_'+lane);const txt=(inp?inp.value:'').trim();if(!txt)return;
+    const id='r'+window.uid();if(!window.D.road)window.D.road={};window.D.road[id]={id,p:pid,txt,lane};
+    if(inp)inp.value='';window.save();window.render();
+  }
+  window.moveRoad = function(pid,rid,currLane){
+    const idx=window.LANES.indexOf(currLane);const nxt=window.LANES[(idx+1)%window.LANES.length];
+    if(window.D.road[rid]){window.D.road[rid].lane=nxt;window.save();window.render();}
+  }
+  window.delRoad = function(pid,rid){
+    if(window.D.road[rid]){delete window.D.road[rid];window.save();window.render();}
+  }
+
+  window.setLeader = function(val){
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,leader:val};window.save();window.render();
+  }
+  window.addDev = function(name){
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    if(!(m.devs||[]).includes(name)){window.D.pmeta[window.ui.sel]={...m,devs:[...(m.devs||[]),name]};window.save();window.render();}
+  }
+  window.removeDev = function(i){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);const d=[...(m.devs||[])];d.splice(i,1);
+    window.D.pmeta[window.ui.sel]={...m,devs:d};window.save();window.render();
+  }
+  window.addItem = function(kind){
+    const inp=$(kind==='feature'?'fi_inp':'si_inp');const name=(inp?inp.value:'').trim();if(!name)return;
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,items:[...(m.items||[]),{id:'i'+window.uid(),name,kind}]};
+    if(inp)inp.value='';window.save();window.render();
+  }
+  window.removeItem = function(iid){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,items:(m.items||[]).filter(i=>i.id!==iid)};window.save();window.render();
+  }
+
+  window.ncSet = function(key,val){
+    window.ui.nc[key]=val;if(key==='fp')window.ui.nc.fi='';if(key==='tp')window.ui.nc.ti='';renderModalContent();
+  }
+  window.ncSetSt = function(val){window.ui.nc.st=val;renderModalContent();}
+  
+  window.addConn = function(){
+    if(!window.ui.nc.fp||!window.ui.nc.tp){alert('Select both projects.');return;}
+    const rel=(($('nc_rel')?$('nc_rel').value:'').trim()||'integration');const id='c'+window.uid();
+    if(!window.D.conns)window.D.conns={};window.D.conns[id]={id,fp:window.ui.nc.fp,fi:window.ui.nc.fi,tp:window.ui.nc.tp,ti:window.ui.nc.ti,rel,st:window.ui.nc.st};
+    window.save();closeModal();window.render();
+  }
+  window.delConn = function(cid){if(window.D.conns[cid]){delete window.D.conns[cid];window.save();window.render();}}
+
+  /* ── MODALS ENGINE ── */
+  window.openModal = function(kind,opts){
+    window.ui.modal={kind,opts};$('modal-overlay').style.display='flex';renderModalContent();
+  }
+  window.closeModal = function(){window.ui.modal=null;$('modal-overlay').style.display='none';}
+  $('modal-bg').onclick=window.closeModal;
+
+  function renderModalContent(){
+    const b=$('modal-box');if(!window.ui.modal)return;const k=window.ui.modal.kind;const opts=window.ui.modal.opts;
+    if(k==='add-project'){
+      b.className='modal-box';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Create Product Core Slot</div></div>'+
+         '<div class="modal-body">'+
+         '<div class="mfld"><label>Product Ref Key (Single word, lowercase)</label><input type="text" id="m_id" placeholder="e.g. moni-loans"></div>'+
+         '<div class="mfld"><label>Product Title Name</label><input type="text" id="m_name" placeholder="e.g. Moni Loans"></div>'+
+         '<div class="mfld"><label>Local Handle</label><input type="text" id="m_local" placeholder="e.g. Loans"></div>'+
+         '<div class="mfld"><label>Architecture Class</label><select id="m_type"><option value="customer">Customer Facing (B2C)</option><option value="platform">Platform Infrastructure</option><option value="service">Shared Microservice</option><option value="internal">Internal Suite</option></select></div>'+
+         '<div class="mfld"><label>Description Scope</label><textarea id="m_desc" placeholder="Scope description..."></textarea></div>'+
+         '<div class="mfld"><label>Tags (Comma-separated)</label><input type="text" id="m_tags" placeholder="e.g. Core, Risk"></div>'+
+         '</div><div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="submitProject()">Create Index</button></div>';
+    }else if(k==='del-project'){
+      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Purge System Node</div></div>'+
+         '<div class="modal-body"><div class="del-warn">Are you sure you want to permanently delete <strong>'+esc(pName(opts.pid))+'</strong>? This action wipes all associated scope tickets, dependencies, and timelines.</div></div>'+
+         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitDelProject(\''+opts.pid+'\')">Confirm Wipe</button></div>';
+    }else if(k==='add-conn'){
+      b.className='modal-box';let p1Opts='<option value="">-- Select System --</option>';let p2Opts='<option value="">-- Select System --</option>';
+      projs().forEach(p=>{p1Opts+='<option value="'+p.id+'"'+(window.ui.nc.fp===p.id?' selected':'')+'>'+p.name+'</option>';p2Opts+='<option value="'+p.id+'"'+(window.ui.nc.tp===p.id?' selected':'')+'>'+p.name+'</option>';});
+      let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+i.name+'"'+(window.ui.nc.fi===i.name?' selected':'')+'>'+i.name+'</option>');
+      let f2Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.tp)getItems(window.ui.nc.tp).forEach(i=>f2Opts+='<option value="'+i.name+'"'+(window.ui.nc.ti===i.name?' selected':'')+'>'+i.name+'</option>');
+      b.innerHTML='<div class="modal-hdr"><div class="modal-title">Establish Architecture Interface Link</div></div>'+
+         '<div class="modal-body">'+
+         '<div class="add-conn-form" style="margin-top:0; padding:0; background:transparent;">'+
+         '<div class="mfld"><label>Source System Node</label><select onchange="window.ncSet(\'fp\',this.value)">'+p1Opts+'</select></div>'+
+         '<div class="mfld"><label>Source Sub-feature (Optional)</label><select onchange="window.ncSet(\'fi\',this.value)">'+f1Opts+'</select></div>'+
+         '<div class="mfld"><label>Relationship / Sync Interface Protocol</label><input type="text" id="nc_rel" placeholder="e.g. gRPC Core Sync, API, webhook" value="'+esc(window.ui.nc.rel)+'" onchange="window.ui.nc.rel=this.value"></div>'+
+         '<div class="mfld"><label>Target System Node</label><select onchange="window.ncSet(\'tp\',this.value)">'+p2Opts+'</select></div>'+
+         '<div class="mfld"><label>Target Sub-feature (Optional)</label><select onchange="window.ncSet(\'ti\',this.value)">'+f2Opts+'</select></div>'+
+         '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
+         '</div></div>'+
+         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="window.addConn()">Form Structural Interface</button></div>';
+    }else if(k==='reset'){
+      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Reset Realtime Database</div></div>'+
+         '<div class="modal-body"><div class="del-warn">This will reset your Firebase database to default seed data. Proceed?</div></div>'+
+         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitReset()">Reset</button></div>';
+    }
+  }
+
+  window.submitProject = function(){
+    const id=(($('m_id')?$('m_id').value:'').trim().toLowerCase());const name=(($('m_name')?$('m_name').value:'').trim());const local=(($('m_local')?$('m_local').value:'').trim());
+    const type=$('m_type')?$('m_type').value:'customer';const desc=(($('m_desc')?$('m_desc').value:'').trim());const tagsInp=$('m_tags')?$('m_tags').value:'';
+    if(!id||!name){alert('ID and Name required.');return;}
+    const tags=tagsInp.split(',').map(t=>t.trim()).filter(t=>t);
+    if(!window.D.projects)window.D.projects={};window.D.projects[id]={id,name,local,type,status:'planned',desc,tags};
+    window.ui.sel=id;window.ui.gview='project';window.save();window.closeModal();window.render();
+  }
+  window.submitDelProject = function(pid){
+    if(window.D.projects[pid])delete window.D.projects[pid];
+    Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid)delete window.D.tasks[t.id];});
+    Object.values(window.D.road||{}).forEach(r=>{if(r.p===pid)delete window.D.road[r.id];});
+    Object.values(window.D.conns||{}).forEach(c=>{if(c.fp===pid||c.tp===pid)delete window.D.conns[c.id];});
+    if(window.D.pmeta&&window.D.pmeta[pid])delete window.D.pmeta[pid];
+    if(window.D.eco&&window.D.eco[pid])delete window.D.eco[pid];
+    if(window.ui.sel===pid)window.ui.sel=window.projs().length?window.projs()[0].id:null;
+    window.ui.gview='overview';window.save();window.closeModal();window.render();
+  }
+  window.submitReset = function(){
+    window.D = defaultData();window.save();window.closeModal();window.render();
+  }
 </script>
 </body>
 </html>
