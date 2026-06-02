@@ -238,7 +238,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="topbar">
     <span class="brand">NBFI <span>&middot; Product OS</span></span>
     <div class="spacer"></div>
-    <!-- АЖИЛТАН СОНГОХ ХЭСЭГ (Дээд талбарт байрлана) -->
     <span style="font-size:12px; color:var(--text2); font-weight:600;">Active User:</span>
     <select id="current-user" class="user-selector" onchange="window.changeUser(this.value)">
       <option value="Анар">Анар</option>
@@ -301,7 +300,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   document.addEventListener("DOMContentLoaded", () => {
     if($('current-user')) $('current-user').value = window.currentUser;
   });
-
   window.changeUser = function(val) {
     window.currentUser = val;
     localStorage.setItem('selected_user', val);
@@ -314,494 +312,164 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   /* ── STATE ── */
   window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
-  window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
+  window.ui={gview:'overview',sel:null,laneInp:{},tab:'tasks',fteam:[]};
 
-  /* ── DATA HELPERS ── */
-  window.projs = function(){return Object.values(window.D.projects||{});}
-  window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
-  window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
-  window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
-  window.getMeta = function(pid){return(window.D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
-  window.getItems = function(pid){return getMeta(pid).items||[];}
-  window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
-  window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
-  window.badge = function(s,click){const m=window.SM[s]||window.SM.progress;return '<span class="bdg '+m.b+'"'+(click?' onclick="toggleSmenu(event)" title="Click to change"':'')+'>'+sdot(s)+m.l+'</span>';}
-  window.connRow = function(c,del){
-    const arr=c.st==='active'?'\u2192':'\u2194';
-    const sb=c.st==='active'?'<span class="csa">active</span>':'<span class="csp">planned</span>';
-    const db=del?'<button class="cdel" onclick="delConn(\''+c.id+'\')">&#10005;</button>':'';
-    return'<div class="conn-row"><span class="cproj">'+esc(pName(c.fp))+'</span>'+(c.fi?'<span class="citem">/ '+esc(c.fi)+'</span>':'')+
-      '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
-      '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
-
-  /* ── FIREBASE SAVE ── */
-  window.save = function(){
-    try{
-      set(dbRef, window.D);
-    }catch(e){
-      console.error('Firebase хадгалалтын алдаа:',e);
-    }
-  }
-
-  window.exportData = function(){
-    const blob=new Blob([JSON.stringify(window.D,null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
-  }
-
-  window.importData = function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const parsedData = JSON.parse(e.target.result);
-        if (!parsedData.projects) {
-          alert("Алдаа: Бүтэц буруу файл байна!");
-          return;
-        }
-        if (confirm("Энэ файлыг Firebase рүү хуулж, бүх хүмүүсийн датаг шинэчлэх үү?")) {
-          window.D = parsedData;
-          window.save();
-          if (window.projs().length > 0) window.ui.sel = window.projs()[0].id;
-          window.render();
-        }
-      } catch (err) {
-        alert("Уншихад алдаа гарлаа: " + err.message);
+  function defaultData(){
+    return {
+      projects:{},
+      tasks:{},
+      road:{},
+      conns:{},
+      eco:JSON.parse(JSON.stringify(window.DEF_ECO)),
+      team:{
+        'Анар':{role:'Product Owner',leads:[]},
+        'Зул-Эрдэнэ':{role:'Developer',leads:[]},
+        'Халиунаа':{role:'QA Engineer',leads:[]}
       }
     };
-    reader.readAsText(file);
-    event.target.value = '';
   }
 
-  /* ── SEED / DEFAULT DATA ── */
-  function defaultData(){
-    const tasks={},road={},conns={};
-    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'Халиунаа',at:'2026-05-10 14:20'},
-     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false,by:'Халиунаа',at:'2026-05-11 09:15'},
-     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false,by:'Анар',at:'2026-05-12 11:30'}
-    ].forEach(t=>tasks[t.id]=t);
-    return {
-      projects:{
-        moni:{id:'moni',name:'Moni App',local:'Moni',type:'customer',status:'live',desc:'Main consumer financial app offering micro-loans, wallet services, and utility payments.',tags:['Core','B2C','Mobile']},
-        omnipay:{id:'omnipay',name:'OmniPay',local:'OmniPay',type:'platform',status:'progress',desc:'Payment gateway ecosystem handling merchant QR, settlements, and BNPL configurations.',tags:['Payments','Infrastructure','B2B']},
-        los:{id:'los',name:'Loan Origination',local:'LOS',type:'internal',status:'progress',desc:'Internal automated scoring and underwriting desk managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']}
-      },
-      tasks,road,conns,
-      pmeta:{
-        moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
-      },
-      eco:JSON.parse(JSON.stringify(window.DEF_ECO))
-    };
-  }
-
-  /* ── FIREBASE REALTIME LISTEN ── */
+  /* ── DATA OPS ── */
   onValue(dbRef, (snapshot) => {
-    const data = snapshot.val();
-    if(data && data.projects) {
-      window.D = data;
+    const val = snapshot.val();
+    if(val) {
+      window.D = val;
+      if(!window.D.eco) window.D.eco = JSON.parse(JSON.stringify(window.DEF_ECO));
+      if(!window.D.team) window.D.team = defaultData().team;
     } else {
       window.D = defaultData();
-      window.save();
-    }
-    if(!window.ui.sel && window.projs().length > 0){
-      window.ui.sel = window.projs()[0].id;
     }
     window.render();
   });
 
-  /* ── RENDER ENGINE ── */
-  window.render = function(){
-    renderSb();
-    renderTeamBar();
-    renderMain();
-  }
-  
-  function renderSb(){
-    let h='<div class="sb-sec"><span>Projects</span></div>';
-    projs().forEach(p=>{
-      const sel=window.ui.sel===p.id?' on':'';
-      const ot=openTasks(p.id);
-      const cnt=ot?'<span class="pcnt">'+ot+'</span>':'';
-      h+='<div class="pitem'+sel+'" onclick="selProj(\''+p.id+'\')">'+
-         sdot(p.status)+'<span class="pname">'+esc(p.name)+'</span>'+cnt+
-         '<div class="pitem-act"><button class="piabtn del" onclick="event.stopPropagation();openModal(\'del-project\',{pid:\''+p.id+'\'})">&#10005;</button></div>'+
-         '</div>';
-    });
-    h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
-       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
-       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
-       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
-    $('sb-scroll').innerHTML=h;
-    $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
+  window.save = function(){
+    set(dbRef, window.D);
   }
 
-  function renderTeamBar(){
-    const tb=$('team-bar');
-    if(!window.ui.showTeam){tb.style.display='none';$('team-btn').classList.remove('on');return;}
-    tb.style.display='flex';$('team-btn').classList.add('on');
-    let m=new Set();projs().forEach(p=>{const meta=getMeta(p.id);if(meta.leader)m.add(meta.leader);(meta.devs||[]).forEach(d=>m.add(d));});
-    let h='<span class="tlbl">&#128100; Roster:</span>';
-    if(m.size===0)h+='<span class="muted" style="font-size:12px;padding:0">No team members allocated.</span>';
-    else m.forEach(name=>h+='<span class="mchip">'+esc(name)+'</span>');
-    tb.innerHTML=h;
+  window.exportData = function(){
+    const s = JSON.stringify(window.D,null,2);
+    const blob = new Blob([s],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'nbfi_product_os_data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
-  function renderMain(){
-    const m=$('main');
-    if(window.ui.gview!=='project'){renderGlobalView(m);return;}
-    const p=(window.D.projects||{})[window.ui.sel];
-    if(!p){m.innerHTML='<div class="muted" style="padding:20px">Project not found.</div>';return;}
-    const meta=getMeta(p.id);const tasks=pTasks(p.id);const dn=tasks.filter(t=>t.done).length;const tot=tasks.length;const pct=tot?Math.round((dn/tot)*100):0;
-    let h='<div class="phdr"><div class="ptrow"><span class="pt">'+esc(p.name)+'</span>';
-    if(p.local)h+='<span class="plocal">('+esc(p.local)+')</span>';
-    h+=badge(p.status,true)+'<span class="ptype">'+esc(p.type).toUpperCase()+'</span></div>'+
-       '<div class="pmeta-row">'+
-       '<div class="pmeta-g"><span class="pmeta-l">Lead:</span><span class="pmeta-v">'+esc(meta.leader||'Unassigned')+'</span></div>'+
-       '<div class="pmeta-sep"></div><div class="pmeta-g"><span class="pmeta-l">Devs:</span>';
-    if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
-    else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
-    h+='</div></div><div class="tabs">'+
-       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
-       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
-       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
-       '</div></div><div class="mbody">';
-    if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
-    else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
-    else h+=renderProjectMeta(p,meta);
-    h+'</div>';m.innerHTML=h;
-    if(window.ui.statusMenu)renderStatusMenu(p);
-  }
-
-  function renderStatusMenu(p){
-    let div=$('smenu-box');if(!div){div=document.createElement('div');div.id='smenu-box';div.className='smenu';document.body.appendChild(div);}
-    let h='';Object.entries(window.SM).forEach(([k,v])=>{h+='<div class="sopt" onclick="setProjStatus(\''+p.id+'\',\''+k+'\')">'+sdot(k)+' '+v.l+'</div>';});
-    div.innerHTML=h;const b=document.querySelector('.bdg');if(b){const r=b.getBoundingClientRect();div.style.top=(r.bottom+window.scrollY)+'px';div.style.left=(r.left+window.scrollX)+'px';div.style.display='block';}
-  }
-
-  function renderProjectTasks(p,tasks,dn,tot,pct){
-    let h='<div class="tmeta"><span>'+pct+'% Complete ('+dn+'/'+tot+' tasks)</span>'+(dn>0?'<button class="clr" onclick="clearDone(\''+p.id+'\')">Clear completed</button>':'')+'</div>'+
-       '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
-       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
-       '<select id="t_tag"><option value="">No context item</option>';
-    getItems(p.id).forEach(i=>h+='<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>');
-    h+='</select><button onclick="addTask(\''+p.id+'\')">+ Add</button></div>';
-    const active=tasks.filter(t=>!t.done);const done=tasks.filter(t=>t.done);
-    h+='<div class="tlist">';
-    if(active.length===0&&done.length===0)h+='<div class="muted">No scope items created yet.</div>';
-    else{
-      active.forEach(t=>h+=taskRow(t));
-      if(done.length>0){h+='<div class="donesec"><div class="dnhdr">Completed</div>';done.forEach(t=>h+=taskRow(t));h+='</div>';}
-    }
-    return h+'</div>';
-  }
-
-  /* TASK МӨР ДЭЭР ХЭН, ХЭЗЭЭ НЭМСНИЙГ ХАРАГДУУЛАХ ХЭСЭГ */
-  function taskRow(t){
-    const ck=t.done?' ck':'';const dn=t.done?' dn':'';
-    const createdBy = t.by ? esc(t.by) : 'Unknown';
-    const createdAt = t.at ? esc(t.at) : 'N/A';
-    
-    return'<div class="titem"><div class="chk'+ck+'" onclick="toggleTask(\''+t.p+'\',\''+t.id+'\')"></div>'+
-       '<div style="flex:1;"><span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+
-       '<span class="ts-meta">Added by <b>'+createdBy+'</b> on '+createdAt+'</span></div>'+
-       (t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
-       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';
-  }
-
-  function renderProjectRoadmap(p){
-    const items=roadItems(p.id);
-    let h='<div class="rcols">';
-    window.LANES.forEach(l=>{
-      const li=items.filter(i=>i.lane===l);
-      h+='<div class="rcol"><div class="rch"><span class="rct" style="text-transform:uppercase">'+l+'</span><span class="rcc">'+li.length+'</span></div><div class="rlist">';
-      if(li.length===0)h+='<div class="muted" style="font-size:11px">Empty</div>';
-      else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
-         '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
-         '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
-      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
-         '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
-    });
-    return h+'</div>';
-  }
-
-  function renderProjectMeta(p,meta){
-    let h='<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
-       '<div class="stitle">Tags</div><div class="tags">';
-    if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
-    else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
-    h+='</div><div class="ps-grid">'+
-       '<div class="ps-col"><div class="ps-col-title">Context & Core Architecture Items</div><div class="ps-items" id="meta-items-list">';
-    const items=meta.items||[];
-    if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
-    else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
-    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
-       '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
-       '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
-    ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
-    h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
-    (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
-    h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
-    ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
-    return h+'</select></div></div></div></div></div>';
-  }
-
-  function renderGlobalView(m){
-    if(window.ui.gview==='overview')renderOverview(m);
-    else if(window.ui.gview==='ecosystem')renderEcosystem(m);
-    else renderMatrix(m);
-  }
-
-  function renderOverview(m){
-    let tot=projs().length;let live=projs().filter(p=>p.status==='live').length;let prog=projs().filter(p=>p.status==='progress').length;let bug=projs().filter(p=>p.status==='bugs').length;
-    let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
-       '<div class="ov-stats">'+
-       '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
-       '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
-       '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
-       '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
-       '</div><div class="ov-sec">Product Catalog</div><div class="ov-grid">';
-    projs().forEach(p=>{
-      const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
-      h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
-         '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
-         '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
-         '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
-         '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
-      (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
-      h+='</div></div>';
-    });
-    m.innerHTML=h+'</div></div>';
-  }
-
-  function renderEcosystem(m){
-    let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
-       '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
-       '</div><div class="eco-wrap" id="eco-wrap" style="height:100%">'+
-       '<div class="eco-legend"><div class="eco-legend-title">System Class</div>'+
-       '<div class="eco-lr"><span class="dot dl"></span> Live Core</div>'+
-       '<div class="eco-lr"><span class="dot dp"></span> Progress</div>'+
-       '<div class="eco-lr"><span class="dot db"></span> Impacted / Bugs</div>'+
-       '<div class="eco-lr"><span class="dot dpl"></span> Pipeline</div>'+
-       '</div><div class="eco-hint">Drag platforms to map dependencies dynamically</div>'+
-       '<svg id="eco-svg" style="width:100%;height:100%;position:absolute;inset:0;z-index:1"></svg>';
-    projs().forEach(p=>{
-      const coord=(window.D.eco||{})[p.id]||window.DEF_ECO[p.id]||{x:150,y:150};const dotM=window.SM[p.status]||window.SM.progress;
-      h+='<div class="pitem" id="node-'+p.id+'" style="position:absolute;left:'+coord.x+'px;top:'+coord.y+'px;z-index:5;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:6px 11px;cursor:move;user-select:none;margin:0;display:flex;align-items:center;gap:6px" onmousedown="dragNode(event,\''+p.id+'\')">'+
-         '<span class="dot '+dotM.d+'"></span><span style="font-size:12px;font-weight:600">'+esc(p.name)+'</span></div>';
-    });
-    m.innerHTML=h+'</div>';drawConnections();
-  }
-
-  function drawConnections(){
-    const svg=$('eco-svg');if(!svg)return;let h='';const wrap=$('eco-wrap');if(!wrap)return;const rect=wrap.getBoundingClientRect();
-    Object.values(window.D.conns||{}).forEach(c=>{
-      if(window.ui.roadFilter!=='all'&&c.st!==window.ui.roadFilter)return;
-      const n1=$('node-'+c.fp);const n2=$('node-'+c.tp);if(!n1||!n2)return;
-      const x1=n1.offsetLeft+(n1.offsetWidth/2);const y1=n1.offsetTop+(n1.offsetHeight/2);
-      const x2=n2.offsetLeft+(n2.offsetWidth/2);const y2=n2.offsetTop+(n2.offsetHeight/2);
-      const col=c.st==='active'?'var(--blue)':'var(--amber)';const dash=c.st==='active'?'':' stroke-dasharray="4,4"';
-      h+='<g class="edge" style="cursor:pointer" onclick="openConnModal(\''+c.id+'\')">'+
-         '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="2" opacity="0.35"'+dash+'/>'+
-         '<circle cx="'+((x1+x2)/2)+'" cy="'+((y1+y2)/2)+'" r="4" fill="'+col+'" opacity="0.8"/>'+
-         '</g>';
-    });
-    svg.innerHTML=h;
-  }
-
-  window.dragNode = function(e,pid){
-    e.preventDefault();const n=$('node-'+pid);if(!n)return;const wrap=$('eco-wrap');if(!wrap)return;
-    const sx=e.clientX-n.offsetLeft;const sy=e.clientY-n.offsetTop;
-    document.onmousemove=function(ev){
-      let x=ev.clientX-sx;let y=ev.clientY-sy;
-      x=Math.max(10,Math.min(wrap.offsetWidth-n.offsetWidth-10,x));y=Math.max(10,Math.min(wrap.offsetHeight-n.offsetHeight-10,y));
-      n.style.left=x+'px';n.style.top=y+'px';drawConnections();
-      if(!window.D.eco)window.D.eco={};window.D.eco[pid]={x,y};
+  window.importData = function(e){
+    const file = e.target.files[0];
+    if(!file)return;
+    const r = new FileReader();
+    r.onload = function(evt){
+      try{
+        const parsed = JSON.parse(evt.target.result);
+        if(parsed && typeof parsed === 'object'){
+          window.D = parsed;
+          window.save();
+          alert('Data imported successfully!');
+        } else { alert('Invalid file format.'); }
+      }catch(err){alert('Error parsing JSON.');}
     };
-    document.onmouseup=function(){document.onmousemove=null;document.onmouseup=null;window.save();};
+    r.readAsText(file);
   }
 
-  function renderMatrix(m){
-    let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap Matrix</div><div class="gsub">Consolidated multi-product sprint lanes</div></div><div class="scrollbody">';
-    window.LANES.forEach(lane=>{
-      let items=[];projs().forEach(p=>{roadItems(p.id).filter(r=>r.lane===lane).forEach(r=>{items.push({p:p.id,txt:r.txt});});});
-      h+='<div class="lsec"><div class="lhdr"><span class="llbl" style="text-transform:uppercase">'+lane+'</span><span class="lcnt">'+items.length+'</span></div><div class="lgrid">';
-      if(items.length===0)h+='<div class="muted">No deliverables slotted.</div>';
-      else{
-        let grouped={};items.forEach(i=>{if(!grouped[i.p])grouped[i.p]=[];grouped[i.p].push(i.txt);});
-        Object.entries(grouped).forEach(([pid,txts])=>{
-          h+='<div class="lcard" onclick="selProj(\''+pid+'\')"><div class="lcard-n">'+esc(pName(pid))+'<span class="lcard-cnt">'+txts.length+'</span></div>';
-          txts.forEach(t=>h+='<div class="litem">'+esc(t)+'</div>');
-          h+='</div>';
-        });
-      }
-      h+='</div></div>';
-    });
-    h+='<div class="ov-sec" style="margin-top:20px;margin-bottom:8px">System Dependency Register</div>'+
-       '<div class="tbtn prim" style="margin-bottom:10px" onclick="window.ncSet(\'fp\',\'\');openModal(\'add-conn\',{})">+ Establish Relationship Link</div>'+
-       '<div id="conn-matrix-list">';
-    const conns=Object.values(window.D.conns||{});
-    if(conns.length===0)h+='<div class="muted">No structural interfaces defined.</div>';
-    else conns.forEach(c=>h+=window.connRow(c,true));
-    m.innerHTML=h+'</div></div>';
-  }
-
-  /* ── INTERACTIONS ── */
-  window.selProj = function(id){window.ui.sel=id;window.ui.gview='project';window.ui.statusMenu=false;window.render();}
-  window.selGview = function(v){window.ui.gview=v;window.ui.statusMenu=false;window.render();}
-  window.selTab = function(t){window.ui.tab=t;window.render();}
-  window.toggleTeam = function(){window.ui.showTeam=!window.ui.showTeam;window.render();}
-  window.setRoadFilter = function(f){window.ui.roadFilter=f;window.render();}
-  window.toggleSmenu = function(e){e.stopPropagation();window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
-  function closeSmenu(){window.ui.statusMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
-  
-  window.setProjStatus = function(pid,st){
-    if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
-  }
-
-  /* ── MUTATIONS ── */
-  window.addTask = function(pid){
-    const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
-    const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
+  /* ── MODALS ── */
+  window.openModal = function(type, ctx={}){
+    const box = $('modal-box');
+    box.className = 'modal-box';
+    if(type==='reset'||type==='del-project') box.classList.add('sm');
+    box.innerHTML = getModalContent(type, ctx);
+    $('modal-overlay').style.display = 'flex';
     
-    const now = new Date();
-    const timeStr = now.getFullYear() + '-' + 
-                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
-                    String(now.getDate()).padStart(2,'0') + ' ' + 
-                    String(now.getHours()).padStart(2,'0') + ':' + 
-                    String(now.getMinutes()).padStart(2,'0');
-
-    if(!window.D.tasks)window.D.tasks={};
-    
-    window.D.tasks[id]={
-      id,
-      p:pid,
-      txt,
-      a:tagVal,
-      done:false,
-      by: window.currentUser,
-      at: timeStr
-    };
-    
-    if(inp)inp.value='';window.save();window.render();
-  }
-  
-  window.toggleTask = function(pid,tid){
-    if(window.D.tasks[tid]){
-      window.D.tasks[tid].done=!window.D.tasks[tid].done;
-      window.D.tasks[tid].modifiedBy = window.currentUser; 
-      window.save();
-      window.render();
+    if(type==='add-project'){
+      const tc = $('m_tags_container');
+      window.m_tags_list = [];
+      window.renderModalTags = () => {
+        tc.innerHTML = window.m_tags_list.map((t,i)=>`<span class="tag-chip">${window.esc(t)} <button onclick="window.m_tags_list.splice(${i},1);window.renderModalTags();">&times;</button></span>`).join('');
+        $('m_tags').value = window.m_tags_list.join(',');
+      };
+      $('m_tag_add_btn').onclick = () => {
+        const v = $('m_tag_input').value.trim();
+        if(v && !window.m_tags_list.includes(v)){
+          window.m_tags_list.push(v);
+          window.renderModalTags();
+        }
+        $('m_tag_input').value = '';
+      };
     }
   }
-  window.delTask = function(pid,tid){
-    if(window.D.tasks[tid]){delete window.D.tasks[tid];window.save();window.render();}
+  window.closeModal = function(){
+    $('modal-overlay').style.display = 'none';
+    $('modal-box').innerHTML = '';
   }
-  window.clearDone = function(pid){
-    Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid&&t.done)delete window.D.tasks[t.id];});
-    window.save();window.render();
-  }
+  $('modal-bg').onclick = closeModal;
 
-  window.addRoad = function(pid,lane){
-    const inp=$('r_inp_'+lane);const txt=(inp?inp.value:'').trim();if(!txt)return;
-    const id='r'+window.uid();if(!window.D.road)window.D.road={};window.D.road[id]={id,p:pid,txt,lane};
-    if(inp)inp.value='';window.save();window.render();
-  }
-  window.moveRoad = function(pid,rid,currLane){
-    const idx=window.LANES.indexOf(currLane);const nxt=window.LANES[(idx+1)%window.LANES.length];
-    if(window.D.road[rid]){window.D.road[rid].lane=nxt;window.save();window.render();}
-  }
-  window.delRoad = function(pid,rid){
-    if(window.D.road[rid]){delete window.D.road[rid];window.save();window.render();}
-  }
-
-  window.setLeader = function(val){
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,leader:val};window.save();window.render();
-  }
-  window.addDev = function(name){
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    if(!(m.devs||[]).includes(name)){window.D.pmeta[window.ui.sel]={...m,devs:[...(m.devs||[]),name]};window.save();window.render();}
-  }
-  window.removeDev = function(i){
-    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);const d=[...(m.devs||[])];d.splice(i,1);
-    window.D.pmeta[window.ui.sel]={...m,devs:d};window.save();window.render();
-  }
-  window.addItem = function(kind){
-    const inp=$(kind==='feature'?'fi_inp':'si_inp');const name=(inp?inp.value:'').trim();if(!name)return;
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,items:[...(m.items||[]),{id:'i'+window.uid(),name,kind}]};
-    if(inp)inp.value='';window.save();window.render();
-  }
-  window.removeItem = function(iid){
-    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,items:(m.items||[]).filter(i=>i.id!==iid)};window.save();window.render();
-  }
-
-  window.ncSet = function(key,val){
-    window.ui.nc[key]=val;if(key==='fp')window.ui.nc.fi='';if(key==='tp')window.ui.nc.ti='';renderModalContent();
-  }
-  window.ncSetSt = function(val){window.ui.nc.st=val;renderModalContent();}
-  
-  window.addConn = function(){
-    if(!window.ui.nc.fp||!window.ui.nc.tp){alert('Select both projects.');return;}
-    const rel=(($('nc_rel')?$('nc_rel').value:'').trim()||'integration');const id='c'+window.uid();
-    if(!window.D.conns)window.D.conns={};window.D.conns[id]={id,fp:window.ui.nc.fp,fi:window.ui.nc.fi,tp:window.ui.nc.tp,ti:window.ui.nc.ti,rel,st:window.ui.nc.st};
-    window.save();closeModal();window.render();
-  }
-  window.delConn = function(cid){if(window.D.conns[cid]){delete window.D.conns[cid];window.save();window.render();}}
-
-  /* ── MODALS ENGINE ── */
-  window.openModal = function(kind,opts){
-    window.ui.modal={kind,opts};$('modal-overlay').style.display='flex';renderModalContent();
-  }
-  window.closeModal = function(){window.ui.modal=null;$('modal-overlay').style.display='none';}
-  $('modal-bg').onclick=window.closeModal;
-
-  function renderModalContent(){
-    const b=$('modal-box');if(!window.ui.modal)return;const k=window.ui.modal.kind;const opts=window.ui.modal.opts;
-    if(k==='add-project'){
-      b.className='modal-box';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Create Product Core Slot</div></div>'+
-         '<div class="modal-body">'+
-         '<div class="mfld"><label>Product Ref Key (Single word, lowercase)</label><input type="text" id="m_id" placeholder="e.g. moni-loans"></div>'+
-         '<div class="mfld"><label>Product Title Name</label><input type="text" id="m_name" placeholder="e.g. Moni Loans"></div>'+
-         '<div class="mfld"><label>Local Handle</label><input type="text" id="m_local" placeholder="e.g. Loans"></div>'+
-         '<div class="mfld"><label>Architecture Class</label><select id="m_type"><option value="customer">Customer Facing (B2C)</option><option value="platform">Platform Infrastructure</option><option value="service">Shared Microservice</option><option value="internal">Internal Suite</option></select></div>'+
-         '<div class="mfld"><label>Description Scope</label><textarea id="m_desc" placeholder="Scope description..."></textarea></div>'+
-         '<div class="mfld"><label>Tags (Comma-separated)</label><input type="text" id="m_tags" placeholder="e.g. Core, Risk"></div>'+
-         '</div><div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="submitProject()">Create Index</button></div>';
-    }else if(k==='del-project'){
-      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Purge System Node</div></div>'+
-         '<div class="modal-body"><div class="del-warn">Are you sure you want to permanently delete <strong>'+esc(pName(opts.pid))+'</strong>? This action wipes all associated scope tickets, dependencies, and timelines.</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitDelProject(\''+opts.pid+'\')">Confirm Wipe</button></div>';
-    }else if(k==='add-conn'){
-      b.className='modal-box';let p1Opts='<option value="">-- Select System --</option>';let p2Opts='<option value="">-- Select System --</option>';
-      projs().forEach(p=>{p1Opts+='<option value="'+p.id+'"'+(window.ui.nc.fp===p.id?' selected':'')+'>'+p.name+'</option>';p2Opts+='<option value="'+p.id+'"'+(window.ui.nc.tp===p.id?' selected':'')+'>'+p.name+'</option>';});
-      let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+i.name+'"'+(window.ui.nc.fi===i.name?' selected':'')+'>'+i.name+'</option>');
-      let f2Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.tp)getItems(window.ui.nc.tp).forEach(i=>f2Opts+='<option value="'+i.name+'"'+(window.ui.nc.ti===i.name?' selected':'')+'>'+i.name+'</option>');
-      b.innerHTML='<div class="modal-hdr"><div class="modal-title">Establish Architecture Interface Link</div></div>'+
-         '<div class="modal-body">'+
-         '<div class="add-conn-form" style="margin-top:0; padding:0; background:transparent;">'+
-         '<div class="mfld"><label>Source System Node</label><select onchange="window.ncSet(\'fp\',this.value)">'+p1Opts+'</select></div>'+
-         '<div class="mfld"><label>Source Sub-feature (Optional)</label><select onchange="window.ncSet(\'fi\',this.value)">'+f1Opts+'</select></div>'+
-         '<div class="mfld"><label>Relationship / Sync Interface Protocol</label><input type="text" id="nc_rel" placeholder="e.g. gRPC Core Sync, API, webhook" value="'+esc(window.ui.nc.rel)+'" onchange="window.ui.nc.rel=this.value"></div>'+
-         '<div class="mfld"><label>Target System Node</label><select onchange="window.ncSet(\'tp\',this.value)">'+p2Opts+'</select></div>'+
-         '<div class="mfld"><label>Target Sub-feature (Optional)</label><select onchange="window.ncSet(\'ti\',this.value)">'+f2Opts+'</select></div>'+
-         '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
-         '</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="window.addConn()">Form Structural Interface</button></div>';
-    }else if(k==='reset'){
-      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Reset Realtime Database</div></div>'+
-         '<div class="modal-body"><div class="del-warn">This will reset your Firebase database to default seed data. Proceed?</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitReset()">Reset</button></div>';
+  function getModalContent(type, ctx){
+    switch(type){
+      case 'add-project':
+        return `
+          <div class="modal-hdr"><div class="modal-title">New Project</div></div>
+          <div class="modal-body">
+            <div class="mfld"><label>Project ID (unique, lowercase)</label><input type="text" id="m_id" placeholder="e.g. omnipay"></div>
+            <div class="mfld"><label>Project Name</label><input type="text" id="m_name" placeholder="e.g. OmniPay Application"></div>
+            <div class="mfld"><label>Localization (Монгол хэл дээрх нэр)</label><input type="text" id="m_local" placeholder="e.g. ОмниПэй Апп"></div>
+            <div class="mfld"><label>Type</label>
+              <select id="m_type">
+                <option value="customer">Customer Facing</option>
+                <option value="internal">Internal System</option>
+                <option value="core">Core Architecture</option>
+              </select>
+            </div>
+            <div class="mfld"><label>Description</label><textarea id="m_desc" placeholder="Brief info..."></textarea></div>
+            <div class="mfld"><label>Tags</label>
+              <div class="tag-inp-wrap">
+                <div style="display:flex;gap:4px;"><input type="text" id="m_tag_input" placeholder="Add a tag..." style="flex:1"><button class="tbtn" id="m_tag_add_btn" type="button">Add</button></div>
+                <div class="tag-chips" id="m_tags_container" style="margin-top:6px;"></div>
+                <input type="hidden" id="m_tags">
+              </div>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="mbtn" onclick="closeModal()">Cancel</button>
+            <button class="mbtn prim" onclick="submitAddProject()">Create</button>
+          </div>
+        `;
+      case 'del-project':
+        return `
+          <div class="modal-hdr"><div class="modal-title" style="color:var(--red-text)">Delete Project</div></div>
+          <div class="modal-body">
+            <p class="del-warn">Are you sure you want to delete <strong>${window.esc(ctx.name)}</strong>? All connected tasks, roadmaps, and architecture relations will be permanently wiped.</p>
+          </div>
+          <div class="modal-foot">
+            <button class="mbtn" onclick="closeModal()">Cancel</button>
+            <button class="mbtn danger" onclick="submitDelProject('${window.esc(ctx.id)}')">Delete Everything</button>
+          </div>
+        `;
+      case 'reset':
+        return `
+          <div class="modal-hdr">
+            <div class="modal-title" style="color: var(--red-text); font-weight: bold; font-size: 17px;">🚨 Баазыг бүрэн форматлах уу?</div>
+            <div class="modal-sub" style="margin-top: 4px; color: var(--text-muted);">Энэ үйлдлийг буцаах боломжгүй бөгөөд бүх өгөгдөл устна.</div>
+          </div>
+          <div class="modal-body" style="padding: 15px 0;">
+            <p class="del-warn" style="margin-bottom: 12px; font-weight: 500;">Үргэлжлүүлэхийн тулд хамгаалалтын ПИН кодыг оруулна уу:</p>
+            <div class="mfld" style="display: flex; justify-content: center;">
+              <input type="password" id="reset-pin" placeholder="ПИН код" maxlength="6" style="text-align:center; font-size:18px; letter-spacing:6px; padding:8px; width:60%;">
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="mbtn" onclick="closeModal()">Цуцлах</button>
+            <button class="mbtn danger" onclick="submitReset()">Тийм, бүгдийг устга</button>
+          </div>
+        `;
     }
+    return '';
   }
 
-  window.submitProject = function(){
+  window.submitAddProject = function(){
     const id=(($('m_id')?$('m_id').value:'').trim().toLowerCase());const name=(($('m_name')?$('m_name').value:'').trim());const local=(($('m_local')?$('m_local').value:'').trim());
     const type=$('m_type')?$('m_type').value:'customer';const desc=(($('m_desc')?$('m_desc').value:'').trim());const tagsInp=$('m_tags')?$('m_tags').value:'';
     if(!id||!name){alert('ID and Name required.');return;}
@@ -814,14 +482,633 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid)delete window.D.tasks[t.id];});
     Object.values(window.D.road||{}).forEach(r=>{if(r.p===pid)delete window.D.road[r.id];});
     Object.values(window.D.conns||{}).forEach(c=>{if(c.fp===pid||c.tp===pid)delete window.D.conns[c.id];});
-    if(window.D.pmeta&&window.D.pmeta[pid])delete window.D.pmeta[pid];
-    if(window.D.eco&&window.D.eco[pid])delete window.D.eco[pid];
-    if(window.ui.sel===pid)window.ui.sel=window.projs().length?window.projs()[0].id:null;
-    window.ui.gview='overview';window.save();window.closeModal();window.render();
+    window.ui.sel=null;window.ui.gview='overview';window.save();window.closeModal();window.render();
   }
+  
   window.submitReset = function(){
-    window.D = defaultData();window.save();window.closeModal();window.render();
+    const pinInput = document.getElementById('reset-pin');
+    const userPin = pinInput ? pinInput.value.trim() : '';
+    const SECURITY_PIN = '9911'; 
+    
+    if (userPin === '') {
+      alert('❌ Хамгаалалтын ПИН кодыг оруулна уу!');
+      if(pinInput) pinInput.focus();
+      return;
+    }
+    
+    if (userPin !== SECURITY_PIN) {
+      alert('❌ Хамгаалалтын ПИН код буруу байна! Систем форматлах үйлдлийг цуцаллаа.');
+      if(pinInput) { pinInput.value = ''; pinInput.focus(); }
+      return;
+    }
+    
+    console.log('⚠️ Устгахаас өмнө автомат backup хийж байна...');
+    try {
+      const backupData = JSON.stringify(window.D || {}, null, 2);
+      const blob = new Blob([backupData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `AUTO_BACKUP_BEFORE_RESET_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Автомат backup хийхэд алдаа гарлаа:', err);
+    }
+
+    window.D = defaultData();
+    window.save();
+    window.closeModal();
+    window.render();
+    alert('✅ Баазыг амжилттай форматлалаа. Хуучин датаг файл хэлбэрээр автоматаар татаж авсан тул шаардлагатай бол буцааж импортлох боломжтой.');
   }
+
+  /* ── TEAM MGMT ── */
+  window.toggleTeam = function(){
+    const b = $('team-bar');
+    if(b.style.display==='none'){b.style.display='flex';window.renderTeamBar();}
+    else{b.style.display='none';}
+    $('team-btn').classList.toggle('on');
+  }
+  window.renderTeamBar = function(){
+    const b = $('team-bar');if(!b)return;
+    if(b.style.display==='none')return;
+    let h = `<div class="tlbl">Team Assignment Filters:</div>`;
+    Object.keys(window.D.team||{}).forEach(name=>{
+      const active = window.ui.fteam.includes(name);
+      h += `<button class="fbtn ${active?'on':''}" onclick="window.toggleTeamFilter('${window.esc(name)}')">${window.esc(name)}</button>`;
+    });
+    b.innerHTML = h;
+  }
+  window.toggleTeamFilter = function(name){
+    const idx = window.ui.fteam.indexOf(name);
+    if(idx===-1)window.ui.fteam.push(name);else window.ui.fteam.splice(idx,1);
+    window.renderTeamBar();window.render();
+  }
+
+  /* ── VIEW ROUTING ── */
+  window.setView = function(v,sel=null){
+    window.ui.gview=v;window.ui.sel=sel;window.render();
+  }
+
+  /* ── CORE RENDERER ── */
+  window.render = function(){
+    renderSidebar();
+    if(window.ui.gview==='overview') renderOverview();
+    else if(window.ui.gview==='roadmap') renderGlobalRoadmap();
+    else if(window.ui.gview==='eco') renderEcosystemGraph();
+    else if(window.ui.gview==='project') renderProjectView();
+  }
+
+  function renderSidebar(){
+    const scr = $('sb-scroll');if(!scr)return;
+    let h = `
+      <div class="gbtn ${window.ui.gview==='overview'?'on':''}" onclick="setView('overview')">&#128202; Overview</div>
+      <div class="gbtn ${window.ui.gview==='roadmap'?'on':''}" onclick="setView('roadmap')">&#128474; Master Roadmap</div>
+      <div class="gbtn ${window.ui.gview==='eco'?'on':''}" onclick="setView('eco')">&#127183; Eco Relations</div>
+      <div class="sb-sec"><span>Projects</span></div>
+    `;
+    const projs = window.toArr(window.D.projects);
+    projs.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    projs.forEach(p=>{
+      const active = (window.ui.gview==='project' && window.ui.sel===p.id);
+      const m = window.SM[p.status||'planned']||window.SM.planned;
+      const tks = window.toArr(window.D.tasks).filter(t=>t.p===p.id);
+      const done = tks.filter(t=>t.dn).length;
+      h += `
+        <div class="pitem ${active?'on':''}" onclick="setView('project','${p.id}')">
+          <div class="dot ${m.d}"></div>
+          <div class="pname" title="${window.esc(p.name)}">${window.esc(p.name)}</div>
+          <div class="pitem-act">
+            <button class="piabtn del" onclick="event.stopPropagation();openModal('del-project',{id:'${p.id}',name:'${p.name}'})">&times;</button>
+          </div>
+          ${tks.length?`<div class="pcnt">${done}/${tks.length}</div>`:''}
+        </div>
+      `;
+    });
+    scr.innerHTML = h;
+    $('sb-foot').innerHTML = `<button class="gbtn" style="width:100%;color:var(--red-text)" onclick="openModal('reset')">&#9888; Reset Database</button>`;
+  }
+
+  function renderOverview(){
+    const main = $('main');
+    const projs = window.toArr(window.D.projects);
+    const tks = window.toArr(window.D.tasks);
+    let totalT = tks.length, doneT = tks.filter(t=>t.dn).length;
+    let liveC=0, progC=0, bugC=0, planC=0;
+    projs.forEach(p=>{
+      if(p.status==='live')liveC++;
+      else if(p.status==='progress')progC++;
+      else if(p.status==='bugs')bugC++;
+      else planC++;
+    });
+    let filteredProjs = projs;
+    if(window.ui.fteam.length>0){
+      filteredProjs = projs.filter(p=>{
+        const pts = window.toArr(window.D.road).filter(r=>r.p===p.id);
+        let match = false;
+        pts.forEach(pt=>{
+          const devs = window.toArr(pt.devs);
+          if(devs.some(d=>window.ui.fteam.includes(d))) match = true;
+          if(window.ui.fteam.includes(pt.owner)) match = true;
+          if(window.ui.fteam.includes(pt.qa)) match = true;
+        });
+        return match;
+      });
+    }
+    let h = `
+      <div class="ov-body">
+        <div class="ov-title">Product Portfolio Overview</div>
+        <div class="ov-sub">NBFI Systems &amp; Strategic Operations Core Control</div>
+        <div class="ov-stats">
+          <div class="sc green"><div class="sv">${liveC}</div><div class="sl">Live Systems</div></div>
+          <div class="sc blue"><div class="sv">${progC}</div><div class="sl">In Production</div></div>
+          <div class="sc red"><div class="sv">${bugC}</div><div class="sl">With Critical Bugs</div></div>
+          <div class="sc amber"><div class="sv">${planC}</div><div class="sl">Planned / Backlog</div></div>
+        </div>
+        <div class="ov-sec">${window.ui.fteam.length?'Filtered Portfolio':'Full Portfolio'} (${filteredProjs.length} systems)</div>
+        <div class="ov-grid">
+    `;
+    filteredProjs.forEach(p=>{
+      const m = window.SM[p.status||'planned']||window.SM.planned;
+      const ptks = tks.filter(t=>t.p===p.id);
+      const pdone = ptks.filter(t=>t.dn).length;
+      const pct = ptks.length ? Math.round((pdone/ptks.length)*100) : 0;
+      h += `
+        <div class="opc" onclick="setView('project','${p.id}')">
+          <div class="opc-top">
+            <div class="dot ${m.d}"></div>
+            <div class="opc-name">${window.esc(p.name)}</div>
+          </div>
+          <div class="opc-type">${window.esc(p.local || p.id)} &middot; <span style="text-transform:capitalize">${p.type||'customer'}</span></div>
+          <div class="opc-prog"><div class="opc-pfill" style="width:${pct}%"></div></div>
+          <div class="opc-row"><span>Tasks Progress</span><span>${pct}% (${pdone}/${ptks.length})</span></div>
+        </div>
+      `;
+    });
+    if(!filteredProjs.length) h+= `<div class="muted" style="grid-column:1/-1">No systems matched current team filters.</div>`;
+    h += `</div></div>`;
+    main.innerHTML = h;
+  }
+
+  function renderGlobalRoadmap(){
+    const main = $('main');
+    let h = `
+      <div class="ghdr">
+        <div class="gtitle">Master Roadmap Matrix</div>
+        <div class="gsub">Cross-Project Delivery Streams Across Execution Horizons</div>
+      </div>
+      <div class="scrollbody">
+    `;
+    window.LANES.forEach(lane=>{
+      const items = window.toArr(window.D.road).filter(r=>r.lane===lane);
+      let filtered = items;
+      if(window.ui.fteam.length>0){
+        filtered = items.filter(r=>{
+          if(window.ui.fteam.includes(r.owner))return true;
+          if(window.ui.fteam.includes(r.qa))return true;
+          if(window.toArr(r.devs).some(d=>window.ui.fteam.includes(d)))return true;
+          return false;
+        });
+      }
+      h += `
+        <div class="lsec">
+          <div class="lhdr"><span class="llbl" style="text-transform:uppercase">${lane}</span><span class="lcnt">${filtered.length}</span></div>
+          <div class="lgrid">
+      `;
+      filtered.forEach(r=>{
+        const proj = window.D.projects[r.p] || {name:r.p};
+        h += `
+          <div class="lcard" onclick="setView('project','${r.p}')">
+            <div class="lcard-n">${window.esc(r.title)}<span class="lcard-cnt">${window.esc(proj.name)}</span></div>
+            ${r.owner?`<div class="litem"><span style="color:var(--text3)">Owner:</span>&nbsp;${window.esc(r.owner)}</div>`:''}
+            ${window.toArr(r.devs).length?`<div class="litem"><span style="color:var(--text3)">Dev:</span>&nbsp;${window.toArr(r.devs).join(', ')}</div>`:''}
+            ${r.qa?`<div class="litem"><span style="color:var(--text3)">QA:</span>&nbsp;${window.esc(r.qa)}</div>`:''}
+          </div>
+        `;
+      });
+      if(!filtered.length) h+= `<div class="muted">Horizon empty or filtered out.</div>`;
+      h += `</div></div>`;
+    });
+    h += `</div>`;
+    main.innerHTML = h;
+  }
+
+  function renderEcosystemGraph(){
+    const main = $('main');
+    let h = `
+      <div class="ghdr">
+        <div class="gtitle">System Architecture Ecosystem</div>
+        <div class="gsub">Interdependency Engine, Pipeline Links, &amp; Downstream Graphs</div>
+      </div>
+      <div class="eco-wrap" id="eco-wrap">
+        <div class="eco-legend">
+          <div class="eco-legend-title">System Topology Legend</div>
+          <div class="eco-lr"><div class="dot dl"></div> Live Infrastructure</div>
+          <div class="eco-lr"><div class="dot dp"></div> Heavy Production</div>
+          <div class="eco-lr"><div class="dot dpl"></div> Backlog Pipeline</div>
+          <div class="eco-lr"><div class="dot db"></div> Operational Blockers</div>
+        </div>
+        <div class="eco-hint">Drag nodes around to reconstruct corporate architecture layout mapping.</div>
+        <svg id="eco-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1"></svg>
+    `;
+    const projs = window.toArr(window.D.projects);
+    projs.forEach(p=>{
+      const m = window.SM[p.status||'planned']||window.SM.planned;
+      const pos = window.D.eco[p.id] || {x:100,y:100};
+      h += `
+        <div class="bdg ${m.b}" id="node-${p.id}" style="position:absolute;left:${pos.x}px;top:${pos.y}px;z-index:5;transform:translate(-50%,-50%);user-select:none;padding:6px 12px;border:1px solid var(--border2);box-shadow:0 2px 6px rgba(0,0,0,0.06)"
+             onmousedown="window.dragNode(event,'${p.id}')" onclick="window.nodeClick(event,'${p.id}')">
+          <div class="dot ${m.d}"></div><strong>${window.esc(p.name)}</strong>
+        </div>
+      `;
+    });
+    h += `</div>`;
+    main.innerHTML = h;
+    setTimeout(drawEcoLines, 50);
+  }
+
+  window.nodeClick = function(e, pid){
+    if(window.eco_dragged)return;
+    setView('project', pid);
+  }
+
+  window.dragNode = function(e, pid){
+    e.preventDefault();
+    window.eco_dragged = false;
+    const n = $('node-'+pid);
+    const wrap = $('eco-wrap');
+    const rect = wrap.getBoundingClientRect();
+    let startX = e.clientX, startY = e.clientY;
+    let currX = window.D.eco[pid].x, currY = window.D.eco[pid].y;
+    
+    function mm(ev){
+      window.eco_dragged = true;
+      let dx = ev.clientX - startX, dy = ev.clientY - startY;
+      let nx = currX + dx, ny = currY + dy;
+      if(nx<40)nx=40;if(nx>rect.width-40)nx=rect.width-40;
+      if(ny<40)ny=40;if(ny>rect.height-40)ny=rect.height-40;
+      n.style.left = nx+'px';n.style.top = ny+'px';
+      window.D.eco[pid].x = nx;window.D.eco[pid].y = ny;
+      drawEcoLines();
+    }
+    function mu(){
+      document.removeEventListener('mousemove', mm);
+      document.removeEventListener('mouseup', mu);
+      if(window.eco_dragged) window.save();
+    }
+    document.addEventListener('mousemove', mm);
+    document.addEventListener('mouseup', mu);
+  }
+
+  function drawEcoLines(){
+    const svg = $('eco-svg');if(!svg)return;
+    const wrap = $('eco-wrap');if(!wrap)return;
+    svg.innerHTML = '';
+    const conns = window.toArr(window.D.conns);
+    conns.forEach(c=>{
+      const from = window.D.eco[c.fp];const to = window.D.eco[c.tp];
+      if(!from || !to)return;
+      const active = window.ui.sel === c.id;
+      
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', from.x);line.setAttribute('y1', from.y);
+      line.setAttribute('x2', to.x);line.setAttribute('y2', to.y);
+      line.setAttribute('stroke', c.rel==='blocked'?'var(--red)':'var(--text3)');
+      line.setAttribute('stroke-width', active?'3':'1.5');
+      if(c.rel==='blocked') line.setAttribute('stroke-dasharray', '4,4');
+      svg.appendChild(line);
+      
+      const mx = (from.x+to.x)/2, my = (from.y+to.y)/2;
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', mx);txt.setAttribute('y', my-4);
+      txt.setAttribute('fill', 'var(--text2)');txt.setAttribute('font-size', '9px');
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('font-weight', '600');
+      txt.textContent = c.rel==='blocked'?'BLOCKED':'DEPENDS';
+      svg.appendChild(txt);
+    });
+  }
+
+  function renderProjectView(){
+    const main = $('main');const pid = window.ui.sel;
+    const p = window.D.projects[pid];
+    if(!p){setView('overview');return;}
+    const m = window.SM[p.status||'planned']||window.SM.planned;
+    let h = `
+      <div class="phdr">
+        <div class="ptrow">
+          <span class="pt">${window.esc(p.name)}</span>
+          <span class="plocal">(${window.esc(p.local || 'No Localization')})</span>
+          <span class="bdg ${m.b}" id="pstatus-bdg" onclick="window.toggleStatusMenu(event)">
+            <div class="dot ${m.d}"></div><span>${m.l}</span> &#9662;
+            <div class="smenu" id="pstatus-menu" style="display:none">
+              <div class="sopt" onclick="window.setProjStatus('${p.id}','live')"><div class="dot dl"></div>Live</div>
+              <div class="sopt" onclick="window.setProjStatus('${p.id}','progress')"><div class="dot dp"></div>In Progress</div>
+              <div class="sopt" onclick="window.setProjStatus('${p.id}','bugs')"><div class="dot db"></div>Has Bugs</div>
+              <div class="sopt" onclick="window.setProjStatus('${p.id}','planned')"><div class="dot dpl"></div>Planned</div>
+            </div>
+          </span>
+          <span class="ptype">System class: <strong style="text-transform:uppercase">${p.type||'customer'}</strong></span>
+        </div>
+        <div class="pmeta-row">
+          <div class="pmeta-g"><span class="pmeta-l">System ID:</span><span class="pmeta-v">${p.id}</span></div>
+          <div class="pmeta-sep"></div>
+          <div class="pmeta-g"><span class="pmeta-l">Tags:</span> ${p.tags&&p.tags.length?p.tags.map(t=>`<span class="pmeta-c">${window.esc(t)}</span>`).join(''):'<span class="pmeta-v" style="color:var(--text3)">None</span>'}</div>
+        </div>
+        <div class="tabs">
+          <div class="tab ${window.ui.tab==='tasks'?'on':''}" onclick="window.setTab('tasks')">&#9745; Tactical Tasks</div>
+          <div class="tab ${window.ui.tab==='road'?'on':''}" onclick="window.setTab('road')">&#128474; Roadmap Streams</div>
+          <div class="tab ${window.ui.tab==='conns'?'on':''}" onclick="window.setTab('conns')">&#127183; Architecture Matrix</div>
+          <div class="tab ${window.ui.tab==='info'?'on':''}" onclick="window.setTab('info')">&#128214; Metadata Info</div>
+        </div>
+      </div>
+      <div class="mbody">
+    `;
+    if(window.ui.tab==='tasks') h += renderProjTasks(p);
+    else if(window.ui.tab==='road') h += renderProjRoad(p);
+    else if(window.ui.tab==='conns') h += renderProjConns(p);
+    else if(window.ui.tab==='info') h += renderProjInfo(p);
+    h += `</div>`;
+    main.innerHTML = h;
+  }
+
+  window.setTab = function(t){window.ui.tab=t;window.render();}
+  window.toggleStatusMenu = function(e){
+    e.stopPropagation();const m = $('pstatus-menu');
+    m.style.display = m.style.display==='none'?'block':'none';
+    const cl = () => { m.style.display='none'; document.removeEventListener('click',cl); };
+    document.addEventListener('click',cl);
+  }
+  window.setProjStatus = function(pid,st){
+    if(window.D.projects[pid])window.D.projects[pid].status=st;
+    window.save();window.render();
+  }
+
+  function renderProjTasks(p){
+    const items = window.toArr(window.D.tasks).filter(t=>t.p===p.id);
+    const active = items.filter(t=>!t.dn);const done = items.filter(t=>t.dn);
+    const pct = items.length ? Math.round((done.length/items.length)*100) : 0;
+    
+    let h = `
+      <div class="tmeta"><span>Tactical Implementation Backlog</span><span>${pct}% complete (${done.length}/${items.length} tasks)</span></div>
+      <div class="prog"><div class="pfill" style="width:${pct}%"></div></div>
+      <div class="ar">
+        <input type="text" id="add-task-txt" placeholder="Describe scope definition..." onkeydown="if(event.key==='Enter')window.addTask('${p.id}')">
+        <select id="add-task-lane"><option value="now">⚡ Now</option><option value="next">⏳ Next</option><option value="later">📋 Later</option></select>
+        <button onclick="window.addTask('${p.id}')">Add Scope</button>
+      </div>
+      <div class="stitle">Active Sprints</div>
+      <div class="tlist">
+    `;
+    active.forEach(t=>{
+      h += `
+        <div class="titem">
+          <div class="chk" onclick="window.toggleTask('${t.id}')"></div>
+          <div class="ttxt">${window.esc(t.txt)}</div>
+          <span class="atag" style="text-transform:uppercase">${t.lane||'now'}</span>
+          <button class="xbtn" onclick="window.delTask('${t.id}')">&times;</button>
+        </div>
+      `;
+    });
+    if(!active.length) h+= `<div class="muted">No active tactical scopes specified. All clean.</div>`;
+    h += `</div>`;
+    if(done.length){
+      h += `<div class="donesec"><div class="dnhdr">Archived Definition of Done</div><div class="tlist">`;
+      done.forEach(t=>{
+        h += `
+          <div class="titem">
+            <div class="chk ck" onclick="window.toggleTask('${t.id}')"></div>
+            <div class="ttxt dn">${window.esc(t.txt)}</div>
+            <button class="xbtn" onclick="window.delTask('${t.id}')">&times;</button>
+          </div>
+        `;
+      });
+      h += `</div></div>`;
+    }
+    return h;
+  }
+
+  window.addTask = function(pid){
+    const txt = $('add-task-txt').value.trim();
+    const lane = $('add-task-lane').value;
+    if(!txt)return;
+    const tid = window.uid();
+    if(!window.D.tasks)window.D.tasks={};
+    window.D.tasks[tid] = {id:tid,p:pid,txt,lane,dn:false};
+    window.save();window.render();
+  }
+  window.toggleTask = function(tid){
+    if(window.D.tasks[tid])window.D.tasks[tid].dn = !window.D.tasks[tid].dn;
+    window.save();window.render();
+  }
+  window.delTask = function(tid){
+    if(window.D.tasks[tid])delete window.D.tasks[tid];
+    window.save();window.render();
+  }
+
+  function renderProjRoad(p){
+    const items = window.toArr(window.D.road).filter(r=>r.p===p.id);
+    let h = `<div class="rcols">`;
+    window.LANES.forEach(lane=>{
+      const laneItems = items.filter(r=>r.lane===lane);
+      h += `
+        <div class="rcol">
+          <div class="rch"><span class="rct" style="text-transform:uppercase">${lane}</span><span class="rcc">${laneItems.length}</span></div>
+          <div class="rlist">
+      `;
+      laneItems.forEach(r=>{
+        let devStr = window.toArr(r.devs).join(', ');
+        h += `
+          <div class="rcard">
+            <div class="rcard-t">
+              <strong>${window.esc(r.title)}</strong>
+              ${r.owner||devStr||r.qa?`<span class="ts-meta">P: ${window.esc(r.owner||'-')} | D: ${window.esc(devStr||'-')} | Q: ${window.esc(r.qa||'-')}</span>`:''}
+            </div>
+            <button class="mvb" onclick="window.moveRoad('${r.id}','${lane}')">&#8646;</button>
+            <button class="rxb" onclick="window.delRoad('${r.id}')">&times;</button>
+          </div>
+        `;
+      });
+      h += `
+          </div>
+          <div class="radd">
+            <input type="text" id="radd-txt-${lane}" placeholder="Delivery item..." onkeydown="if(event.key==='Enter')window.addRoad('${p.id}','${lane}')">
+            <button onclick="window.addRoad('${p.id}','${lane}')">+</button>
+          </div>
+        </div>
+      `;
+    });
+    h += `</div>`;
+    
+    // БҮРЭН БҮРЭЛДЭХҮҮНИЙ ДАРААХ СЕКЦ: ХӨГЖҮҮЛЭЛТИЙН БАГ ХУВААРИЛАЛТ
+    h += `
+      <div class="stitle" style="margin-top:20px">&#128101; Stream Engineering Resource Assignment</div>
+      <div class="team-sec">
+    `;
+    if(items.length===0){
+      h += `<div class="muted">Эхлээд дээрх хоризонуудад хүргэлтийн элемент нэмээд, дараа нь энд багаа хуваарилаарай.</div>`;
+    } else {
+      items.forEach(r=>{
+        h += `
+          <div class="tf">
+            <div class="tfl" style="font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${window.esc(r.title)}">${window.esc(r.title)}:</div>
+            
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span style="font-size:11px; color:var(--text3)">Owner:</span>
+              <select onchange="window.assignRole('${r.id}','owner',this.value)">
+                <option value="">-- None --</option>
+                ${Object.keys(window.D.team||{}).map(n=>`<option value="${n}" ${r.owner===n?'selected':''}>${n}</option>`).join('')}
+              </select>
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:4px; flex:1; margin-left:10px;">
+              <span style="font-size:11px; color:var(--text3)">Devs:</span>
+              <div class="dev-chips">
+                ${window.toArr(r.devs).map(d=>`<span class="dev-chip">${window.esc(d)} <button onclick="window.removeDev('${r.id}','${d}')">&times;</button></span>`).join('')}
+                <select class="dev-add-sel" onchange="window.addDev('${r.id}',this.value); this.value='';">
+                  <option value="">+ Add</option>
+                  ${Object.keys(window.D.team||{}).filter(n=>!window.toArr(r.devs).includes(n)).map(n=>`<option value="${n}">${n}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:4px; margin-left:10px;">
+              <span style="font-size:11px; color:var(--text3)">QA:</span>
+              <select onchange="window.assignRole('${r.id}','qa',this.value)">
+                <option value="">-- None --</option>
+                ${Object.keys(window.D.team||{}).map(n=>`<option value="${n}" ${r.qa===n?'selected':''}>${n}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        `;
+      });
+    }
+    h += `</div>`;
+    return h;
+  }
+
+  window.addRoad = function(pid,lane){
+    const txt = $('radd-txt-'+lane).value.trim();if(!txt)return;
+    const rid = window.uid();
+    if(!window.D.road)window.D.road={};
+    window.D.road[rid] = {id:rid,p:pid,title:txt,lane,devs:[],owner:'',qa:''};
+    window.save();window.render();
+  }
+  window.delRoad = function(rid){
+    if(window.D.road[rid])delete window.D.road[rid];
+    window.save();window.render();
+  }
+  window.moveRoad = function(rid,clane){
+    const r = window.D.road[rid];if(!r)return;
+    let idx = window.LANES.indexOf(clane);
+    idx = (idx+1)%window.LANES.length;
+    r.lane = window.LANES[idx];
+    window.save();window.render();
+  }
+  window.assignRole = function(rid, field, value){
+    if(window.D.road[rid]) window.D.road[rid][field] = value;
+    window.save(); window.render();
+  }
+  window.addDev = function(rid, dev){
+    if(!dev)return;
+    if(window.D.road[rid]){
+      if(!window.D.road[rid].devs) window.D.road[rid].devs = [];
+      if(!window.D.road[rid].devs.includes(dev)) window.D.road[rid].devs.push(dev);
+      window.save(); window.render();
+    }
+  }
+  window.removeDev = function(rid, dev){
+    if(window.D.road[rid] && window.D.road[rid].devs){
+      window.D.road[rid].devs = window.D.road[rid].devs.filter(d=>d!==dev);
+      window.save(); window.render();
+    }
+  }
+
+  function renderProjConns(p){
+    const conns = window.toArr(window.D.conns).filter(c=>c.fp===p.id || c.tp===p.id);
+    const projs = window.toArr(window.D.projects).filter(pr=>pr.id!==p.id);
+    let h = `
+      <div class="stitle">System Topology Interdependencies</div>
+      <div class="tlist" style="margin-bottom:12px">
+    `;
+    conns.forEach(c=>{
+      const isFrom = c.fp === p.id;
+      const targetId = isFrom ? c.tp : c.fp;
+      const target = window.D.projects[targetId] || {name:targetId};
+      const rbdg = c.rel==='blocked'?`<span class="csp">BLOCKED</span>` : `<span class="csa">DEPENDS</span>`;
+      h += `
+        <div class="conn-row">
+          ${isFrom ? `<strong>This system</strong> <span class="carr">&rarr;</span> ${rbdg} on <span class="cproj">${window.esc(target.name)}</span>` : 
+                     `<span class="cproj">${window.esc(target.name)}</span> <span class="carr">&rarr;</span> ${rbdg} on <strong>This system</strong>`}
+          <button class="cdel" onclick="window.delConn('${c.id}')">&times;</button>
+        </div>
+      `;
+    });
+    if(!conns.length) h+= `<div class="muted">Architectural graph decoupled. No microservice connections mapped.</div>`;
+    h += `</div>`;
+    
+    h += `
+      <div class="stitle">Map New Network Edge</div>
+      <div class="add-conn-form">
+        <div class="acr">
+          <select id="conn-dir"><option value="out">This project depends on &rarr;</option><option value="in">Is required upstream by &larr;</option></select>
+          <select id="conn-target">
+            ${projs.map(pr=>`<option value="${pr.id}">${window.esc(pr.name)}</option>`).join('')}
+          </select>
+          <span style="font-size:12px;color:var(--text2)">Status:</span>
+          <div class="stog" id="conn-rel-tog"><button class="on" id="rel-dep" onclick="window.setConnRel('depends')">Depends</button><button id="rel-blk" onclick="window.setConnRel('blocked')">Blocked</button></div>
+          <button class="primary" onclick="window.addConn('${p.id}')">Bind Edge</button>
+        </div>
+      </div>
+    `;
+    window.ui.addConnRel = 'depends';
+    return h;
+  }
+
+  window.setConnRel = function(r){
+    window.ui.addConnRel = r;
+    $('rel-dep').classList.toggle('on', r==='depends');
+    $('rel-blk').classList.toggle('on', r==='blocked');
+  }
+  window.addConn = function(pid){
+    const dir = $('conn-dir').value;
+    const target = $('conn-target').value;
+    if(!target)return;
+    const cid = window.uid();
+    const fp = dir==='out'?pid:target;
+    const tp = dir==='out'?target:pid;
+    if(!window.D.conns)window.D.conns={};
+    window.D.conns[cid] = {id:cid,fp,tp,rel:window.ui.addConnRel};
+    window.save();window.render();
+  }
+  window.delConn = function(cid){
+    if(window.D.conns[cid])delete window.D.conns[cid];
+    window.save();window.render();
+  }
+
+  function renderProjInfo(p){
+    return `
+      <div class="stitle">System Scope Definition</div>
+      <div class="idesc">${p.desc?window.esc(p.desc).replace(/\n/g,'<br>'):'<span style="color:var(--text3)">No specifications declared for this core node. Input values inside structural templates.</span>'}</div>
+      <div class="ar" style="margin-top:15px;gap:4px;">
+        <button onclick="window.editProjDesc('${p.id}')">&#9998; Rewrite Definition</button>
+      </div>
+    `;
+  }
+
+  window.editProjDesc = function(pid){
+    const p = window.D.projects[pid];if(!p)return;
+    const n = prompt('Edit description scope for '+p.name+':', p.desc||'');
+    if(n!==null){
+      p.desc = n.trim();
+      window.save();window.render();
+    }
+  }
+
+  window.render();
 </script>
 </body>
 </html>
