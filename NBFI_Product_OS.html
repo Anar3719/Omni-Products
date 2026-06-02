@@ -193,6 +193,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .eco-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg2)}
 .eco-legend{position:absolute;bottom:13px;left:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:11px;z-index:10}
 .eco-legend-title{font-weight:600;color:var(--text);margin-bottom:6px}
+.eco-legend-text{color:var(--text2);margin-bottom:3px}
 .eco-lr{display:flex;align-items:center;gap:5px;color:var(--text2);margin-bottom:3px}
 .eco-lr:last-child{margin-bottom:0}
 .eco-hint{position:absolute;top:13px;right:13px;font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;z-index:10}
@@ -296,7 +297,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
 
   /* ── ИДЭВХТЭЙ ХЭРЭГЛЭГЧИЙГ LOCALSTORAGE-Д ХАДГАЛАХ ── */
-  window.currentUser = localStorage.getItem('selected_user') || 'bat';
+  window.currentUser = localStorage.getItem('selected_user') || 'Анар';
   document.addEventListener("DOMContentLoaded", () => {
     if($('current-user')) $('current-user').value = window.currentUser;
   });
@@ -389,7 +390,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       },
       tasks,road,conns,
       pmeta:{
-        moni:{leader:'bat',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
+        moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
       },
       eco:JSON.parse(JSON.stringify(window.DEF_ECO))
     };
@@ -538,7 +539,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
        '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
        '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
-    ['bat','dulguun','ganzorig','namuun'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
+    ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
     h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
     (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
     h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
@@ -662,12 +663,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
   }
 
-  /* ── MUTATIONS (TASK НЭМЭХДЭЭ ХЭРЭГЛЭГЧ БОЛОН ЦАГ ХУГАЦААГ ОРУУЛАХ ШИНЭЧЛЭЛТ) ── */
+  /* ── MUTATIONS ── */
   window.addTask = function(pid){
     const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
     const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
     
-    // Одоогийн цаг хугацааг Монгол форматын дагуу авах
     const now = new Date();
     const timeStr = now.getFullYear() + '-' + 
                     String(now.getMonth()+1).padStart(2,'0') + '-' + 
@@ -677,7 +677,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     if(!window.D.tasks)window.D.tasks={};
     
-    // Дата бааз руу хэн нэмсэн (by) болон хэзээ нэмсэн (at) мэдээллийг шиднэ
     window.D.tasks[id]={
       id,
       p:pid,
