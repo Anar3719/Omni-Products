@@ -67,7 +67,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab{padding:8px 13px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;user-select:none}
 .tab:hover{color:var(--text)}.tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
 .mbody{flex:1;overflow-y:auto;padding:15px 18px}
-.tmeta">display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
+.tmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
 .clr{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:0}
 .clr:hover{color:var(--text2);text-decoration:underline}
 .prog{height:3px;background:var(--bg3);border-radius:999px;margin-bottom:11px;overflow:hidden}
@@ -226,6 +226,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .mbtn.prim:hover{opacity:.9}.mbtn.danger{background:var(--red);color:#fff;border-color:var(--red)}
 .del-warn{font-size:13px;color:var(--text2);line-height:1.6}.del-warn strong{color:var(--text)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+
+/* ШИНЭЭР НЭМЭГДСЭН ДИЗАЙН */
+.user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
+.ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
 </style>
 </head>
 <body>
@@ -233,6 +237,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="topbar">
     <span class="brand">NBFI <span>&middot; Product OS</span></span>
     <div class="spacer"></div>
+    <!-- АЖИЛТАН СОНГОХ ХЭСЭГ (Дээд талбарт байрлана) -->
+    <span style="font-size:12px; color:var(--text2); font-weight:600;">Active User:</span>
+    <select id="current-user" class="user-selector" onchange="window.changeUser(this.value)">
+      <option value="bat">bat</option>
+      <option value="dulguun">dulguun</option>
+      <option value="ganzorig">ganzorig</option>
+      <option value="namuun">namuun</option>
+      <option value="Anand">Anand</option>
+      <option value="Bilguun">Bilguun</option>
+      <option value="Sukhbat">Sukhbat</option>
+      <option value="Ondrakh">Ondrakh</option>
+      <option value="Tuvshin">Tuvshin</option>
+      <option value="Zoloo">Zoloo</option>
+    </select>
+    <span style="color:var(--border2)">|</span>
+    
     <button class="tbtn prim" onclick="openModal('add-project',{})">+ Add project</button>
     <button class="tbtn" id="team-btn" onclick="toggleTeam()">&#128101; Team</button>
     <button class="tbtn" onclick="exportData()">&#8659; Export JSON</button>
@@ -260,7 +280,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
-  // Таны өгсөн Firebase тохиргооны объект
   const firebaseConfig = {
     apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
     authDomain: "omni-products.firebaseapp.com",
@@ -272,7 +291,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     measurementId: "G-KQND2ECQ33"
   };
 
-  // Инициализаци
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
   const analytics = getAnalytics(app);
@@ -284,12 +302,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.uid = function(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
   window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
 
+  /* ── ИДЭВХТЭЙ ХЭРЭГЛЭГЧИЙГ LOCALSTORAGE-Д ХАДГАЛАХ ── */
+  window.currentUser = localStorage.getItem('selected_user') || 'bat';
+  document.addEventListener("DOMContentLoaded", () => {
+    if($('current-user')) $('current-user').value = window.currentUser;
+  });
+
+  window.changeUser = function(val) {
+    window.currentUser = val;
+    localStorage.setItem('selected_user', val);
+  }
+
   /* ── CONSTANTS ── */
   window.SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
   window.LANES=['now','next','later'];
   window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
 
-  /* ── STATE (Төлөв) ── */
+  /* ── STATE ── */
   window.D={};
   window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
   window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
@@ -312,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
       '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
 
-  /* ── FIREBASE SAVE (Сервер лүү шууд хадгалах) ── */
+  /* ── FIREBASE SAVE ── */
   window.save = function(){
     try{
       set(dbRef, window.D);
@@ -355,62 +384,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   /* ── SEED / DEFAULT DATA ── */
   function defaultData(){
     const tasks={},road={},conns={};
-    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false},
-     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false},
-     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false},
-     {id:'t4',p:'los',txt:'Complete business requirements document',a:'',done:false},
-     {id:'t5',p:'los',txt:'Review loan origination process flow',a:'',done:false},
-     {id:'t6',p:'los',txt:'Sprint planning with dev team',a:'',done:false},
-     {id:'t7',p:'khurimtlal',txt:'Finalize UX/UI in Figma',a:'',done:false},
-     {id:'t8',p:'khurimtlal',txt:'Write savings product requirements',a:'',done:false},
-     {id:'t9',p:'khurimtlal',txt:'Define Keep integration scope',a:'',done:false},
-     {id:'t10',p:'omnicars',txt:'Document all known bugs',a:'',done:false},
-     {id:'t11',p:'omnicars',txt:'Bug fix prioritization with devs',a:'',done:false},
-     {id:'t12',p:'omnicars',txt:'Test car evaluation flow end-to-end',a:'',done:false},
-     {id:'t13',p:'omnipay',txt:'Define merchant onboarding flow',a:'',done:false},
-     {id:'t14',p:'omnipay',txt:'Review BNPL checkout requirements',a:'',done:false},
-     {id:'t15',p:'omnipay',txt:'Add new ticket sale categories',a:'',done:false},
-     {id:'t16',p:'keep',txt:'Define Khurimtlal integration scope',a:'',done:false},
-     {id:'t17',p:'keep',txt:'Review current app analytics',a:'',done:false}
+    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'bat',at:'2026-05-10 14:20'},
+     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false,by:'bat',at:'2026-05-11 09:15'},
+     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false,by:'ganzorig',at:'2026-05-12 11:30'}
     ].forEach(t=>tasks[t.id]=t);
-    [{id:'r1',p:'moni',txt:'eSIM Boxo integration',lane:'now'},{id:'r2',p:'moni',txt:'OmniPay BNPL checkout',lane:'now'},
-     {id:'r3',p:'moni',txt:'Loyalty system MVP',lane:'next'},{id:'r4',p:'moni',txt:'Expanded merchant ecosystem',lane:'later'},
-     {id:'r5',p:'los',txt:'Core loan origination flow',lane:'now'},{id:'r6',p:'los',txt:'Omnicars integration flow',lane:'next'},
-     {id:'r7',p:'khurimtlal',txt:'Figma designs complete',lane:'now'},{id:'r8',p:'khurimtlal',txt:'Pilot launch with selected users',lane:'next'},
-     {id:'r9',p:'omnicars',txt:'Production bug resolution',lane:'now'},{id:'r10',p:'omnicars',txt:'Automated evaluation trigger',lane:'next'},
-     {id:'r11',p:'omnipay',txt:'Merchant QR onboarding flow',lane:'now'},{id:'r12',p:'omnipay',txt:'In-app marketplace MVP',lane:'next'}
-    ].forEach(r=>road[r.id]=r);
-    [{id:'c1',fp:'moni',fi:'',tp:'omnipay',ti:'',rel:'integration',st:'active'},
-     {id:'c2',fp:'moni',fi:'',tp:'keep',ti:'',rel:'data-sync',st:'active'},
-     {id:'c3',fp:'moni',fi:'',tp:'khurimtlal',ti:'',rel:'ui-embed',st:'planned'},
-     {id:'c4',fp:'los',fi:'',tp:'omnipay',ti:'',rel:'disbursement',st:'active'},
-     {id:'c5',fp:'los',fi:'',tp:'omnicars',ti:'',rel:'collateral-check',st:'active'},
-     {id:'c6',fp:'los',fi:'',tp:'erp',ti:'',rel:'accounting',st:'active'},
-     {id:'c7',fp:'los',fi:'',tp:'crm',ti:'',rel:'leads',st:'planned'}
-    ].forEach(c=>conns[c.id]=c);
     return {
       projects:{
         moni:{id:'moni',name:'Moni App',local:'Moni',type:'customer',status:'live',desc:'Main consumer financial app offering micro-loans, wallet services, and utility payments.',tags:['Core','B2C','Mobile']},
         omnipay:{id:'omnipay',name:'OmniPay',local:'OmniPay',type:'platform',status:'progress',desc:'Payment gateway ecosystem handling merchant QR, settlements, and BNPL configurations.',tags:['Payments','Infrastructure','B2B']},
-        'moni-transfer':{id:'moni-transfer',name:'Moni Transfer',local:'Transfer',type:'service',status:'live',desc:'Internal ledger service routing real-time peer-to-peer and bank transactions.',tags:['Backend','Core']},
-        keep:{id:'keep',name:'Keep Fin',local:'Keep',type:'customer',status:'live',desc:'Wealth management tracker helping users balance expense budgets and simple investments.',tags:['Savings','PFM']},
-        khurimtlal:{id:'khurimtlal',name:'Khurimtlal',local:'Khurimtlal',type:'customer',status:'progress',desc:'Micro-savings setup incentivizing automated rounded-up deposits from daily transactions.',tags:['Savings','Gamification']},
-        los:{id:'los',name:'Loan Origination',local:'LOS',type:'internal',status:'progress',desc:'Internal automated scoring and underwriting desk managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']},
-        omnicars:{id:'omnicars',name:'OmniCars',local:'OmniCars',type:'customer',status:'bugs',desc:'Auto-financing interface supporting vehicle inspection checklist and appraisal pricing.',tags:['Automotive','Loans']},
-        erp:{id:'erp',name:'Core ERP',local:'ERP',type:'internal',status:'live',desc:'Central ledger system managing regulatory charts, cash journals, and payroll audits.',tags:['Backoffice','Finance']},
-        crm:{id:'crm',name:'Omni CRM',local:'CRM',type:'internal',status:'planned',desc:'Support pipeline distributing customer service tickets and tele-collection queues.',tags:['Support','Collections']}
+        los:{id:'los',name:'Loan Origination',local:'LOS',type:'internal',status:'progress',desc:'Internal automated scoring and underwriting desk managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']}
       },
       tasks,road,conns,
       pmeta:{
-        moni:{leader:'bat',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'},{id:'i2',name:'Loyalty Engine',kind:'feature'}]},
-        los:{leader:'dulguun',devs:['Sukhbat'],items:[{id:'i3',name:'Scoring Model v2',kind:'feature'},{id:'i4',name:'SignDoc Engine',kind:'feature'}]},
-        omnipay:{leader:'ganzorig',devs:['Anand','Ondrakh'],items:[{id:'i5',name:'Split Settlement',kind:'feature'}]}
+        moni:{leader:'bat',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
       },
       eco:JSON.parse(JSON.stringify(window.DEF_ECO))
     };
   }
 
-  /* ── FIREBASE REALTIME LISTEN (Бодит хугацааны синхрончлол) ── */
+  /* ── FIREBASE REALTIME LISTEN ── */
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     if(data && data.projects) {
@@ -511,11 +503,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     return h+'</div>';
   }
 
+  /* TASK МӨР ДЭЭР ХЭН, ХЭЗЭЭ НЭМСНИЙГ ХАРАГДУУЛАХ ХЭСЭГ */
   function taskRow(t){
     const ck=t.done?' ck':'';const dn=t.done?' dn':'';
+    const createdBy = t.by ? esc(t.by) : 'Unknown';
+    const createdAt = t.at ? esc(t.at) : 'N/A';
+    
     return'<div class="titem"><div class="chk'+ck+'" onclick="toggleTask(\''+t.p+'\',\''+t.id+'\')"></div>'+
-       '<span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+(t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
-       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';}
+       '<div style="flex:1;"><span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+
+       '<span class="ts-meta">Added by <b>'+createdBy+'</b> on '+createdAt+'</span></div>'+
+       (t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
+       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';
+  }
 
   function renderProjectRoadmap(p){
     const items=roadItems(p.id);
@@ -670,15 +669,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
   }
 
-  /* ── MUTATIONS ── */
+  /* ── MUTATIONS (TASK НЭМЭХДЭЭ ХЭРЭГЛЭГЧ БОЛОН ЦАГ ХУГАЦААГ ОРУУЛАХ ШИНЭЧЛЭЛТ) ── */
   window.addTask = function(pid){
     const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
     const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
-    if(!window.D.tasks)window.D.tasks={};window.D.tasks[id]={id,p:pid,txt,a:tagVal,done:false};
+    
+    // Одоогийн цаг хугацааг Монгол форматын дагуу авах
+    const now = new Date();
+    const timeStr = now.getFullYear() + '-' + 
+                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
+                    String(now.getDate()).padStart(2,'0') + ' ' + 
+                    String(now.getHours()).padStart(2,'0') + ':' + 
+                    String(now.getMinutes()).padStart(2,'0');
+
+    if(!window.D.tasks)window.D.tasks={};
+    
+    // Дата бааз руу хэн нэмсэн (by) болон хэзээ нэмсэн (at) мэдээллийг шиднэ
+    window.D.tasks[id]={
+      id,
+      p:pid,
+      txt,
+      a:tagVal,
+      done:false,
+      by: window.currentUser,
+      at: timeStr
+    };
+    
     if(inp)inp.value='';window.save();window.render();
   }
+  
   window.toggleTask = function(pid,tid){
-    if(window.D.tasks[tid]){window.D.tasks[tid].done=!window.D.tasks[tid].done;window.save();window.render();}
+    if(window.D.tasks[tid]){
+      window.D.tasks[tid].done=!window.D.tasks[tid].done;
+      window.D.tasks[tid].modifiedBy = window.currentUser; 
+      window.save();
+      window.render();
+    }
   }
   window.delTask = function(pid,tid){
     if(window.D.tasks[tid]){delete window.D.tasks[tid];window.save();window.render();}
