@@ -240,16 +240,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- АЖИЛТАН СОНГОХ ХЭСЭГ (Дээд талбарт байрлана) -->
     <span style="font-size:12px; color:var(--text2); font-weight:600;">Active User:</span>
     <select id="current-user" class="user-selector" onchange="window.changeUser(this.value)">
-      <option value="bat">bat</option>
-      <option value="dulguun">dulguun</option>
-      <option value="ganzorig">ganzorig</option>
-      <option value="namuun">namuun</option>
-      <option value="Anand">Anand</option>
-      <option value="Bilguun">Bilguun</option>
-      <option value="Sukhbat">Sukhbat</option>
-      <option value="Ondrakh">Ondrakh</option>
-      <option value="Tuvshin">Tuvshin</option>
-      <option value="Zoloo">Zoloo</option>
+      <option value="Анар">Анар</option>
+      <option value="Зул-Эрдэнэ">Зул-Эрдэнэ</option>
+      <option value="Халиунаа">Халиунаа</option>
     </select>
     <span style="color:var(--border2)">|</span>
     
@@ -384,9 +377,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   /* ── SEED / DEFAULT DATA ── */
   function defaultData(){
     const tasks={},road={},conns={};
-    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'bat',at:'2026-05-10 14:20'},
-     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false,by:'bat',at:'2026-05-11 09:15'},
-     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false,by:'ganzorig',at:'2026-05-12 11:30'}
+    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'Халиунаа',at:'2026-05-10 14:20'},
+     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false,by:'Халиунаа',at:'2026-05-11 09:15'},
+     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false,by:'Анар',at:'2026-05-12 11:30'}
     ].forEach(t=>tasks[t.id]=t);
     return {
       projects:{
