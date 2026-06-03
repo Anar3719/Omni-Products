@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .piabtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 3px;border-radius:4px;line-height:1}
 .piabtn:hover{background:var(--bg3);color:var(--text)}.piabtn.del:hover{color:var(--red)}
 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dl{background:var(--green)}..dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
+.dl{background:var(--green)}.dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
 .pcnt{font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0 5px;min-width:18px;text-align:center;flex-shrink:0}
 .sb-foot{border-top:1px solid var(--border);padding:5px}
 .gbtn{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;color:var(--text2);cursor:pointer;border-radius:6px}
@@ -228,11 +228,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .del-warn{font-size:13px;color:var(--text2);line-height:1.6}.del-warn strong{color:var(--text)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
 
-/* ШИНЭЭР НЭМЭГДСЭН ДИЗАЙН */
+/* USER STATS STYLE */
 .user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
 .ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
-
-/* ӨВӨРМӨЦ СТАТИСТИК ХҮСНЭГТИЙН СТИЛЬ */
 .stat-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: var(--bg2); border-radius: var(--rl); overflow: hidden; border: 1px solid var(--border); }
 .stat-table th, .stat-table td { padding: 10px 14px; text-align: left; font-size: 13px; }
 .stat-table th { background: var(--bg3); color: var(--text); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .05em; }
@@ -306,7 +304,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.uid = function(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
   window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
 
-  /* ── ИДЭВХТЭЙ ХЭРЭГЛЭГЧИЙГ LOCALSTORAGE-Д ХАДГАЛАХ ── */
+  /* ── ACTIVE USER ── */
   window.currentUser = localStorage.getItem('selected_user') || 'Анар';
   document.addEventListener("DOMContentLoaded", () => {
     if($('current-user')) $('current-user').value = window.currentUser;
@@ -350,7 +348,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     try{
       set(dbRef, window.D);
     }catch(e){
-      console.error('Firebase хадгалалтын алдаа:',e);
+      console.error('Firebase save error:',e);
     }
   }
 
@@ -368,24 +366,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       try {
         const parsedData = JSON.parse(e.target.result);
         if (!parsedData.projects) {
-          alert("Алдаа: Бүтэц буруу файл байна!");
+          alert("Error: Invalid backup format!");
           return;
         }
-        if (confirm("Энэ файлыг Firebase рүү хуулж, бүх хүмүүсийн датаг шинэчлэх үү?")) {
+        if (confirm("Overwrite Firebase storage with this data?")) {
           window.D = parsedData;
           window.save();
           if (window.projs().length > 0) window.ui.sel = window.projs()[0].id;
           window.render();
         }
       } catch (err) {
-        alert("Уншихад алдаа гарлаа: " + err.message);
+        alert("Upload error: " + err.message);
       }
     };
     reader.readAsText(file);
     event.target.value = '';
   }
 
-  /* ── SEED / DEFAULT DATA ── */
+  /* ── SEED DATA ── */
   function defaultData(){
     const tasks={},road={},conns={};
     [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'Халиунаа',at:'2026-05-10 14:20'},
@@ -406,7 +404,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     };
   }
 
-  /* ── FIREBASE REALTIME LISTEN ── */
+  /* ── REALTIME DATA SYNC ── */
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     if(data && data.projects) {
@@ -421,7 +419,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     window.render();
   });
 
-  /* ── RENDER ENGINE ── */
+  /* ── RENDER CORE ── */
   window.render = function(){
     renderSb();
     renderTeamBar();
@@ -440,9 +438,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
          '</div>';
     });
     h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
-       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\ 'overview\')">&#128202; Overview</div>'+
-       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\ 'ecosystem\')">&#128376; Ecosystem</div>'+
-       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\ 'matrix\')">&#128338; Roadmaps</div>';
+       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
+       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
+       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
     $('sb-scroll').innerHTML=h;
     $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
   }
@@ -473,9 +471,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
     else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
     h+='</div></div><div class="tabs">'+
-       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\ 'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
-       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\ 'roadmap\')">Roadmap</div>'+
-       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\ 'meta\')">Configuration</div>'+
+       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
+       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
+       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
        '</div></div><div class="mbody">';
     if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
     else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
@@ -493,7 +491,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   function renderProjectTasks(p,tasks,dn,tot,pct){
     let h='<div class="tmeta"><span>'+pct+'% Complete ('+dn+'/'+tot+' tasks)</span>'+(dn>0?'<button class="clr" onclick="clearDone(\''+p.id+'\')">Clear completed</button>':'')+'</div>'+
        '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
-       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\ 'Enter\')addTask(\''+p.id+'\')">'+
+       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
        '<select id="t_tag"><option value="">No context item</option>';
     getItems(p.id).forEach(i=>h+='<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>');
     h+='</select><button onclick="addTask(\''+p.id+'\')">+ Add</button></div>';
@@ -529,7 +527,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
          '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
          '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
-      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\ 'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
+      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
          '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
     });
     return h+'</div>';
@@ -545,7 +543,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     const items=meta.items||[];
     if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
     else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
-    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\ 'Enter\')addItem(\ 'feature\')"><button onclick="addItem(\ 'feature\')">+</button></div></div>'+
+    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
        '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
        '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
     ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
@@ -562,21 +560,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     else renderMatrix(m);
   }
 
-  /* ── ШИНЭЧЛЭГДСЭН OVERVIEW ХЭСЭГ (ХҮСНЭГТ СТАТИСТИК БҮХИЙ) ── */
+  /* ── OVERVIEW VIEW WITH REPAIRED ACTIONS ── */
   function renderOverview(m){
     let tot=projs().length;
     let live=projs().filter(p=>p.status==='live').length;
     let prog=projs().filter(p=>p.status==='progress').length;
     let bug=projs().filter(p=>p.status==='bugs').length;
     
-    // Ажилтан тус бүрээр статистик бодох логик
     let userStats = {
       'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0 },
       'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0 },
       'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0 }
     };
 
-    // 1. Том таск буюу прожект удирдаж буй Leads тоолох
     projs().forEach(p => {
       const meta = getMeta(p.id);
       if (meta.leader && userStats[meta.leader]) {
@@ -584,7 +580,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       }
     });
 
-    // 2. Жижиг таскуудыг хэн нэмсэн (by)-ээр шүүж тоолох
     Object.values(window.D.tasks || {}).forEach(t => {
       if (t.by && userStats[t.by]) {
         userStats[t.by].totalSub += 1;
@@ -602,7 +597,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
        '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
        '</div>';
 
-    // ШИНЭ: Хэрэглэгчийн нэгдсэн гүйцэтгэлийн статистик хүснэгт
     h += '<div class="ov-sec">User Workload & Performance Overview</div>';
     h += '<table class="stat-table">'+
          '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
@@ -625,7 +619,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     });
     h += '</tbody></table>';
 
-    // Хуучин Бүтээгдэхүүний Каталог хэсэг доор нь хэвээр үлдэнэ
     h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
     projs().forEach(p=>{
       const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
@@ -643,9 +636,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   function renderEcosystem(m){
     let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
        '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\ 'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\ 'active\')">Active Core</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\ 'planned\')">Planned Triggers</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
        '</div><div class="eco-wrap" id="eco-wrap" style="height:100%">'+
        '<div class="eco-legend"><div class="eco-legend-title">System Class</div>'+
        '<div class="eco-lr"><span class="dot dl"></span> Live Core</div>'+
@@ -663,7 +656,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
 
   function drawConnections(){
-    const svg=$('eco-svg');if(!svg)return;let h='';const wrap=$('eco-wrap');if(!wrap)return;const rect=wrap.getBoundingClientRect();
+    const svg=$('eco-svg');if(!svg)return;let h='';const wrap=$('eco-wrap');if(!wrap)return;
     Object.values(window.D.conns||{}).forEach(c=>{
       if(window.ui.roadFilter!=='all'&&c.st!==window.ui.roadFilter)return;
       const n1=$('node-'+c.fp);const n2=$('node-'+c.tp);if(!n1||!n2)return;
