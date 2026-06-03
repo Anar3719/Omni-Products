@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .piabtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 3px;border-radius:4px;line-height:1}
 .piabtn:hover{background:var(--bg3);color:var(--text)}.piabtn.del:hover{color:var(--red)}
 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dl{background:var(--green)}.dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
+.dl{background:var(--green)}..dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
 .pcnt{font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0 5px;min-width:18px;text-align:center;flex-shrink:0}
 .sb-foot{border-top:1px solid var(--border);padding:5px}
 .gbtn{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;color:var(--text2);cursor:pointer;border-radius:6px}
@@ -126,7 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ps-add input:focus{border-color:var(--blue)}
 .ps-add button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer}
 .ps-add button:hover{background:var(--bg)}
-.team-sec{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-bottom:5px}
+.team-sec {background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-bottom:5px}
 .tf{display:flex;align-items:center;gap:11px;margin-bottom:9px}
 .tf:last-child{margin-bottom:0}
 .tfl{font-size:12px;color:var(--text3);width:75px;flex-shrink:0}
@@ -231,6 +231,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ШИНЭЭР НЭМЭГДСЭН ДИЗАЙН */
 .user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
 .ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
+
+/* ӨВӨРМӨЦ СТАТИСТИК ХҮСНЭГТИЙН СТИЛЬ */
+.stat-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: var(--bg2); border-radius: var(--rl); overflow: hidden; border: 1px solid var(--border); }
+.stat-table th, .stat-table td { padding: 10px 14px; text-align: left; font-size: 13px; }
+.stat-table th { background: var(--bg3); color: var(--text); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .05em; }
+.stat-table tr { border-bottom: 1px solid var(--border); }
+.stat-table tr:last-child { border-bottom: none; }
+.stat-table td b { color: var(--text); }
+.stat-prog-bar { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; width: 80px; display: inline-block; vertical-align: middle; margin-right: 8px; }
+.stat-prog-fill { height: 100%; background: var(--green); border-radius: 999px; }
+.stat-pct { font-size: 11px; color: var(--text2); font-weight: 600; display: inline-block; vertical-align: middle; width: 35px; text-align: right; }
 </style>
 </head>
 <body>
@@ -238,7 +249,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="topbar">
     <span class="brand">NBFI <span>&middot; Product OS</span></span>
     <div class="spacer"></div>
-    <!-- АЖИЛТАН СОНГОХ ХЭСЭГ (Дээд талбарт байрлана) -->
     <span style="font-size:12px; color:var(--text2); font-weight:600;">Active User:</span>
     <select id="current-user" class="user-selector" onchange="window.changeUser(this.value)">
       <option value="Анар">Анар</option>
@@ -430,9 +440,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
          '</div>';
     });
     h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
-       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
-       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
-       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
+       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\ 'overview\')">&#128202; Overview</div>'+
+       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\ 'ecosystem\')">&#128376; Ecosystem</div>'+
+       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\ 'matrix\')">&#128338; Roadmaps</div>';
     $('sb-scroll').innerHTML=h;
     $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
   }
@@ -463,9 +473,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
     else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
     h+='</div></div><div class="tabs">'+
-       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
-       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
-       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
+       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\ 'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
+       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\ 'roadmap\')">Roadmap</div>'+
+       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\ 'meta\')">Configuration</div>'+
        '</div></div><div class="mbody">';
     if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
     else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
@@ -483,7 +493,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   function renderProjectTasks(p,tasks,dn,tot,pct){
     let h='<div class="tmeta"><span>'+pct+'% Complete ('+dn+'/'+tot+' tasks)</span>'+(dn>0?'<button class="clr" onclick="clearDone(\''+p.id+'\')">Clear completed</button>':'')+'</div>'+
        '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
-       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
+       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\ 'Enter\')addTask(\''+p.id+'\')">'+
        '<select id="t_tag"><option value="">No context item</option>';
     getItems(p.id).forEach(i=>h+='<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>');
     h+='</select><button onclick="addTask(\''+p.id+'\')">+ Add</button></div>';
@@ -497,7 +507,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     return h+'</div>';
   }
 
-  /* TASK МӨР ДЭЭР ХЭН, ХЭЗЭЭ НЭМСНИЙГ ХАРАГДУУЛАХ ХЭСЭГ */
   function taskRow(t){
     const ck=t.done?' ck':'';const dn=t.done?' dn':'';
     const createdBy = t.by ? esc(t.by) : 'Unknown';
@@ -520,7 +529,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
          '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
          '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
-      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
+      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\ 'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
          '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
     });
     return h+'</div>';
@@ -536,7 +545,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     const items=meta.items||[];
     if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
     else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
-    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
+    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\ 'Enter\')addItem(\ 'feature\')"><button onclick="addItem(\ 'feature\')">+</button></div></div>'+
        '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
        '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
     ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
@@ -553,15 +562,71 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     else renderMatrix(m);
   }
 
+  /* ── ШИНЭЧЛЭГДСЭН OVERVIEW ХЭСЭГ (ХҮСНЭГТ СТАТИСТИК БҮХИЙ) ── */
   function renderOverview(m){
-    let tot=projs().length;let live=projs().filter(p=>p.status==='live').length;let prog=projs().filter(p=>p.status==='progress').length;let bug=projs().filter(p=>p.status==='bugs').length;
+    let tot=projs().length;
+    let live=projs().filter(p=>p.status==='live').length;
+    let prog=projs().filter(p=>p.status==='progress').length;
+    let bug=projs().filter(p=>p.status==='bugs').length;
+    
+    // Ажилтан тус бүрээр статистик бодох логик
+    let userStats = {
+      'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0 },
+      'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0 },
+      'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0 }
+    };
+
+    // 1. Том таск буюу прожект удирдаж буй Leads тоолох
+    projs().forEach(p => {
+      const meta = getMeta(p.id);
+      if (meta.leader && userStats[meta.leader]) {
+        userStats[meta.leader].mainTasks += 1;
+      }
+    });
+
+    // 2. Жижиг таскуудыг хэн нэмсэн (by)-ээр шүүж тоолох
+    Object.values(window.D.tasks || {}).forEach(t => {
+      if (t.by && userStats[t.by]) {
+        userStats[t.by].totalSub += 1;
+        if (t.done) {
+          userStats[t.by].doneSub += 1;
+        }
+      }
+    });
+
     let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
        '<div class="ov-stats">'+
        '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
        '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
        '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
        '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
-       '</div><div class="ov-sec">Product Catalog</div><div class="ov-grid">';
+       '</div>';
+
+    // ШИНЭ: Хэрэглэгчийн нэгдсэн гүйцэтгэлийн статистик хүснэгт
+    h += '<div class="ov-sec">User Workload & Performance Overview</div>';
+    h += '<table class="stat-table">'+
+         '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
+         '<tbody>';
+    
+    Object.entries(userStats).forEach(([name, stat]) => {
+      const openSub = stat.totalSub - stat.doneSub;
+      const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
+      h += `<tr>`+
+           `<td><b>${esc(name)}</b></td>`+
+           `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
+           `<td>${stat.totalSub} таск</td>`+
+           `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
+           `<td><span style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; font-weight:600;">${openSub}</span></td>`+
+           `<td>`+
+             `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
+             `<span class="stat-pct">${pct}%</span>`+
+           `</td>`+
+           `</tr>`;
+    });
+    h += '</tbody></table>';
+
+    // Хуучин Бүтээгдэхүүний Каталог хэсэг доор нь хэвээр үлдэнэ
+    h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
     projs().forEach(p=>{
       const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
       h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
@@ -578,9 +643,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   function renderEcosystem(m){
     let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
        '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\ 'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\ 'active\')">Active Core</button>'+
+       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\ 'planned\')">Planned Triggers</button>'+
        '</div><div class="eco-wrap" id="eco-wrap" style="height:100%">'+
        '<div class="eco-legend"><div class="eco-legend-title">System Class</div>'+
        '<div class="eco-lr"><span class="dot dl"></span> Live Core</div>'+
