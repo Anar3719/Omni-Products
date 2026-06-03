@@ -231,7 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* USER STATS STYLE */
 .user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
 .ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
-.stat-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: var(--bg2); border-radius: var(--rl); overflow: hidden; border: 1px solid var(--border); }
+.stat-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: var(--bg2); border-radius: var(--rl); overflow: visible; border: 1px solid var(--border); }
 .stat-table th, .stat-table td { padding: 10px 14px; text-align: left; font-size: 13px; }
 .stat-table th { background: var(--bg3); color: var(--text); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .05em; }
 .stat-table tr { border-bottom: 1px solid var(--border); }
@@ -240,6 +240,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-prog-bar { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; width: 80px; display: inline-block; vertical-align: middle; margin-right: 8px; }
 .stat-prog-fill { height: 100%; background: var(--green); border-radius: 999px; }
 .stat-pct { font-size: 11px; color: var(--text2); font-weight: 600; display: inline-block; vertical-align: middle; width: 35px; text-align: right; }
+
+/* HOVER POPOVER FOR OPEN TASKS */
+.open-task-cell { position: relative; display: inline-block; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s; }
+.open-task-cell:hover { background: var(--red-bg); text-decoration: underline; }
+.task-popover { display: none; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 10px; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r); box-shadow: 0 4px 18px rgba(0,0,0,0.15); padding: 8px 12px; z-index: 999; min-width: 260px; max-width: 340px; text-align: left; }
+.open-task-cell:hover .task-popover { display: block; }
+.popover-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px; letter-spacing: 0.05em;}
+.popover-item { font-size: 12px; color: var(--text); padding: 4px 6px; border-radius: 4px; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 6px; border: 1px solid transparent; margin-bottom: 2px;}
+.popover-item:hover { background: var(--blue-bg); border-color: var(--blue); color: var(--blue-text); }
+.popover-pname { font-size: 10px; font-weight: 600; background: var(--bg3); padding: 1px 4px; border-radius: 3px; color: var(--text2); text-transform: uppercase;}
 
 /* TEAM PERFORMANCE KPI BLOCK STYLE */
 .team-kpi-card { display: flex; align-items: center; gap: 20px; background: var(--bg2); border-radius: var(--rl); padding: 16px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
@@ -580,9 +590,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     let bug=projs().filter(p=>p.status==='bugs').length;
     
     let userStats = {
-      'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0 },
-      'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0 },
-      'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0 }
+      'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
+      'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
+      'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] }
     };
 
     projs().forEach(p => {
@@ -597,6 +607,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         userStats[t.by].totalSub += 1;
         if (t.done) {
           userStats[t.by].doneSub += 1;
+        } else {
+          // Цуглуулах дутуу байгаа таскуудыг төслийн ID-тай цуг хадгалах
+          userStats[t.by].openItems.push({ id: t.id, txt: t.txt, pid: t.p });
         }
       }
     });
@@ -644,12 +657,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     Object.entries(userStats).forEach(([name, stat]) => {
       const openSub = stat.totalSub - stat.doneSub;
       const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
+      
+      // Поповер цонхны доторх таскуудын жагсаалтыг үүсгэх HTML
+      let popoverHtml = '';
+      if(openSub > 0) {
+        popoverHtml += `<div class="task-popover">`;
+        popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
+        stat.openItems.forEach(item => {
+          popoverHtml += `<div class="popover-item" onclick="event.stopPropagation(); window.goToTask('${item.pid}');">` +
+                         `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
+                         `<span>${esc(item.txt)}</span>` +
+                         `</div>`;
+        });
+        popoverHtml += `</div>`;
+      }
+
       h += `<tr>`+
            `<td><b>${esc(name)}</b></td>`+
            `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
            `<td>${stat.totalSub} таск</td>`+
            `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
-           `<td><span style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; font-weight:600;">${openSub}</span></td>`+
+           `<td>`+
+             `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; font-weight:600;">`+
+               `${openSub}${popoverHtml}`+
+             `</div>`+
+           `</td>`+
            `<td>`+
              `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
              `<span class="stat-pct">${pct}%</span>`+
@@ -670,6 +702,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       h+='</div></div>';
     });
     m.innerHTML=h+'</div></div>';
+  }
+
+  /* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
+  window.goToTask = function(pid) {
+    window.ui.sel = pid;
+    window.ui.gview = 'project';
+    window.ui.tab = 'tasks'; // Төслийн Scope & Tasks таб руу шилжүүлнэ
+    window.ui.statusMenu = false;
+    window.render();
   }
 
   function renderEcosystem(m){
