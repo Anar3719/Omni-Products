@@ -489,6 +489,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
        '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
        '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
     $('sb-scroll').innerHTML=h;
+    $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
   }
 
   function renderTeamBar(){
@@ -951,7 +952,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
          '<div class="mfld"><label>Target Sub-feature (Optional)</label><select onchange="window.ncSet(\'ti\',this.value)">'+f2Opts+'</select></div>'+
          '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
          '</div></div>'+
-         
+         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="window.addConn()">Form Structural Interface</button></div>';
+    }else if(k==='reset'){
+      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Reset Realtime Database</div></div>'+
+         '<div class="modal-body"><div class="del-warn">This will reset your Firebase database to default seed data. Proceed?</div></div>'+
+         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitReset()">Reset</button></div>';
     }
   }
 
