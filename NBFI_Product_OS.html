@@ -240,6 +240,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-prog-bar { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; width: 80px; display: inline-block; vertical-align: middle; margin-right: 8px; }
 .stat-prog-fill { height: 100%; background: var(--green); border-radius: 999px; }
 .stat-pct { font-size: 11px; color: var(--text2); font-weight: 600; display: inline-block; vertical-align: middle; width: 35px; text-align: right; }
+
+/* TEAM PERFORMANCE KPI BLOCK STYLE */
+.team-kpi-card { display: flex; align-items: center; gap: 20px; background: var(--bg2); border-radius: var(--rl); padding: 16px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+.team-pie-container { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
+.team-pie-chart { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s ease; }
+.team-pie-inner { width: 44px; height: 44px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text); box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
+.team-kpi-details { flex: 1; }
+.team-kpi-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 3px; }
+.team-kpi-subtitle { font-size: 13px; color: var(--text3); line-height: 1.4; }
+.team-kpi-subtitle b { color: var(--text); }
+.team-kpi-subtitle span.done-txt { color: var(--green); font-weight: 600; }
+.team-kpi-subtitle span.open-txt { color: var(--red); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -560,7 +572,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     else renderMatrix(m);
   }
 
-  /* ── OVERVIEW VIEW WITH REPAIRED ACTIONS ── */
+  /* ── OVERVIEW VIEW WITH DYNAMIC PIE CHART & AGGREGATED METRICS ── */
   function renderOverview(m){
     let tot=projs().length;
     let live=projs().filter(p=>p.status==='live').length;
@@ -589,6 +601,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       }
     });
 
+    // ── CALC TEAM TOTALS FOR PIE CHART ──
+    let teamTotalTasks = 0;
+    let teamTotalDone = 0;
+    Object.entries(userStats).forEach(([name, stat]) => {
+      teamTotalTasks += stat.totalSub;
+      teamTotalDone += stat.doneSub;
+    });
+    let teamTotalOpen = teamTotalTasks - teamTotalDone;
+    let teamPct = teamTotalTasks ? Math.round((teamTotalDone / teamTotalTasks) * 100) : 0;
+
+    // Build conic gradient for clean CSS-only Pie Chart
+    let pieBg = `conic-gradient(var(--green) 0% ${teamPct}%, var(--bg3) ${teamPct}% 100%)`;
+
     let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
        '<div class="ov-stats">'+
        '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
@@ -596,6 +621,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
        '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
        '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
        '</div>';
+
+    // ── DEV TEAM PERFORMANCE BLOCK (PIE CHART) ──
+    h += '<div class="ov-sec">Dev Team Ажиллагаа</div>'+
+         '<div class="team-kpi-card">'+
+           '<div class="team-pie-container">'+
+             '<div class="team-pie-chart" style="background: ' + pieBg + ';">'+
+               '<div class="team-pie-inner">' + teamPct + '%</div>'+
+             '</div>'+
+           '</div>'+
+           '<div class="team-kpi-details">'+
+             '<div class="team-kpi-title">Багийн Нийт Гүйцэтгэл</div>'+
+             '<div class="team-kpi-subtitle">Хөгжүүлэлтийн багийн 3 ажилтны нийт таск ажиллагаа <b>' + teamPct + '%</b>-тай байна. Тооцоолол: Нийт <b>' + teamTotalTasks + '</b> таскаас <span class="done-txt">✓ ' + teamTotalDone + ' болсон</span>, <span class="open-txt">' + teamTotalOpen + ' хүлээгдэж буй</span>.</div>'+
+           '</div>'+
+         '</div>';
 
     h += '<div class="ov-sec">User Workload & Performance Overview</div>';
     h += '<table class="stat-table">'+
@@ -839,8 +878,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     }else if(k==='add-conn'){
       b.className='modal-box';let p1Opts='<option value="">-- Select System --</option>';let p2Opts='<option value="">-- Select System --</option>';
       projs().forEach(p=>{p1Opts+='<option value="'+p.id+'"'+(window.ui.nc.fp===p.id?' selected':'')+'>'+p.name+'</option>';p2Opts+='<option value="'+p.id+'"'+(window.ui.nc.tp===p.id?' selected':'')+'>'+p.name+'</option>';});
-      let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+i.name+'"'+(window.ui.nc.fi===i.name?' selected':'')+'>'+i.name+'</option>');
-      let f2Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.tp)getItems(window.ui.nc.tp).forEach(i=>f2Opts+='<option value="'+i.name+'"'+(window.ui.nc.ti===i.name?' selected':'')+'>'+i.name+'</option>');
+      let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+window.ui.nc.fi===i.name?' selected':''+'">'+i.name+'</option>');
+      let f2Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.tp)getItems(window.ui.nc.tp).forEach(i=>f2Opts+='<option value="'+window.ui.nc.ti===i.name?' selected':''+'">'+i.name+'</option>');
       b.innerHTML='<div class="modal-hdr"><div class="modal-title">Establish Architecture Interface Link</div></div>'+
          '<div class="modal-body">'+
          '<div class="add-conn-form" style="margin-top:0; padding:0; background:transparent;">'+
