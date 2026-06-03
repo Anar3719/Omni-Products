@@ -194,7 +194,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .eco-legend{position:absolute;bottom:13px;left:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:11px;z-index:10}
 .eco-legend-title{font-weight:600;color:var(--text);margin-bottom:6px}
 .eco-legend-text{color:var(--text2);margin-bottom:3px}
-.eco-lr{display:flex;align-items:center;gap:5px;color:var(--text2);margin-bottom:3px}
+.eco-wrap { display: flex; align-items: center; gap: 5px; color: var(--text2); margin-bottom: 3px; }
 .eco-lr:last-child{margin-bottom:0}
 .eco-hint{position:absolute;top:13px;right:13px;font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;z-index:10}
 .eco-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:12px;z-index:20;max-width:220px;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none}
@@ -241,15 +241,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-prog-fill { height: 100%; background: var(--green); border-radius: 999px; }
 .stat-pct { font-size: 11px; color: var(--text2); font-weight: 600; display: inline-block; vertical-align: middle; width: 35px; text-align: right; }
 
-/* HOVER POPOVER FOR OPEN TASKS */
-.open-task-cell { position: relative; display: inline-block; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s; }
+/* HOVER POPOVER FOR OPEN TASKS - FIXED POSITIONS */
+.open-task-cell { position: relative; display: inline-block; cursor: pointer; padding: 4px 10px; border-radius: 4px; transition: background 0.2s; }
 .open-task-cell:hover { background: var(--red-bg); text-decoration: underline; }
-.task-popover { display: none; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 10px; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r); box-shadow: 0 4px 18px rgba(0,0,0,0.15); padding: 8px 12px; z-index: 999; min-width: 260px; max-width: 340px; text-align: left; }
-.open-task-cell:hover .task-popover { display: block; }
-.popover-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px; letter-spacing: 0.05em;}
-.popover-item { font-size: 12px; color: var(--text); padding: 4px 6px; border-radius: 4px; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 6px; border: 1px solid transparent; margin-bottom: 2px;}
+
+/* Поп-ап цонхыг доошоо наалдаж гардаг болгох, дундаа ямар ч хоосон зайгүй */
+.task-popover { 
+  display: none; 
+  position: absolute; 
+  top: 100%; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  margin-top: 0px; 
+  background: var(--bg); 
+  border: 1px solid var(--border2); 
+  border-radius: var(--r); 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18); 
+  padding: 10px; 
+  z-index: 999; 
+  min-width: 280px; 
+  max-width: 360px; 
+  text-align: left; 
+}
+
+/* Энэ хэсэг нь хулгана тооноос холдож поп-ап руу очих үед нээлттэй байлгах үүрэгтэй */
+.open-task-cell:hover .task-popover,
+.task-popover:hover { 
+  display: block; 
+}
+
+.popover-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 6px; letter-spacing: 0.05em;}
+.popover-list { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+.popover-item { font-size: 12px; color: var(--text); padding: 5px 8px; border-radius: 5px; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 6px; border: 1px solid transparent;}
 .popover-item:hover { background: var(--blue-bg); border-color: var(--blue); color: var(--blue-text); }
-.popover-pname { font-size: 10px; font-weight: 600; background: var(--bg3); padding: 1px 4px; border-radius: 3px; color: var(--text2); text-transform: uppercase;}
+.popover-pname { font-size: 9px; font-weight: 700; background: var(--bg3); padding: 2px 5px; border-radius: 4px; color: var(--text2); text-transform: uppercase; white-space: nowrap;}
 
 /* TEAM PERFORMANCE KPI BLOCK STYLE */
 .team-kpi-card { display: flex; align-items: center; gap: 20px; background: var(--bg2); border-radius: var(--rl); padding: 16px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
@@ -608,13 +633,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         if (t.done) {
           userStats[t.by].doneSub += 1;
         } else {
-          // Цуглуулах дутуу байгаа таскуудыг төслийн ID-тай цуг хадгалах
           userStats[t.by].openItems.push({ id: t.id, txt: t.txt, pid: t.p });
         }
       }
     });
 
-    // ── CALC TEAM TOTALS FOR PIE CHART ──
     let teamTotalTasks = 0;
     let teamTotalDone = 0;
     Object.entries(userStats).forEach(([name, stat]) => {
@@ -624,7 +647,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     let teamTotalOpen = teamTotalTasks - teamTotalDone;
     let teamPct = teamTotalTasks ? Math.round((teamTotalDone / teamTotalTasks) * 100) : 0;
 
-    // Build conic gradient for clean CSS-only Pie Chart
     let pieBg = `conic-gradient(var(--green) 0% ${teamPct}%, var(--bg3) ${teamPct}% 100%)`;
 
     let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
@@ -635,7 +657,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
        '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
        '</div>';
 
-    // ── DEV TEAM PERFORMANCE BLOCK (PIE CHART) ──
     h += '<div class="ov-sec">Dev Team Ажиллагаа</div>'+
          '<div class="team-kpi-card">'+
            '<div class="team-pie-container">'+
@@ -658,18 +679,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       const openSub = stat.totalSub - stat.doneSub;
       const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
       
-      // Поповер цонхны доторх таскуудын жагсаалтыг үүсгэх HTML
       let popoverHtml = '';
       if(openSub > 0) {
-        popoverHtml += `<div class="task-popover">`;
+        popoverHtml += `<div class="task-popover" onclick="event.stopPropagation();">`;
         popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
+        popoverHtml += `<div class="popover-list">`;
         stat.openItems.forEach(item => {
-          popoverHtml += `<div class="popover-item" onclick="event.stopPropagation(); window.goToTask('${item.pid}');">` +
+          popoverHtml += `<div class="popover-item" onclick="window.goToTask('${item.pid}');">` +
                          `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
-                         `<span>${esc(item.txt)}</span>` +
+                         `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.txt)}</span>` +
                          `</div>`;
         });
-        popoverHtml += `</div>`;
+        popoverHtml += `</div></div>`;
       }
 
       h += `<tr>`+
@@ -678,7 +699,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
            `<td>${stat.totalSub} таск</td>`+
            `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
            `<td>`+
-             `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; font-weight:600;">`+
+             `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; background:${openSub > 0 ? 'var(--red-bg)' : 'transparent'};">`+
                `${openSub}${popoverHtml}`+
              `</div>`+
            `</td>`+
@@ -708,7 +729,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.goToTask = function(pid) {
     window.ui.sel = pid;
     window.ui.gview = 'project';
-    window.ui.tab = 'tasks'; // Төслийн Scope & Tasks таб руу шилжүүлнэ
+    window.ui.tab = 'tasks';
     window.ui.statusMenu = false;
     window.render();
   }
