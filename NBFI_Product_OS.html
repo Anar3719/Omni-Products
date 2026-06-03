@@ -6,981 +6,529 @@
 <title>NBFI · Product OS</title>
 <style>
 :root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--green:#639922;--green-bg:#EAF3DE;--green-text:#3B6D11;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#A32D2D;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#854F0B;--r:8px;--rl:12px}
-@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--green-bg:#1a2e0a;--green-text:#97C459;--blue-bg:#0a1e35;--blue-text:#85B7EB;--red-bg:#2e0a0a;--red-text:#F09595;--amber-bg:#2e1e0a;--amber-text:#EF9F27}}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.16);--green:#7cb342;--green-bg:#24301a;--green-text:#aed581;--blue:#42a5f5;--blue-bg:#162b3d;--blue-text:#90caf9;--red:#ef5350;--red-bg:#331c1c;--red-text:#ef9a9a;--amber:#ffa726;--amber-bg:#332515;--amber-text:#ffe082}}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.topbar{display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
-.brand{font-size:14px;font-weight:600;color:var(--text)}.brand span{font-weight:400;color:var(--text3)}
-.spacer{flex:1}
-.tbtn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap}
-.tbtn:hover,.tbtn.on{background:var(--bg);color:var(--text)}
-.tbtn.prim{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
-.tbtn.prim:hover{opacity:.9}
-.team-bar{padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.tlbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0}
-.mchip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);color:var(--text2);background:var(--bg)}
-.mchip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
-.mchip button:hover{color:var(--red)}
-.minp{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text);outline:none;width:120px}
-.layout{display:flex;flex:1;overflow:hidden}
-.sb{width:185px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
-.sb-head{padding:12px 13px 9px;border-bottom:1px solid var(--border)}
-.sb-org{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.09em}
-.sb-title{font-size:15px;font-weight:600;color:var(--text);margin-top:2px}
-.sb-scroll{flex:1;overflow-y:auto;padding:4px 0 6px}
-.sb-sec{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px 3px;display:flex;align-items:center;justify-content:space-between}
-.sb-add{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0}
-.sb-add:hover{color:var(--text)}
-.pitem{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;border-radius:6px;margin:1px 5px;position:relative}
-.pitem:hover{background:var(--bg)}.pitem.on{background:var(--bg);font-weight:600}
-.pname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--text2)}
-.pitem.on .pname{color:var(--text)}
-.pitem-act{display:none;gap:2px}
-.pitem:hover .pitem-act{display:flex}
-.piabtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 3px;border-radius:4px;line-height:1}
-.piabtn:hover{background:var(--bg3);color:var(--text)}.piabtn.del:hover{color:var(--red)}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dl{background:var(--green)}.dp{background:var(--blue)}.db{background:var(--red)}.dpl{background:var(--amber)}
-.pcnt{font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:0 5px;min-width:18px;text-align:center;flex-shrink:0}
-.sb-foot{border-top:1px solid var(--border);padding:5px}
-.gbtn{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;color:var(--text2);cursor:pointer;border-radius:6px}
-.gbtn:hover,.gbtn.on{background:var(--bg);color:var(--text);font-weight:600}
-.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
-.phdr{padding:13px 18px 0;border-bottom:1px solid var(--border);flex-shrink:0}
-.ptrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.pt{font-size:18px;font-weight:700;color:var(--text)}
-.plocal{font-size:13px;color:var(--text3);font-weight:400}
-.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600;cursor:pointer;position:relative}
-.bl{background:var(--green-bg);color:var(--green-text)}.bp{background:var(--blue-bg);color:var(--blue-text)}.bb{background:var(--red-bg);color:var(--red-text)}.bpl{background:var(--amber-bg);color:var(--amber-text)}
-.ptype{font-size:12px;color:var(--text3);margin-left:auto}
-.smenu{position:absolute;top:calc(100% + 4px);left:0;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:4px;z-index:100;min-width:130px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.sopt{display:flex;align-items:center;gap:7px;padding:6px 9px;font-size:12px;cursor:pointer;border-radius:5px;color:var(--text2)}
-.sopt:hover{background:var(--bg2)}
-.pmeta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px;padding:7px 10px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border)}
-.pmeta-g{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.pmeta-l{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.pmeta-v{font-size:12px;color:var(--text);font-weight:500}
-.pmeta-c{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
-.pmeta-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0}
-.tabs{display:flex}
-.tab{padding:8px 13px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;user-select:none}
-.tab:hover{color:var(--text)}.tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
-.mbody{flex:1;overflow-y:auto;padding:15px 18px}
-.tmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--text3)}
-.clr{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:0}
-.clr:hover{color:var(--text2);text-decoration:underline}
-.prog{height:3px;background:var(--bg3);border-radius:999px;margin-bottom:11px;overflow:hidden}
-.pfill{height:100%;background:var(--green);border-radius:999px;transition:width .3s}
-.ar{display:flex;gap:6px;margin-bottom:11px}
-.ar input,.ar select{font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:7px 9px;background:var(--bg2);color:var(--text);outline:none}
-.ar input{flex:1}.ar select{max-width:125px}
-.ar input:focus,.ar select:focus{border-color:var(--blue)}
-.ar button{display:inline-flex;align-items:center;gap:4px;font-size:13px;padding:7px 11px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer;flex-shrink:0}
-.ar button:hover{background:var(--bg2)}
-.tlist{display:flex;flex-direction:column;gap:4px}
-.titem{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:var(--r);border:1px solid transparent}
-.titem:hover{border-color:var(--border)}
-.chk{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.chk.ck{background:var(--green);border-color:var(--green)}
-.chk.ck::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
-.ttxt{flex:1;font-size:13px;color:var(--text);line-height:1.4}
-.ttxt.dn{color:var(--text3);text-decoration:line-through}
-.atag{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:2px 7px;white-space:nowrap}
-.xbtn{background:none;border:none;font-size:15px;color:var(--text3);cursor:pointer;opacity:0;flex-shrink:0;line-height:1;padding:0}
-.titem:hover .xbtn{opacity:1}.xbtn:hover{color:var(--red)}
-.donesec{margin-top:11px;border-top:1px solid var(--border);padding-top:9px}
-.dnhdr{font-size:12px;color:var(--text3);margin-bottom:6px}
-.muted{font-size:13px;color:var(--text3);padding:6px 0}
-.rcols{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.rcol{background:var(--bg2);border-radius:var(--rl);padding:11px}
-.rch{display:flex;align-items:center;gap:5px;margin-bottom:9px}
-.rct{font-size:13px;font-weight:600;color:var(--text)}
-.rcc{font-size:11px;color:var(--text3);background:var(--bg);border-radius:999px;padding:1px 6px;border:1px solid var(--border)}
-.rlist{min-height:28px;display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
-.rcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--text);display:flex;align-items:flex-start;gap:3px;line-height:1.5}
-.rcard-t{flex:1;min-width:0;word-break:break-word}
-.mvb,.rxb{background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;opacity:0;flex-shrink:0;line-height:1.5;padding:0}
-.rcard:hover .mvb,.rcard:hover .rxb{opacity:.7}
-.mvb:hover{opacity:1!important;color:var(--text)}.rxb:hover{opacity:1!important;color:var(--red)}
-.radd{display:flex;gap:4px}
-.radd input{flex:1;min-width:0;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 7px;background:var(--bg);color:var(--text);outline:none}
-.radd input:focus{border-color:var(--blue)}
-.radd button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;flex-shrink:0}
-.radd button:hover{background:var(--bg2)}
-.stitle{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;margin-top:15px}
-.stitle:first-child{margin-top:0}
-.idesc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:13px}
-.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px}
-.tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--border2);color:var(--text2)}
-.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:4px}
-.ps-col{background:var(--bg2);border-radius:var(--rl);padding:11px}
-.ps-col-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.ps-items{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
-.ps-item{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);font-size:12px;color:var(--text)}
-.ps-item-name{flex:1}
-.ps-xbtn{background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;opacity:0;line-height:1;padding:0}
-.ps-item:hover .ps-xbtn{opacity:1}.ps-xbtn:hover{color:var(--red)}
-.ps-add{display:flex;gap:4px}
-.ps-add input{flex:1;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 7px;background:var(--bg);color:var(--text);outline:none}
-.ps-add input:focus{border-color:var(--blue)}
-.ps-add button{display:inline-flex;align-items:center;font-size:12px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer}
-.ps-add button:hover{background:var(--bg)}
-.team-sec {background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-bottom:5px}
-.tf{display:flex;align-items:center;gap:11px;margin-bottom:9px}
-.tf:last-child{margin-bottom:0}
-.tfl{font-size:12px;color:var(--text3);width:75px;flex-shrink:0}
-.tf select{font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
-.dev-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.dev-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text2);background:var(--bg)}
-.dev-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
-.dev-chip button:hover{color:var(--red)}
-.dev-add-sel{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text2);outline:none;cursor:pointer}
-.conn-row{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;background:var(--bg2);border-radius:var(--r);margin-bottom:3px;flex-wrap:wrap}
-.cproj{font-weight:600;color:var(--text)}.citem{color:var(--text2)}
-.crel{font-size:10px;padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--text3);background:var(--bg)}
-.carr{color:var(--text3);font-size:11px}
-.csa{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--green-bg);color:var(--green-text);font-weight:600}
-.csp{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--amber-bg);color:var(--amber-text);font-weight:600}
-.cdel{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;opacity:0;padding:0;margin-left:auto}
-.conn-row:hover .cdel{opacity:1}.cdel:hover{color:var(--red)}
-.ghdr{padding:14px 18px 13px;border-bottom:1px solid var(--border);flex-shrink:0}
-.gtitle{font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px}
-.gsub{font-size:13px;color:var(--text2)}
-.filter-bar{display:flex;gap:5px;padding:9px 18px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
-.fbtn{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer}
-.fbtn:hover{background:var(--bg2)}.fbtn.on{background:var(--bg2);border-color:var(--border2);color:var(--text);font-weight:600}
-.scrollbody{flex:1;overflow-y:auto;padding:15px 18px}
-.lsec{margin-bottom:17px}
-.lhdr{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.llbl{font-size:14px;font-weight:600;color:var(--text)}
-.lcnt{font-size:11px;color:var(--text3);background:var(--bg2);border-radius:999px;padding:1px 6px;border:1px solid var(--border)}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:7px}
-.lcard{background:var(--bg2);border-radius:var(--r);padding:8px 10px;cursor:pointer}
-.lcard:hover{background:var(--bg3)}
-.lcard-n{font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.05em}
-.lcard-cnt{font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0}
-.litem{font-size:12px;color:var(--text2);padding:2px 0;display:flex;align-items:flex-start;gap:4px;line-height:1.4}
-.litem::before{content:"\00B7";color:var(--text3);flex-shrink:0}
-.add-conn-form{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;margin-top:3px}
-.acr{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
-.acr select,.acr input{font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
-.stog{display:flex;border:1px solid var(--border2);border-radius:var(--r);overflow:hidden}
-.stog button{font-size:11px;padding:5px 9px;border:none;background:transparent;color:var(--text2);cursor:pointer}
-.stog button.on{background:var(--blue);color:#fff}
-.acr button.primary{font-size:12px;padding:5px 11px;border:1px solid var(--blue);border-radius:var(--r);background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
-.ov-body{flex:1;overflow-y:auto;padding:18px}
-.ov-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px}
-.ov-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
-.ov-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:20px}
-.sc{background:var(--bg2);border-radius:var(--rl);padding:13px 15px;border:1px solid var(--border)}
-.sv{font-size:26px;font-weight:700;color:var(--text);margin-bottom:2px}
-.sl{font-size:12px;color:var(--text2)}
-.sc.green .sv{color:var(--green)}.sc.blue .sv{color:var(--blue)}.sc.red .sv{color:var(--red)}.sc.amber .sv{color:var(--amber)}
-.ov-sec{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
-.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:9px;margin-bottom:20px}
-.opc{background:var(--bg2);border-radius:var(--rl);padding:11px 13px;cursor:pointer;border:1px solid var(--border)}
-.opc:hover{border-color:var(--border2)}
-.opc-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
-.opc-name{font-size:13px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.opc-type{font-size:11px;color:var(--text3);margin-bottom:7px}
-.opc-row{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px}
-.opc-prog{height:3px;background:var(--bg3);border-radius:999px;margin-top:7px;overflow:hidden}
-.opc-pfill{height:100%;background:var(--green);border-radius:999px}
-.ov-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.opc-chip{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);color:var(--text3)}
-.opc-chip.warn{color:var(--amber-text);border-color:var(--amber)}
-.eco-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg2)}
-.eco-legend{position:absolute;bottom:13px;left:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:11px;z-index:10}
-.eco-legend-title{font-weight:600;color:var(--text);margin-bottom:6px}
-.eco-legend-text{color:var(--text2);margin-bottom:3px}
-.eco-wrap { display: flex; align-items: center; gap: 5px; color: var(--text2); margin-bottom: 3px; }
-.eco-lr:last-child{margin-bottom:0}
-.eco-hint{position:absolute;top:13px;right:13px;font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;z-index:10}
-.eco-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:12px;z-index:20;max-width:220px;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none}
-.eco-tt-name{font-weight:700;color:var(--text);font-size:13px;margin-bottom:3px}
-.eco-tt-type{color:var(--text3);font-size:11px;margin-bottom:6px}
-.eco-tt-row{display:flex;gap:7px;font-size:11px;color:var(--text2);margin-bottom:2px}
-.eco-tt-key{color:var(--text3);min-width:70px}
-.modal-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
-.modal-box{position:relative;background:var(--bg);border-radius:var(--rl);border:1px solid var(--border2);width:100%;max-width:500px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.15)}
-.modal-box.sm{max-width:380px}
-.modal-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border)}
-.modal-title{font-size:16px;font-weight:700;color:var(--text)}
-.modal-sub{font-size:13px;color:var(--text2);margin-top:2px}
-.modal-body{flex:1;overflow-y:auto;padding:16px 20px}
-.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-.mfld{margin-bottom:14px}
-.mfld:last-child{margin-bottom:0}
-.mfld label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-.mfld input,.mfld textarea,.mfld select{width:100%;font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:8px 10px;background:var(--bg2);color:var(--text);outline:none;font-family:inherit}
-.mfld textarea{resize:vertical;min-height:70px;line-height:1.5}
-.mfld input:focus,.mfld textarea:focus,.mfld select:focus{border-color:var(--blue)}
-.tag-inp-wrap{display:flex;flex-direction:column;gap:6px}
-.tag-chips{display:flex;flex-wrap:wrap;gap:5px}
-.tag-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
-.tag-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;line-height:1;padding:0}
-.tag-chip button:hover{color:var(--red)}
-.mbtn{font-size:13px;padding:7px 14px;border-radius:var(--r);cursor:pointer;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--text2)}
-.mbtn:hover{background:var(--bg2)}.mbtn.prim{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
-.mbtn.prim:hover{opacity:.9}.mbtn.danger{background:var(--red);color:#fff;border-color:var(--red)}
-.del-warn{font-size:13px;color:var(--text2);line-height:1.6}.del-warn strong{color:var(--text)}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-
-/* USER STATS STYLE */
-.user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
-.ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
-.stat-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: var(--bg2); border-radius: var(--rl); overflow: visible; border: 1px solid var(--border); }
-.stat-table th, .stat-table td { padding: 10px 14px; text-align: left; font-size: 13px; }
-.stat-table th { background: var(--bg3); color: var(--text); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .05em; }
-.stat-table tr { border-bottom: 1px solid var(--border); }
-.stat-table tr:last-child { border-bottom: none; }
-.stat-table td b { color: var(--text); }
-.stat-prog-bar { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; width: 80px; display: inline-block; vertical-align: middle; margin-right: 8px; }
-.stat-prog-fill { height: 100%; background: var(--green); border-radius: 999px; }
-.stat-pct { font-size: 11px; color: var(--text2); font-weight: 600; display: inline-block; vertical-align: middle; width: 35px; text-align: right; }
-
-/* HOVER POPOVER FOR OPEN TASKS - FIXED POSITIONS */
-.open-task-cell { position: relative; display: inline-block; cursor: pointer; padding: 4px 10px; border-radius: 4px; transition: background 0.2s; }
-.open-task-cell:hover { background: var(--red-bg); text-decoration: underline; }
-
-/* Поп-ап цонхыг доошоо наалдаж гардаг болгох, дундаа ямар ч хоосон зайгүй */
-.task-popover { 
-  display: none; 
-  position: absolute; 
-  top: 100%; 
-  left: 50%; 
-  transform: translateX(-50%); 
-  margin-top: 0px; 
-  background: var(--bg); 
-  border: 1px solid var(--border2); 
-  border-radius: var(--r); 
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18); 
-  padding: 10px; 
-  z-index: 999; 
-  min-width: 280px; 
-  max-width: 360px; 
-  text-align: left; 
-}
-
-/* Энэ хэсэг нь хулгана тооноос холдож поп-ап руу очих үед нээлттэй байлгах үүрэгтэй */
-.open-task-cell:hover .task-popover,
-.task-popover:hover { 
-  display: block; 
-}
-
-.popover-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 6px; letter-spacing: 0.05em;}
-.popover-list { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
-.popover-item { font-size: 12px; color: var(--text); padding: 5px 8px; border-radius: 5px; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 6px; border: 1px solid transparent;}
-.popover-item:hover { background: var(--blue-bg); border-color: var(--blue); color: var(--blue-text); }
-.popover-pname { font-size: 9px; font-weight: 700; background: var(--bg3); padding: 2px 5px; border-radius: 4px; color: var(--text2); text-transform: uppercase; white-space: nowrap;}
-
-/* TEAM PERFORMANCE KPI BLOCK STYLE */
-.team-kpi-card { display: flex; align-items: center; gap: 20px; background: var(--bg2); border-radius: var(--rl); padding: 16px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-.team-pie-container { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
-.team-pie-chart { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s ease; }
-.team-pie-inner { width: 44px; height: 44px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text); box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
-.team-kpi-details { flex: 1; }
-.team-kpi-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 3px; }
-.team-kpi-subtitle { font-size: 13px; color: var(--text3); line-height: 1.4; }
-.team-kpi-subtitle b { color: var(--text); }
-.team-kpi-subtitle span.done-txt { color: var(--green); font-weight: 600; }
-.team-kpi-subtitle span.open-txt { color: var(--red); font-weight: 600; }
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.4;user-select:none;overflow:hidden}
+input,textarea,select{font-family:inherit;font-size:inherit;color:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--text3)}
+button{font-family:inherit;font-size:inherit;background:var(--bg3);color:var(--text);border:none;border-radius:var(--r);padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:500}
+button:hover{filter:brightness(0.95)}
+button.primary{background:var(--text);color:var(--bg)}
+button.primary:hover{opacity:0.9}
+button.danger{background:var(--red-bg);color:var(--red-text)}
+.badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.badge.planned{background:var(--bg3);color:var(--text2)}
+.badge.active{background:var(--blue-bg);color:var(--blue-text)}
+.badge.done{background:var(--green-bg);color:var(--green-text)}
+.badge.blocked{background:var(--red-bg);color:var(--red-text)}
+.badge.tag{background:var(--bg2);color:var(--text2);text-transform:none;font-weight:normal}
+#app{display:grid;grid-template-columns:260px 1px 1px 1px 1fr;height:100vh;width:100vw;position:relative}
+#sidebar{background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden}
+.sb-header{padding:16px;display:flex;align-items:center;justify-content:between;border-bottom:1px solid var(--border);gap:8px}
+.sb-title{font-weight:700;font-size:15px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-search-box{padding:10px 16px;border-bottom:1px solid var(--border)}
+.sb-search-box input{width:100%}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);cursor:pointer;color:var(--text2);font-weight:500}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{background:var(--bg3);color:var(--text);font-weight:600}
+.sb-item svg{width:16px;height:16px;opacity:0.7}
+.sb-section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;padding:12px 10px 4px 10px}
+#main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.topbar{height:53px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--bg);gap:12px;z-index:10}
+.topbar-title{font-weight:600;font-size:16px}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.content-area{flex:1;overflow-y:auto;padding:24px;position:relative}
+.view-pane{display:none;height:100%}
+.view-pane.active{display:block}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:box-shadow 0.1s}
+.card:hover{box-shadow:0 4px 12px var(--border);border-color:var(--border2)}
+.card-header{display:flex;align-items:start;justify-content:space-between;gap:8px}
+.card-title{font-weight:600;font-size:15px;line-height:1.3}
+.card-desc{color:var(--text2);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text3);margin-top:auto;padding-top:8px;border-top:1px solid var(--border)}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px}
+.detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start}
+.detail-main{display:flex;flex-direction:column;gap:20px}
+.detail-side{background:var(--bg2);border-radius:var(--rl);padding:20px;display:flex;flex-direction:column;gap:16px;border:1px solid var(--border)}
+.section-heading{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.kv-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.kv-row:last-child{border:none}
+.kv-label{color:var(--text2)}
+.kv-val{font-weight:500;text-align:right}
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-item{display:flex;align-items:center;gap:10px;background:var(--bg2);padding:10px 12px;border-radius:var(--r);border:1px solid var(--border);cursor:pointer}
+.task-item:hover{border-color:var(--border2)}
+.task-text{flex:1;font-size:13px}
+.task-text.done{text-decoration:line-through;color:var(--text3)}
+.road-swimlanes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;height:100%;align-items:start}
+.swimlane{background:var(--bg2);border-radius:var(--rl);padding:12px;display:flex;flex-direction:column;gap:12px;max-height:100%;overflow-y:auto;border:1px solid var(--border)}
+.swimlane-header{display:flex;align-items:center;justify-content:space-between;padding:2px 4px}
+.swimlane-title{font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2)}
+.swimlane-count{background:var(--bg3);color:var(--text2);padding:2px 6px;border-radius:10px;font-size:11px;font-weight:600}
+.road-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.road-card:hover{border-color:var(--border2);box-shadow:0 2px 6px var(--border)}
+.road-pname{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase}
+.road-title{font-weight:500}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg);border-radius:var(--rl);width:100%;max-width:500px;display:flex;flex-direction:column;box-shadow:0 20px 40px rgba(0,0,0,0.15);border:1px solid var(--border);overflow:hidden}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:between}
+.modal-title{font-weight:600;font-size:16px}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;max-height:70vh}
+.modal-footer{padding:12px 20px;background:var(--bg2);border-top:1px solid var(--border);display:flex;justify-content:end;gap:8px}
+.f-group{display:flex;flex-direction:column;gap:6px}
+.f-group label{font-size:12px;font-weight:600;color:var(--text2)}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--text3);gap:12px}
+.empty-state svg{width:48px;height:48px;opacity:0.5}
+.setting-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:16px;display:flex;flex-direction:column;gap:12px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.setting-info{flex:1}
+.setting-title{font-weight:600;font-size:14px;margin-bottom:2px}
+.setting-desc{font-size:13px;color:var(--text2)}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <span class="brand">NBFI <span>&middot; Product OS</span></span>
-    <div class="spacer"></div>
-    <span style="font-size:12px; color:var(--text2); font-weight:600;">Active User:</span>
-    <select id="current-user" class="user-selector" onchange="window.changeUser(this.value)">
-      <option value="Анар">Анар</option>
-      <option value="Зул-Эрдэнэ">Зул-Эрдэнэ</option>
-      <option value="Халиунаа">Халиунаа</option>
-    </select>
-    <span style="color:var(--border2)">|</span>
-    
-    <button class="tbtn prim" onclick="openModal('add-project',{})">+ Add project</button>
-    <button class="tbtn" id="team-btn" onclick="toggleTeam()">&#128101; Team</button>
-    <button class="tbtn" onclick="exportData()">&#8659; Export JSON</button>
-    <button class="tbtn" style="background: var(--bg3); font-weight: 600;" onclick="document.getElementById('json-file-input').click()">&#8657; Import JSON</button>
-    <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="importData(event)">
-  </div>
-  <div class="team-bar" id="team-bar" style="display:none"></div>
-  <div class="layout">
-    <div class="sb">
-      <div class="sb-head"><div class="sb-org">NBFI</div><div class="sb-title">Product OS</div></div>
-      <div class="sb-scroll" id="sb-scroll"></div>
-      <div class="sb-foot" id="sb-foot"></div>
+<div id="app">
+  <div id="sidebar">
+    <div class="sb-header">
+      <svg viewBox="0 0 24 24" style="color:var(--blue)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <div class="sb-title">NBFI · Product OS</div>
     </div>
-    <div class="main" id="main"></div>
+    <div class="sb-search-box">
+      <input type="text" id="sb_search" placeholder="Search everywhere..." oninput="window.doSearch(this.value)">
+    </div>
+    <div class="sb-nav">
+      <div class="sb-item active" id="sb_tab_all" onclick="window.setTab('all')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>All Projects</span>
+      </div>
+      <div class="sb-item" id="sb_tab_road" onclick="window.setTab('road')">
+        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        <span>Roadmap Lanes</span>
+      </div>
+      <div class="sb-section-title">Types</div>
+      <div class="sb-item" id="sb_tab_t_customer" onclick="window.setTab('t_customer')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Customer Facing</span>
+      </div>
+      <div class="sb-item" id="sb_tab_t_internal" onclick="window.setTab('t_internal')">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span>Internal Tools</span>
+      </div>
+      <div class="sb-item" id="sb_tab_t_core" onclick="window.setTab('t_core')">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+        <span>Core Engine / Infra</span>
+      </div>
+      <div class="sb-section-title">System</div>
+      <div class="sb-item" id="sb_tab_settings" onclick="window.setTab('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Data & Settings</span>
+      </div>
+    </div>
+  </div>
+  <div style="width:0px;border:none"></div><div style="width:0px;border:none"></div><div style="width:0px;border:none"></div>
+  <div id="main">
+    <div class="topbar">
+      <div class="topbar-title" id="view_title">Projects</div>
+      <div class="topbar-actions" id="view_actions"></div>
+    </div>
+    <div class="content-area" id="content_scroll">
+      <div id="v_all" class="view-pane"></div>
+      <div id="v_road" class="view-pane"></div>
+      <div id="v_project" class="view-pane"></div>
+      <div id="v_settings" class="view-pane"></div>
+    </div>
   </div>
 </div>
-<div id="modal-overlay" class="modal-overlay" style="display:none">
-  <div class="modal-bg" id="modal-bg"></div>
-  <div class="modal-box" id="modal-box"></div>
+<div id="modal_overlay" class="modal-overlay" onclick="if(event.target===this)window.closeModal()">
+  <div class="modal" id="modal_holder"></div>
 </div>
-<div class="eco-tooltip" id="eco-tt"></div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
-    authDomain: "omni-products.firebaseapp.com",
-    databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
-    projectId: "omni-products",
-    storageBucket: "omni-products.firebasestorage.app",
-    messagingSenderId: "879805024712",
-    appId: "1:879805024712:web:9b694019cf8388953998fd",
-    measurementId: "G-KQND2ECQ33"
+<input type="file" id="import_file_input" style="display:none" accept=".json" onchange="window.handleImportFile(event)">
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  window.D={projects:{},tasks:{},road:{},conns:{}};
+  window.ui={tab:'all',gview:'list',sel:null,search:''};
+  const def_p={
+    'p1':{id:'p1',name:'Core Banking API V2',local:'HQ-Core',type:'core',status:'active',desc:'Upgrading transaction processing system for high throughput ledger settlement and concurrent lock mitigation.',tags:['infra','speed']},
+    'p2':{id:'p2',name:'Merchant Portal Dashboard',local:'UB-Office',type:'customer',status:'active',desc:'Re-designing statements extraction, clearing reconciliation tools, and instant settlement widgets for SME nodes.',tags:['frontend','fintech']},
+    'p3':{id:'p3',name:'E-KYC Face Verification',local:'Remote-Node',type:'customer',status:'planned',desc:'Integrating localized identity provider liveness streams to reduce manual verification queues.',tags:['security','biometric']},
+    'p4':{id:'p4',name:'Automated Credit Scoring',local:'HQ-Risk',type:'core',status:'done',desc:'Decision engine node wiring machine learning data buckets with social ledger footprints.',tags:['risk','ml']},
+    'p5':{id:'p5',name:'Internal Audit Logging Engine',local:'HQ-Compliance',type:'internal',status:'blocked',desc:'Immutable ledger log pipe for capturing operator session snapshots across high privilege zones.',tags:['compliance','audit']}
   };
-
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
-  const analytics = getAnalytics(app);
-  const dbRef = ref(database, 'product_os_data');
-
-  /* ── UTILS ── */
-  window.$ = function(id){return document.getElementById(id);}
-  window.esc = function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  window.uid = function(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
-  window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
-
-  /* ── ACTIVE USER ── */
-  window.currentUser = localStorage.getItem('selected_user') || 'Анар';
-  document.addEventListener("DOMContentLoaded", () => {
-    if($('current-user')) $('current-user').value = window.currentUser;
-  });
-
-  window.changeUser = function(val) {
-    window.currentUser = val;
-    localStorage.setItem('selected_user', val);
-  }
-
-  /* ── CONSTANTS ── */
-  window.SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
-  window.LANES=['now','next','later'];
-  window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
-
-  /* ── STATE ── */
-  window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
-  window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
-
-  /* ── DATA HELPERS ── */
-  window.projs = function(){return Object.values(window.D.projects||{});}
-  window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
-  window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
-  window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
-  window.getMeta = function(pid){return(window.D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
-  window.getItems = function(pid){return getMeta(pid).items||[];}
-  window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
-  window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
-  window.badge = function(s,click){const m=window.SM[s]||window.SM.progress;return '<span class="bdg '+m.b+'"'+(click?' onclick="toggleSmenu(event)" title="Click to change"':'')+'>'+sdot(s)+m.l+'</span>';}
-  window.connRow = function(c,del){
-    const arr=c.st==='active'?'\u2192':'\u2194';
-    const sb=c.st==='active'?'<span class="csa">active</span>':'<span class="csp">planned</span>';
-    const db=del?'<button class="cdel" onclick="delConn(\''+c.id+'\')">&#10005;</button>':'';
-    return'<div class="conn-row"><span class="cproj">'+esc(pName(c.fp))+'</span>'+(c.fi?'<span class="citem">/ '+esc(c.fi)+'</span>':'')+
-      '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
-      '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
-
-  /* ── FIREBASE SAVE ── */
-  window.save = function(){
+  const def_t={
+    't1':{id:'t1',p:'p1',text:'Database schema structure migrations and index benchmarking',done:true},
+    't2':{id:'t2',p:'p1',text:'Kafka cluster routing stream pipe load stress tests',done:false},
+    't3':{id:'t3',p:'p2',text:'Exportable XLSX statement parsing optimization',done:true},
+    't4':{id:'t4',p:'p2',text:'Websocket channel connection drop retry timers',done:false},
+    't5':{id:'t5',p:'p3',text:'Camera framing alignment guides and baseline latency filters',done:false}
+  };
+  const def_r={
+    'r1':{id:'r1',p:'p1',lane:'q1',title:'Database Schema Migrations & Benchmarking'},
+    'r2':{id:'r2',p:'p1',lane:'q2',title:'Kafka Cluster Routing & Stress Testing'},
+    'r3':{id:'r3',p:'p2',lane:'q1',title:'Reconciliation Pipeline UI & Statements'},
+    'r4':{id:'r4',p:'p3',lane:'q3',title:'Liveness SDK Pipeline Wiring'},
+    'r5':{id:'r5',p:'p4',lane:'done',title:'Decision Tree Risk Model Rollout'},
+    'r6':{id:'r6',p:'p5',lane:'q2',title:'Audit Log Mirror Pipe Initialization'}
+  };
+  window.initDB=function(){
     try{
-      set(dbRef, window.D);
-    }catch(e){
-      console.error('Firebase save error:',e);
-    }
-  }
-
-  window.exportData = function(){
-    const blob=new Blob([JSON.stringify(window.D,null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
-  }
-
-  window.importData = function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const parsedData = JSON.parse(e.target.result);
-        if (!parsedData.projects) {
-          alert("Error: Invalid backup format!");
-          return;
-        }
-        if (confirm("Overwrite Firebase storage with this data?")) {
-          window.D = parsedData;
-          window.save();
-          if (window.projs().length > 0) window.ui.sel = window.projs()[0].id;
-          window.render();
-        }
-      } catch (err) {
-        alert("Upload error: " + err.message);
+      if(localStorage.getItem('nbfi_pos_p')){
+        window.D.projects=JSON.parse(localStorage.getItem('nbfi_pos_p')||'{}');
+        window.D.tasks=JSON.parse(localStorage.getItem('nbfi_pos_t')||'{}');
+        window.D.road=JSON.parse(localStorage.getItem('nbfi_pos_r')||'{}');
+        window.D.conns=JSON.parse(localStorage.getItem('nbfi_pos_c')||'{}');
+      }else{
+        window.D.projects=def_p;window.D.tasks=def_t;window.D.road=def_r;window.D.conns={};
+        window.save();
       }
+    }catch(e){
+      window.D.projects=def_p;window.D.tasks=def_t;window.D.road=def_r;window.D.conns={};
+    }
+  };
+  window.save=function(){
+    localStorage.setItem('nbfi_pos_p',JSON.stringify(window.D.projects));
+    localStorage.setItem('nbfi_pos_t',JSON.stringify(window.D.tasks));
+    localStorage.setItem('nbfi_pos_r',JSON.stringify(window.D.road));
+    localStorage.setItem('nbfi_pos_c',JSON.stringify(window.D.conns));
+  };
+  window.exportJSON=function(){
+    const pwd = prompt('Введите пароль для экспорта (Password required):');
+    if(pwd !== '425879'){
+      alert('Неверный пароль! / Буруу нууц үг!');
+      return;
+    }
+    const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(window.D,null,2));
+    const dlAnchor=document.createElement('a');
+    dlAnchor.setAttribute("href",dataStr);
+    dlAnchor.setAttribute("download","nbfi_product_os_backup.json");
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  };
+  window.triggerImport=function(){
+    const pwd = prompt('Введите пароль для импорта (Password required):');
+    if(pwd !== '425879'){
+      alert('Неверный пароль! / Буруу нууц үг!');
+      return;
+    }
+    $('import_file_input').click();
+  };
+  window.handleImportFile=function(e){
+    const file=e.target.files[0];
+    if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(evt){
+      try{
+        const parsed=JSON.parse(evt.target.result);
+        if(parsed.projects && parsed.tasks && parsed.road){
+          window.D=parsed;
+          window.save();
+          alert('Data imported successfully.');
+          window.render();
+        }else{alert('Invalid JSON structure.');}
+      }catch(err){alert('Error parsing file.');}
     };
     reader.readAsText(file);
-    event.target.value = '';
-  }
-
-  /* ── SEED DATA ── */
-  function defaultData(){
-    const tasks={},road={},conns={};
-    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'Халиунаа',at:'2026-05-10 14:20'},
-     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false,by:'Халиунаа',at:'2026-05-11 09:15'},
-     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false,by:'Анар',at:'2026-05-12 11:30'}
-    ].forEach(t=>tasks[t.id]=t);
-    return {
-      projects:{
-        moni:{id:'moni',name:'Moni App',local:'Moni',type:'customer',status:'live',desc:'Main consumer financial app offering micro-loans, wallet services, and utility payments.',tags:['Core','B2C','Mobile']},
-        omnipay:{id:'omnipay',name:'OmniPay',local:'OmniPay',type:'platform',status:'progress',desc:'Payment gateway ecosystem handling merchant QR, settlements, and BNPL configurations.',tags:['Payments','Infrastructure','B2B']},
-        los:{id:'los',name:'Loan Origination',local:'LOS',type:'internal',status:'progress',desc:'Internal automated scoring and underwriting desk managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']}
-      },
-      tasks,road,conns,
-      pmeta:{
-        moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
-      },
-      eco:JSON.parse(JSON.stringify(window.DEF_ECO))
-    };
-  }
-
-  /* ── REALTIME DATA SYNC ── */
-  onValue(dbRef, (snapshot) => {
-    const data = snapshot.val();
-    if(data && data.projects) {
-      window.D = data;
-    } else {
-      window.D = defaultData();
-      window.save();
-    }
-    if(!window.ui.sel && window.projs().length > 0){
-      window.ui.sel = window.projs()[0].id;
-    }
+    e.target.value='';
+  };
+  window.setTab=function(tabId){
+    window.ui.tab=tabId;
+    if(tabId==='road'){window.ui.gview='road';window.ui.sel=null;}
+    else if(tabId==='settings'){window.ui.gview='settings';window.ui.sel=null;}
+    else{window.ui.gview='list';window.ui.sel=null;}
+    document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+    const targeted=$('sb_tab_'+tabId);if(targeted)targeted.classList.add('active');
     window.render();
-  });
-
-  /* ── RENDER CORE ── */
-  window.render = function(){
-    renderSb();
-    renderTeamBar();
-    renderMain();
-  }
-  
-  function renderSb(){
-    let h='<div class="sb-sec"><span>Projects</span></div>';
-    projs().forEach(p=>{
-      const sel=window.ui.sel===p.id?' on':'';
-      const ot=openTasks(p.id);
-      const cnt=ot?'<span class="pcnt">'+ot+'</span>':'';
-      h+='<div class="pitem'+sel+'" onclick="selProj(\''+p.id+'\')">'+
-         sdot(p.status)+'<span class="pname">'+esc(p.name)+'</span>'+cnt+
-         '<div class="pitem-act"><button class="piabtn del" onclick="event.stopPropagation();openModal(\'del-project\',{pid:\''+p.id+'\'})">&#10005;</button></div>'+
-         '</div>';
-    });
-    h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
-       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
-       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
-       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
-    $('sb-scroll').innerHTML=h;
-    $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
-  }
-
-  function renderTeamBar(){
-    const tb=$('team-bar');
-    if(!window.ui.showTeam){tb.style.display='none';$('team-btn').classList.remove('on');return;}
-    tb.style.display='flex';$('team-btn').classList.add('on');
-    let m=new Set();projs().forEach(p=>{const meta=getMeta(p.id);if(meta.leader)m.add(meta.leader);(meta.devs||[]).forEach(d=>m.add(d));});
-    let h='<span class="tlbl">&#128100; Roster:</span>';
-    if(m.size===0)h+='<span class="muted" style="font-size:12px;padding:0">No team members allocated.</span>';
-    else m.forEach(name=>h+='<span class="mchip">'+esc(name)+'</span>');
-    tb.innerHTML=h;
-  }
-
-  function renderMain(){
-    const m=$('main');
-    if(window.ui.gview!=='project'){renderGlobalView(m);return;}
-    const p=(window.D.projects||{})[window.ui.sel];
-    if(!p){m.innerHTML='<div class="muted" style="padding:20px">Project not found.</div>';return;}
-    const meta=getMeta(p.id);const tasks=pTasks(p.id);const dn=tasks.filter(t=>t.done).length;const tot=tasks.length;const pct=tot?Math.round((dn/tot)*100):0;
-    let h='<div class="phdr"><div class="ptrow"><span class="pt">'+esc(p.name)+'</span>';
-    if(p.local)h+='<span class="plocal">('+esc(p.local)+')</span>';
-    h+=badge(p.status,true)+'<span class="ptype">'+esc(p.type).toUpperCase()+'</span></div>'+
-       '<div class="pmeta-row">'+
-       '<div class="pmeta-g"><span class="pmeta-l">Lead:</span><span class="pmeta-v">'+esc(meta.leader||'Unassigned')+'</span></div>'+
-       '<div class="pmeta-sep"></div><div class="pmeta-g"><span class="pmeta-l">Devs:</span>';
-    if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
-    else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
-    h+='</div></div><div class="tabs">'+
-       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
-       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
-       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
-       '</div></div><div class="mbody">';
-    if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
-    else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
-    else h+=renderProjectMeta(p,meta);
-    h+'</div>';m.innerHTML=h;
-    if(window.ui.statusMenu)renderStatusMenu(p);
-  }
-
-  function renderStatusMenu(p){
-    let div=$('smenu-box');if(!div){div=document.createElement('div');div.id='smenu-box';div.className='smenu';document.body.appendChild(div);}
-    let h='';Object.entries(window.SM).forEach(([k,v])=>{h+='<div class="sopt" onclick="setProjStatus(\''+p.id+'\',\''+k+'\')">'+sdot(k)+' '+v.l+'</div>';});
-    div.innerHTML=h;const b=document.querySelector('.bdg');if(b){const r=b.getBoundingClientRect();div.style.top=(r.bottom+window.scrollY)+'px';div.style.left=(r.left+window.scrollX)+'px';div.style.display='block';}
-  }
-
-  function renderProjectTasks(p,tasks,dn,tot,pct){
-    let h='<div class="tmeta"><span>'+pct+'% Complete ('+dn+'/'+tot+' tasks)</span>'+(dn>0?'<button class="clr" onclick="clearDone(\''+p.id+'\')">Clear completed</button>':'')+'</div>'+
-       '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
-       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
-       '<select id="t_tag"><option value="">No context item</option>';
-    getItems(p.id).forEach(i=>h+='<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>');
-    h+='</select><button onclick="addTask(\''+p.id+'\')">+ Add</button></div>';
-    const active=tasks.filter(t=>!t.done);const done=tasks.filter(t=>t.done);
-    h+='<div class="tlist">';
-    if(active.length===0&&done.length===0)h+='<div class="muted">No scope items created yet.</div>';
-    else{
-      active.forEach(t=>h+=taskRow(t));
-      if(done.length>0){h+='<div class="donesec"><div class="dnhdr">Completed</div>';done.forEach(t=>h+=taskRow(t));h+='</div>';}
-    }
-    return h+'</div>';
-  }
-
-  function taskRow(t){
-    const ck=t.done?' ck':'';const dn=t.done?' dn':'';
-    const createdBy = t.by ? esc(t.by) : 'Unknown';
-    const createdAt = t.at ? esc(t.at) : 'N/A';
-    
-    return'<div class="titem"><div class="chk'+ck+'" onclick="toggleTask(\''+t.p+'\',\''+t.id+'\')"></div>'+
-       '<div style="flex:1;"><span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+
-       '<span class="ts-meta">Added by <b>'+createdBy+'</b> on '+createdAt+'</span></div>'+
-       (t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
-       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';
-  }
-
-  function renderProjectRoadmap(p){
-    const items=roadItems(p.id);
-    let h='<div class="rcols">';
-    window.LANES.forEach(l=>{
-      const li=items.filter(i=>i.lane===l);
-      h+='<div class="rcol"><div class="rch"><span class="rct" style="text-transform:uppercase">'+l+'</span><span class="rcc">'+li.length+'</span></div><div class="rlist">';
-      if(li.length===0)h+='<div class="muted" style="font-size:11px">Empty</div>';
-      else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
-         '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
-         '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
-      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
-         '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
-    });
-    return h+'</div>';
-  }
-
-  function renderProjectMeta(p,meta){
-    let h='<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
-       '<div class="stitle">Tags</div><div class="tags">';
-    if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
-    else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
-    h+='</div><div class="ps-grid">'+
-       '<div class="ps-col"><div class="ps-col-title">Context & Core Architecture Items</div><div class="ps-items" id="meta-items-list">';
-    const items=meta.items||[];
-    if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
-    else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
-    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
-       '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
-       '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
-    ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
-    h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
-    (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
-    h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
-    ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
-    return h+'</select></div></div></div></div></div>';
-  }
-
-  function renderGlobalView(m){
-    if(window.ui.gview==='overview')renderOverview(m);
-    else if(window.ui.gview==='ecosystem')renderEcosystem(m);
-    else renderMatrix(m);
-  }
-
-  /* ── OVERVIEW VIEW WITH DYNAMIC PIE CHART & AGGREGATED METRICS ── */
-  function renderOverview(m){
-    let tot=projs().length;
-    let live=projs().filter(p=>p.status==='live').length;
-    let prog=projs().filter(p=>p.status==='progress').length;
-    let bug=projs().filter(p=>p.status==='bugs').length;
-    
-    let userStats = {
-      'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
-      'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
-      'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] }
-    };
-
-    projs().forEach(p => {
-      const meta = getMeta(p.id);
-      if (meta.leader && userStats[meta.leader]) {
-        userStats[meta.leader].mainTasks += 1;
-      }
-    });
-
-    Object.values(window.D.tasks || {}).forEach(t => {
-      if (t.by && userStats[t.by]) {
-        userStats[t.by].totalSub += 1;
-        if (t.done) {
-          userStats[t.by].doneSub += 1;
-        } else {
-          userStats[t.by].openItems.push({ id: t.id, txt: t.txt, pid: t.p });
-        }
-      }
-    });
-
-    let teamTotalTasks = 0;
-    let teamTotalDone = 0;
-    Object.entries(userStats).forEach(([name, stat]) => {
-      teamTotalTasks += stat.totalSub;
-      teamTotalDone += stat.doneSub;
-    });
-    let teamTotalOpen = teamTotalTasks - teamTotalDone;
-    let teamPct = teamTotalTasks ? Math.round((teamTotalDone / teamTotalTasks) * 100) : 0;
-
-    let pieBg = `conic-gradient(var(--green) 0% ${teamPct}%, var(--bg3) ${teamPct}% 100%)`;
-
-    let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
-       '<div class="ov-stats">'+
-       '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
-       '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
-       '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
-       '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
-       '</div>';
-
-    h += '<div class="ov-sec">Dev Team Ажиллагаа</div>'+
-         '<div class="team-kpi-card">'+
-           '<div class="team-pie-container">'+
-             '<div class="team-pie-chart" style="background: ' + pieBg + ';">'+
-               '<div class="team-pie-inner">' + teamPct + '%</div>'+
-             '</div>'+
-           '</div>'+
-           '<div class="team-kpi-details">'+
-             '<div class="team-kpi-title">Багийн Нийт Гүйцэтгэл</div>'+
-             '<div class="team-kpi-subtitle">Хөгжүүлэлтийн багийн 3 ажилтны нийт таск ажиллагаа <b>' + teamPct + '%</b>-тай байна. Тооцоолол: Нийт <b>' + teamTotalTasks + '</b> таскаас <span class="done-txt">✓ ' + teamTotalDone + ' болсон</span>, <span class="open-txt">' + teamTotalOpen + ' хүлээгдэж буй</span>.</div>'+
-           '</div>'+
-         '</div>';
-
-    h += '<div class="ov-sec">User Workload & Performance Overview</div>';
-    h += '<table class="stat-table">'+
-         '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
-         '<tbody>';
-    
-    Object.entries(userStats).forEach(([name, stat]) => {
-      const openSub = stat.totalSub - stat.doneSub;
-      const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
-      
-      let popoverHtml = '';
-      if(openSub > 0) {
-        popoverHtml += `<div class="task-popover" onclick="event.stopPropagation();">`;
-        popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
-        popoverHtml += `<div class="popover-list">`;
-        stat.openItems.forEach(item => {
-          popoverHtml += `<div class="popover-item" onclick="window.goToTask('${item.pid}');">` +
-                         `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
-                         `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.txt)}</span>` +
-                         `</div>`;
-        });
-        popoverHtml += `</div></div>`;
-      }
-
-      h += `<tr>`+
-           `<td><b>${esc(name)}</b></td>`+
-           `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
-           `<td>${stat.totalSub} таск</td>`+
-           `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
-           `<td>`+
-             `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; background:${openSub > 0 ? 'var(--red-bg)' : 'transparent'};">`+
-               `${openSub}${popoverHtml}`+
-             `</div>`+
-           `</td>`+
-           `<td>`+
-             `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
-             `<span class="stat-pct">${pct}%</span>`+
-           `</td>`+
-           `</tr>`;
-    });
-    h += '</tbody></table>';
-
-    h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
-    projs().forEach(p=>{
-      const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
-      h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
-         '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
-         '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
-         '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
-         '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
-      (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
-      h+='</div></div>';
-    });
-    m.innerHTML=h+'</div></div>';
-  }
-
-  /* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
-  window.goToTask = function(pid) {
-    window.ui.sel = pid;
-    window.ui.gview = 'project';
-    window.ui.tab = 'tasks';
-    window.ui.statusMenu = false;
-    window.render();
-  }
-
-  function renderEcosystem(m){
-    let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
-       '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
-       '</div><div class="eco-wrap" id="eco-wrap" style="height:100%">'+
-       '<div class="eco-legend"><div class="eco-legend-title">System Class</div>'+
-       '<div class="eco-lr"><span class="dot dl"></span> Live Core</div>'+
-       '<div class="eco-lr"><span class="dot dp"></span> Progress</div>'+
-       '<div class="eco-lr"><span class="dot db"></span> Impacted / Bugs</div>'+
-       '<div class="eco-lr"><span class="dot dpl"></span> Pipeline</div>'+
-       '</div><div class="eco-hint">Drag platforms to map dependencies dynamically</div>'+
-       '<svg id="eco-svg" style="width:100%;height:100%;position:absolute;inset:0;z-index:1"></svg>';
-    projs().forEach(p=>{
-      const coord=(window.D.eco||{})[p.id]||window.DEF_ECO[p.id]||{x:150,y:150};const dotM=window.SM[p.status]||window.SM.progress;
-      h+='<div class="pitem" id="node-'+p.id+'" style="position:absolute;left:'+coord.x+'px;top:'+coord.y+'px;z-index:5;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:6px 11px;cursor:move;user-select:none;margin:0;display:flex;align-items:center;gap:6px" onmousedown="dragNode(event,\''+p.id+'\')">'+
-         '<span class="dot '+dotM.d+'"></span><span style="font-size:12px;font-weight:600">'+esc(p.name)+'</span></div>';
-    });
-    m.innerHTML=h+'</div>';drawConnections();
-  }
-
-  function drawConnections(){
-    const svg=$('eco-svg');if(!svg)return;let h='';const wrap=$('eco-wrap');if(!wrap)return;
-    Object.values(window.D.conns||{}).forEach(c=>{
-      if(window.ui.roadFilter!=='all'&&c.st!==window.ui.roadFilter)return;
-      const n1=$('node-'+c.fp);const n2=$('node-'+c.tp);if(!n1||!n2)return;
-      const x1=n1.offsetLeft+(n1.offsetWidth/2);const y1=n1.offsetTop+(n1.offsetHeight/2);
-      const x2=n2.offsetLeft+(n2.offsetWidth/2);const y2=n2.offsetTop+(n2.offsetHeight/2);
-      const col=c.st==='active'?'var(--blue)':'var(--amber)';const dash=c.st==='active'?'':' stroke-dasharray="4,4"';
-      h+='<g class="edge" style="cursor:pointer" onclick="openConnModal(\''+c.id+'\')">'+
-         '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="2" opacity="0.35"'+dash+'/>'+
-         '<circle cx="'+((x1+x2)/2)+'" cy="'+((y1+y2)/2)+'" r="4" fill="'+col+'" opacity="0.8"/>'+
-         '</g>';
-    });
-    svg.innerHTML=h;
-  }
-
-  window.dragNode = function(e,pid){
-    e.preventDefault();const n=$('node-'+pid);if(!n)return;const wrap=$('eco-wrap');if(!wrap)return;
-    const sx=e.clientX-n.offsetLeft;const sy=e.clientY-n.offsetTop;
-    document.onmousemove=function(ev){
-      let x=ev.clientX-sx;let y=ev.clientY-sy;
-      x=Math.max(10,Math.min(wrap.offsetWidth-n.offsetWidth-10,x));y=Math.max(10,Math.min(wrap.offsetHeight-n.offsetHeight-10,y));
-      n.style.left=x+'px';n.style.top=y+'px';drawConnections();
-      if(!window.D.eco)window.D.eco={};window.D.eco[pid]={x,y};
-    };
-    document.onmouseup=function(){document.onmousemove=null;document.onmouseup=null;window.save();};
-  }
-
-  function renderMatrix(m){
-    let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap Matrix</div><div class="gsub">Consolidated multi-product sprint lanes</div></div><div class="scrollbody">';
-    window.LANES.forEach(lane=>{
-      let items=[];projs().forEach(p=>{roadItems(p.id).filter(r=>r.lane===lane).forEach(r=>{items.push({p:p.id,txt:r.txt});});});
-      h+='<div class="lsec"><div class="lhdr"><span class="llbl" style="text-transform:uppercase">'+lane+'</span><span class="lcnt">'+items.length+'</span></div><div class="lgrid">';
-      if(items.length===0)h+='<div class="muted">No deliverables slotted.</div>';
-      else{
-        let grouped={};items.forEach(i=>{if(!grouped[i.p])grouped[i.p]=[];grouped[i.p].push(i.txt);});
-        Object.entries(grouped).forEach(([pid,txts])=>{
-          h+='<div class="lcard" onclick="selProj(\''+pid+'\')"><div class="lcard-n">'+esc(pName(pid))+'<span class="lcard-cnt">'+txts.length+'</span></div>';
-          txts.forEach(t=>h+='<div class="litem">'+esc(t)+'</div>');
-          h+='</div>';
-        });
-      }
-      h+='</div></div>';
-    });
-    h+='<div class="ov-sec" style="margin-top:20px;margin-bottom:8px">System Dependency Register</div>'+
-       '<div class="tbtn prim" style="margin-bottom:10px" onclick="window.ncSet(\'fp\',\'\');openModal(\'add-conn\',{})">+ Establish Relationship Link</div>'+
-       '<div id="conn-matrix-list">';
-    const conns=Object.values(window.D.conns||{});
-    if(conns.length===0)h+='<div class="muted">No structural interfaces defined.</div>';
-    else conns.forEach(c=>h+=window.connRow(c,true));
-    m.innerHTML=h+'</div></div>';
-  }
-
-  /* ── INTERACTIONS ── */
-  window.selProj = function(id){window.ui.sel=id;window.ui.gview='project';window.ui.statusMenu=false;window.render();}
-  window.selGview = function(v){window.ui.gview=v;window.ui.statusMenu=false;window.render();}
-  window.selTab = function(t){window.ui.tab=t;window.render();}
-  window.toggleTeam = function(){window.ui.showTeam=!window.ui.showTeam;window.render();}
-  window.setRoadFilter = function(f){window.ui.roadFilter=f;window.render();}
-  window.toggleSmenu = function(e){e.stopPropagation();window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
-  function closeSmenu(){window.ui.statusMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
-  
-  window.setProjStatus = function(pid,st){
-    if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
-  }
-
-  /* ── MUTATIONS ── */
-  window.addTask = function(pid){
-    const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
-    const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
-    
-    const now = new Date();
-    const timeStr = now.getFullYear() + '-' + 
-                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
-                    String(now.getDate()).padStart(2,'0') + ' ' + 
-                    String(now.getHours()).padStart(2,'0') + ':' + 
-                    String(now.getMinutes()).padStart(2,'0');
-
-    if(!window.D.tasks)window.D.tasks={};
-    
-    window.D.tasks[id]={
-      id,
-      p:pid,
-      txt,
-      a:tagVal,
-      done:false,
-      by: window.currentUser,
-      at: timeStr
-    };
-    
-    if(inp)inp.value='';window.save();window.render();
-  }
-  
-  window.toggleTask = function(pid,tid){
-    if(window.D.tasks[tid]){
-      window.D.tasks[tid].done=!window.D.tasks[tid].done;
-      window.D.tasks[tid].modifiedBy = window.currentUser; 
-      window.save();
-      window.render();
-    }
-  }
-  window.delTask = function(pid,tid){
-    if(window.D.tasks[tid]){delete window.D.tasks[tid];window.save();window.render();}
-  }
-  window.clearDone = function(pid){
-    Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid&&t.done)delete window.D.tasks[t.id];});
-    window.save();window.render();
-  }
-
-  window.addRoad = function(pid,lane){
-    const inp=$('r_inp_'+lane);const txt=(inp?inp.value:'').trim();if(!txt)return;
-    const id='r'+window.uid();if(!window.D.road)window.D.road={};window.D.road[id]={id,p:pid,txt,lane};
-    if(inp)inp.value='';window.save();window.render();
-  }
-  window.moveRoad = function(pid,rid,currLane){
-    const idx=window.LANES.indexOf(currLane);const nxt=window.LANES[(idx+1)%window.LANES.length];
-    if(window.D.road[rid]){window.D.road[rid].lane=nxt;window.save();window.render();}
-  }
-  window.delRoad = function(pid,rid){
-    if(window.D.road[rid]){delete window.D.road[rid];window.save();window.render();}
-  }
-
-  window.setLeader = function(val){
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,leader:val};window.save();window.render();
-  }
-  window.addDev = function(name){
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    if(!(m.devs||[]).includes(name)){window.D.pmeta[window.ui.sel]={...m,devs:[...(m.devs||[]),name]};window.save();window.render();}
-  }
-  window.removeDev = function(i){
-    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);const d=[...(m.devs||[])];d.splice(i,1);
-    window.D.pmeta[window.ui.sel]={...m,devs:d};window.save();window.render();
-  }
-  window.addItem = function(kind){
-    const inp=$(kind==='feature'?'fi_inp':'si_inp');const name=(inp?inp.value:'').trim();if(!name)return;
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,items:[...(m.items||[]),{id:'i'+window.uid(),name,kind}]};
-    if(inp)inp.value='';window.save();window.render();
-  }
-  window.removeItem = function(iid){
-    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,items:(m.items||[]).filter(i=>i.id!==iid)};window.save();window.render();
-  }
-
-  window.ncSet = function(key,val){
-    window.ui.nc[key]=val;if(key==='fp')window.ui.nc.fi='';if(key==='tp')window.ui.nc.ti='';renderModalContent();
-  }
-  window.ncSetSt = function(val){window.ui.nc.st=val;renderModalContent();}
-  
-  window.addConn = function(){
-    if(!window.ui.nc.fp||!window.ui.nc.tp){alert('Select both projects.');return;}
-    const rel=(($('nc_rel')?$('nc_rel').value:'').trim()||'integration');const id='c'+window.uid();
-    if(!window.D.conns)window.D.conns={};window.D.conns[id]={id,fp:window.ui.nc.fp,fi:window.ui.nc.fi,tp:window.ui.nc.tp,ti:window.ui.nc.ti,rel,st:window.ui.nc.st};
-    window.save();closeModal();window.render();
-  }
-  window.delConn = function(cid){if(window.D.conns[cid]){delete window.D.conns[cid];window.save();window.render();}}
-
-  /* ── MODALS ENGINE ── */
-  window.openModal = function(kind,opts){
-    window.ui.modal={kind,opts};$('modal-overlay').style.display='flex';renderModalContent();
-  }
-  window.closeModal = function(){window.ui.modal=null;$('modal-overlay').style.display='none';}
-  $('modal-bg').onclick=window.closeModal;
-
-  function renderModalContent(){
-    const b=$('modal-box');if(!window.ui.modal)return;const k=window.ui.modal.kind;const opts=window.ui.modal.opts;
-    if(k==='add-project'){
-      b.className='modal-box';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Create Product Core Slot</div></div>'+
-         '<div class="modal-body">'+
-         '<div class="mfld"><label>Product Ref Key (Single word, lowercase)</label><input type="text" id="m_id" placeholder="e.g. moni-loans"></div>'+
-         '<div class="mfld"><label>Product Title Name</label><input type="text" id="m_name" placeholder="e.g. Moni Loans"></div>'+
-         '<div class="mfld"><label>Local Handle</label><input type="text" id="m_local" placeholder="e.g. Loans"></div>'+
-         '<div class="mfld"><label>Architecture Class</label><select id="m_type"><option value="customer">Customer Facing (B2C)</option><option value="platform">Platform Infrastructure</option><option value="service">Shared Microservice</option><option value="internal">Internal Suite</option></select></div>'+
-         '<div class="mfld"><label>Description Scope</label><textarea id="m_desc" placeholder="Scope description..."></textarea></div>'+
-         '<div class="mfld"><label>Tags (Comma-separated)</label><input type="text" id="m_tags" placeholder="e.g. Core, Risk"></div>'+
-         '</div><div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="submitProject()">Create Index</button></div>';
-    }else if(k==='del-project'){
-      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Purge System Node</div></div>'+
-         '<div class="modal-body"><div class="del-warn">Are you sure you want to permanently delete <strong>'+esc(pName(opts.pid))+'</strong>? This action wipes all associated scope tickets, dependencies, and timelines.</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitDelProject(\''+opts.pid+'\')">Confirm Wipe</button></div>';
-    }else if(k==='add-conn'){
-      b.className='modal-box';let p1Opts='<option value="">-- Select System --</option>';let p2Opts='<option value="">-- Select System --</option>';
-      projs().forEach(p=>{p1Opts+='<option value="'+p.id+'"'+(window.ui.nc.fp===p.id?' selected':'')+'>'+p.name+'</option>';p2Opts+='<option value="'+p.id+'"'+(window.ui.nc.tp===p.id?' selected':'')+'>'+p.name+'</option>';});
-      let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+window.ui.nc.fi===i.name?' selected':''+'">'+i.name+'</option>');
-      let f2Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.tp)getItems(window.ui.nc.tp).forEach(i=>f2Opts+='<option value="'+window.ui.nc.ti===i.name?' selected':''+'">'+i.name+'</option>');
-      b.innerHTML='<div class="modal-hdr"><div class="modal-title">Establish Architecture Interface Link</div></div>'+
-         '<div class="modal-body">'+
-         '<div class="add-conn-form" style="margin-top:0; padding:0; background:transparent;">'+
-         '<div class="mfld"><label>Source System Node</label><select onchange="window.ncSet(\'fp\',this.value)">'+p1Opts+'</select></div>'+
-         '<div class="mfld"><label>Source Sub-feature (Optional)</label><select onchange="window.ncSet(\'fi\',this.value)">'+f1Opts+'</select></div>'+
-         '<div class="mfld"><label>Relationship / Sync Interface Protocol</label><input type="text" id="nc_rel" placeholder="e.g. gRPC Core Sync, API, webhook" value="'+esc(window.ui.nc.rel)+'" onchange="window.ui.nc.rel=this.value"></div>'+
-         '<div class="mfld"><label>Target System Node</label><select onchange="window.ncSet(\'tp\',this.value)">'+p2Opts+'</select></div>'+
-         '<div class="mfld"><label>Target Sub-feature (Optional)</label><select onchange="window.ncSet(\'ti\',this.value)">'+f2Opts+'</select></div>'+
-         '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
-         '</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="window.addConn()">Form Structural Interface</button></div>';
-    }else if(k==='reset'){
-      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Reset Realtime Database</div></div>'+
-         '<div class="modal-body"><div class="del-warn">This will reset your Firebase database to default seed data. Proceed?</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitReset()">Reset</button></div>';
-    }
-  }
-
-  window.submitProject = function(){
+  };
+  window.doSearch=function(val){window.ui.search=(val||'').trim().toLowerCase();window.render();};
+  window.openModal=function(html){$('modal_holder').innerHTML=html;$('modal_overlay').classList.add('active');};
+  window.closeModal=function(){$('modal_overlay').classList.remove('active');$('modal_holder').innerHTML='';};
+  window.addProjectModal=function(){
+    const html=`
+      <div class="modal-header"><div class="modal-title">Create New Project</div></div>
+      <div class="modal-body">
+        <div class="f-group"><label>Project Unique ID *</label><input type="text" id="m_id" placeholder="e.g. p6"></div>
+        <div class="f-group"><label>Project Name *</label><input type="text" id="m_name" placeholder="Title line..."></div>
+        <div class="f-row">
+          <div class="f-group"><label>Localization / Squad</label><input type="text" id="m_local" placeholder="e.g. HQ-Fin"></div>
+          <div class="f-group"><label>Strategic Bucket</label>
+            <select id="m_type">
+              <option value="customer">Customer Facing</option>
+              <option value="internal">Internal Tools</option>
+              <option value="core">Core Engine / Infra</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-group"><label>Scope Objective / Description</label><textarea id="m_desc" rows="3" placeholder="Context metrics..."></textarea></div>
+        <div class="f-group"><label>Tags (Comma separated)</label><input type="text" id="m_tags" placeholder="speed, security"></div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="window.closeModal()">Cancel</button>
+        <button class="primary" onclick="window.submitNewProject()">Create Project</button>
+      </div>`;
+    window.openModal(html);
+  };
+  window.submitNewProject=function(){
     const id=(($('m_id')?$('m_id').value:'').trim().toLowerCase());const name=(($('m_name')?$('m_name').value:'').trim());const local=(($('m_local')?$('m_local').value:'').trim());
     const type=$('m_type')?$('m_type').value:'customer';const desc=(($('m_desc')?$('m_desc').value:'').trim());const tagsInp=$('m_tags')?$('m_tags').value:'';
     if(!id||!name){alert('ID and Name required.');return;}
     const tags=tagsInp.split(',').map(t=>t.trim()).filter(t=>t);
     if(!window.D.projects)window.D.projects={};window.D.projects[id]={id,name,local,type,status:'planned',desc,tags};
     window.ui.sel=id;window.ui.gview='project';window.save();window.closeModal();window.render();
-  }
-  window.submitDelProject = function(pid){
+  };
+  window.submitDelProject=function(pid){
     if(window.D.projects[pid])delete window.D.projects[pid];
     Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid)delete window.D.tasks[t.id];});
     Object.values(window.D.road||{}).forEach(r=>{if(r.p===pid)delete window.D.road[r.id];});
     Object.values(window.D.conns||{}).forEach(c=>{if(c.fp===pid||c.tp===pid)delete window.D.conns[c.id];});
-    if(window.D.pmeta&&window.D.pmeta[pid])delete window.D.pmeta[pid];
-    if(window.D.eco&&window.D.eco[pid])delete window.D.eco[pid];
-    if(window.ui.sel===pid)window.ui.sel=window.projs().length?window.projs()[0].id:null;
-    window.ui.gview='overview';window.save();window.closeModal();window.render();
-  }
-  window.submitReset = function(){
-    window.D = defaultData();window.save();window.closeModal();window.render();
-  }
+    window.ui.sel=null;window.ui.gview='list';window.save();window.closeModal();window.render();
+  };
+  window.editProjectModal=function(pid){
+    const p=window.D.projects[pid];if(!p)return;
+    const html=`
+      <div class="modal-header"><div class="modal-title">Edit: ${p.name}</div></div>
+      <div class="modal-body">
+        <div class="f-group"><label>Project Name *</label><input type="text" id="me_name" value="${p.name}"></div>
+        <div class="f-row">
+          <div class="f-group"><label>Localization / Squad</label><input type="text" id="me_local" value="${p.local||''}"></div>
+          <div class="f-group"><label>Status State</label>
+            <select id="me_status">
+              <option value="planned" ${p.status==='planned'?'selected':''}>Planned</option>
+              <option value="active" ${p.status==='active'?'selected':''}>Active Tracking</option>
+              <option value="done" ${p.status==='done'?'selected':''}>Done / Shipped</option>
+              <option value="blocked" ${p.status==='blocked'?'selected':''}>Blocked</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-group"><label>Scope Objective</label><textarea id="me_desc" rows="3">${p.desc||''}</textarea></div>
+        <div class="f-group"><label>Tags (Comma separated)</label><input type="text" id="me_tags" value="${(p.tags||[]).join(', ')}"></div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between">
+        <button class="danger" onclick="if(confirm('Delete entire project and its structural items?'))window.submitDelProject('${p.id}')">Delete</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="window.closeModal()">Cancel</button>
+          <button class="primary" onclick="window.submitEditProject('${p.id}')">Save Changes</button>
+        </div>
+      </div>`;
+    window.openModal(html);
+  };
+  window.submitEditProject=function(pid){
+    const p=window.D.projects[pid];if(!p)return;
+    p.name=(($('me_name')?$('me_name').value:'').trim());p.local=(($('me_local')?$('me_local').value:'').trim());
+    p.status=$('me_status')?$('me_status').value:'planned';p.desc=(($('me_desc')?$('me_desc').value:'').trim());
+    const tagsInp=$('me_tags')?$('me_tags').value:'';p.tags=tagsInp.split(',').map(t=>t.trim()).filter(t=>t);
+    window.save();window.closeModal();window.render();
+  };
+  window.addTask=function(pid){
+    const txt=prompt('Enter scope chunk checklist objective:');if(!txt||!txt.trim())return;
+    const id='t_'+Date.now();
+    if(!window.D.tasks)window.D.tasks={};window.D.tasks[id]={id,p:pid,text:txt.trim(),done:false};
+    window.save();window.render();
+  };
+  window.toggleTask=function(tid){
+    if(window.D.tasks[tid])window.D.tasks[tid].done=!window.D.tasks[tid].done;
+    window.save();window.render();
+  };
+  window.delTask=function(tid){
+    if(window.D.tasks[tid])delete window.D.tasks[tid];
+    window.save();window.render();
+  };
+  window.addRoadItem=function(lane){
+    const pids=Object.keys(window.D.projects);
+    if(!pids.length){alert('Create a project hub anchor node first.');return;}
+    let opts=pids.map(id=>`<option value="${id}">${window.D.projects[id].name}</option>`).join('');
+    const html=`
+      <div class="modal-header"><div class="modal-title">Add Roadmap Lane Epic</div></div>
+      <div class="modal-body">
+        <div class="f-group"><label>Parent Project Anchor</label><select id="mr_pid">${opts}</select></div>
+        <div class="f-group"><label>Epic Item Title</label><input type="text" id="mr_title" placeholder="Deliverable slice target..."></div>
+        <input type="hidden" id="mr_lane" value="${lane}">
+      </div>
+      <div class="modal-footer">
+        <button onclick="window.closeModal()">Cancel</button>
+        <button class="primary" onclick="window.submitRoadItem()">Add to Roadmap</button>
+      </div>`;
+    window.openModal(html);
+  };
+  window.submitRoadItem=function(){
+    const p=$('mr_pid').value;const title=(($('mr_title')?$('mr_title').value:'').trim());const lane=$('mr_lane').value;
+    if(!title){alert('Epic title context needed.');return;}
+    const id='r_'+Date.now();
+    if(!window.D.road)window.D.road={};window.D.road[id]={id,p,lane,title};
+    window.save();window.closeModal();window.render();
+  };
+  window.editRoadItem=function(rid){
+    const r=window.D.road[rid];if(!r)return;
+    const html=`
+      <div class="modal-header"><div class="modal-title">Edit Epic Track Placement</div></div>
+      <div class="modal-body">
+        <div class="f-group"><label>Epic Item Title</label><input type="text" id="mre_title" value="${r.title}"></div>
+        <div class="f-group"><label>Roadmap Target Quarter</label>
+          <select id="mre_lane">
+            <option value="q1" ${r.lane==='q1'?'selected':''}>Q1 Target Window</option>
+            <option value="q2" ${r.lane==='q2'?'selected':''}>Q2 Target Window</option>
+            <option value="q3" ${r.lane==='q3'?'selected':''}>Q3 Target Window</option>
+            <option value="done" ${r.lane==='done'?'selected':''}>Completed Track / Archive</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between">
+        <button class="danger" onclick="delete window.D.road['${r.id}'];window.save();window.closeModal();window.render();">Delete Epic</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="window.closeModal()">Cancel</button>
+          <button class="primary" onclick="window.D.road['${r.id}'].title=$('mre_title').value;window.D.road['${r.id}'].lane=$('mre_lane').value;window.save();window.closeModal();window.render();">Update</button>
+        </div>
+      </div>`;
+    window.openModal(html);
+  };
+  window.render=function(){
+    document.querySelectorAll('.view-pane').forEach(el=>el.classList.remove('active'));
+    const t_scroll=$('content_scroll');if(t_scroll)t_scroll.scrollTop=0;
+    let titleText="Projects Hub";
+    let actionsHtml=`<button class="primary" onclick="window.addProjectModal()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Project</button>`;
+    if(window.ui.gview==='list'){
+      $('v_all').classList.add('active');
+      let filtered=Object.values(window.D.projects);
+      if(window.ui.tab.startsWith('t_')){
+        const targetType=window.ui.tab.substring(2);
+        filtered=filtered.filter(p=>p.type===targetType);
+        titleText=(targetType==='customer'?'Customer Facing Nodes':targetType==='internal'?'Internal Infrastructure':'Core Layer Matrix');
+      }else{titleText="All Registered Projects";}
+      if(window.ui.search){
+        filtered=filtered.filter(p=>(p.name||'').toLowerCase().includes(window.ui.search)||(p.desc||'').toLowerCase().includes(window.ui.search)||(p.local||'').toLowerCase().includes(window.ui.search));
+      }
+      if(!filtered.length){
+        $('v_all').innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg><div>No active trace found matching selection matrix parameters.</div></div>`;
+      }else{
+        let cards=filtered.map(p=>{
+          const tArr=Object.values(window.D.tasks||{}).filter(t=>t.p===p.id);
+          const finishedCount=tArr.filter(t=>t.done).length;
+          const tagsHtml=(p.tags||[]).map(t=>`<span class="badge tag">${t}</span>`).join('');
+          return `
+            <div class="card" onclick="window.ui.gview='project';window.ui.sel='${p.id}';window.render()">
+              <div class="card-header">
+                <span class="badge ${p.status}">${p.status}</span>
+                <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase">${p.local||'Unassigned'}</span>
+              </div>
+              <div class="card-title">${p.name}</div>
+              <div class="card-desc">${p.desc||'No overview documentation defined for this node record.'}</div>
+              <div class="card-tags">${tagsHtml}</div>
+              <div class="card-meta">
+                <span>Type: <strong style="text-transform:capitalize">${p.type}</strong></span>
+                <span>${finishedCount}/${tArr.length} Checkpoints</span>
+              </div>
+            </div>`;
+        }).join('');
+        $('v_all').innerHTML=`<div class="grid-cards">${cards}</div>`;
+      }
+    }else if(window.ui.gview==='project'){
+      $('v_project').classList.add('active');
+      const p=window.D.projects[window.ui.sel];
+      if(!p){window.ui.gview='list';window.render();return;}
+      titleText=`Project: ${p.id}`;
+      actionsHtml=`
+        <button onclick="window.ui.gview='list';window.render()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back</button>
+        <button class="primary" onclick="window.editProjectModal('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Configure Node</button>`;
+      const pTasks=Object.values(window.D.tasks||{}).filter(t=>t.p===p.id);
+      let tListHtml=pTasks.map(t=>`
+        <div class="task-item">
+          <input type="checkbox" ${t.done?'checked':''} onclick="event.stopPropagation();window.toggleTask('${t.id}')">
+          <div class="task-text ${t.done?'done':''}" onclick="window.toggleTask('${t.id}')">${t.text}</div>
+          <button style="padding:4px 6px;background:transparent" onclick="event.stopPropagation();if(confirm('Drop milestone?'))window.delTask('${t.id}')">×</button>
+        </div>`).join('');
+      if(!tListHtml)tListHtml=`<div class="empty-state" style="padding:20px">No verification steps loaded for this project segment footprint.</div>`;
+      const roadmapEpics=Object.values(window.D.road||{}).filter(r=>r.p===p.id);
+      let rLinkedHtml=roadmapEpics.map(r=>`<div class="road-card" onclick="window.editRoadItem('${r.id}')"><div class="road-pname">${r.lane.toUpperCase()} Timeline</div><div class="road-title">${r.title}</div></div>`).join('');
+      if(!rLinkedHtml)rLinkedHtml=`<div style="font-size:12px;color:var(--text3);text-align:center;padding:10px;background:var(--bg2);border-radius:var(--r);border:1px dashed var(--border)">Not currently referenced on any system roadmap timelines.</div>`;
+      $('v_project').innerHTML=`
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div>
+              <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;line-height:1.2">${p.name}</h2>
+              <div style="display:flex;gap:6px;align-items:center;margin-bottom:16px">
+                <span class="badge ${p.status}">${p.status}</span>
+                <span class="badge tag">${p.type}</span>
+                <span style="font-size:12px;color:var(--text3);margin-left:4px">Location Vector: <strong>${p.local||'Unknown Zone'}</strong></span>
+              </div>
+              <p style="font-size:15px;color:var(--text2);line-height:1.5;background:var(--bg2);padding:14px;border-radius:var(--rl);border:1px solid var(--border)">${p.desc||'No description outline has been documented for this deployment trace objective.'}</p>
+            </div>
+            <div>
+              <div class="section-heading"><span>Scope Milestones & Checkpoints</span><button style="padding:4px 8px;font-size:12px" onclick="window.addTask('${p.id}')">+ Add Step</button></div>
+              <div class="task-list">${tListHtml}</div>
+            </div>
+          </div>
+          <div class="detail-side">
+            <div>
+              <div class="section-heading">Telemetry Ledger</div>
+              <div class="kv-row"><div class="kv-label">Node Unique Identifier</div><div class="kv-val" style="font-family:monospace">${p.id}</div></div>
+              <div class="kv-row"><div class="kv-label">Sub-System Pipeline</div><div class="kv-val" style="text-transform:capitalize">${p.type}</div></div>
+              <div class="kv-row"><div class="kv-label">Milestone Checkpoints</div><div class="kv-val">${pTasks.filter(t=>t.done).length} / ${pTasks.length}</div></div>
+            </div>
+            <div>
+              <div class="section-heading">Roadmap Placements</div>
+              <div style="display:flex;flex-direction:column;gap:8px">${rLinkedHtml}</div>
+            </div>
+          </div>
+        </div>`;
+    }else if(window.ui.gview=='road'){
+      $('v_road').classList.add('active');
+      titleText="Roadmap Epic Matrix";
+      actionsHtml=`<span style="font-size:12px;color:var(--text3);font-weight:500">Cross-Project Delivery Streams</span>`;
+      const lanes=['q1','q2','q3','done'];
+      const laneNames={q1:'Q1 Delivery','q2':'Q2 Delivery','q3':'Q3 Delivery','done':'Shipped / Archive'};
+      let swimlanesHtml=lanes.map(lId=>{
+        let epics=Object.values(window.D.road||{}).filter(r=>r.lane===lId);
+        if(window.ui.search){epics=epics.filter(e=>(e.title||'').toLowerCase().includes(window.ui.search));}
+        let cardsHtml=epics.map(e=>{
+          const p=window.D.projects[e.p]||{name:'Broken Anchor Node',type:'core'};
+          return `<div class="road-card" onclick="window.editRoadItem('${e.id}')"><div class="road-pname">${p.name}</div><div class="road-title">${e.title}</div></div>`;
+        }).join('');
+        return `
+          <div class="swimlane">
+            <div class="swimlane-header">
+              <span class="swimlane-title">${laneNames[lId]}</span>
+              <span class="swimlane-count">${epics.length}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1">${cardsHtml}</div>
+            <button style="width:100%;justify-content:center;margin-top:4px;font-size:12px;padding:4px" onclick="window.addRoadItem('${lId}')">+ Add Epic</button>
+          </div>`;
+      }).join('');
+      $('v_road').innerHTML=`<div class="road-swimlanes">${swimlanesHtml}</div>`;
+    }else if(window.ui.gview=='settings'){
+      $('v_settings').classList.add('active');
+      titleText="Data Management Matrix";
+      actionsHtml=`<span style="font-size:12px;color:var(--text3)">Pipeline Engine Active</span>`;
+      $('v_settings').innerHTML=`
+        <div style="max-width:600px">
+          <div class="setting-card">
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-title">Export Operations Snapshot (JSON)</div>
+                <div class="setting-desc">Downloads a full state package file representing all active pipelines, architectural records, track epics, and checklists.</div>
+              </div>
+              <button class="primary" onclick="window.exportJSON()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export JSON</button>
+            </div>
+          </div>
+          <div class="setting-card">
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-title">Import Operations Snapshot (JSON)</div>
+                <div class="setting-desc">Overwrites current runtime database structures with an external saved schema snapshot file. Warning: this step removes untracked sessions.</div>
+              </div>
+              <button onclick="window.triggerImport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import JSON</button>
+            </div>
+          </div>
+        </div>`;
+    }
+    if($('view_title'))$('view_title').innerText=titleText;if($('view_actions'))$('view_actions').innerHTML=actionsHtml;
+  };
+  window.initDB();window.render();
+})();
 </script>
 </body>
 </html>
