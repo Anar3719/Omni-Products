@@ -245,7 +245,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .open-task-cell { position: relative; display: inline-block; cursor: pointer; padding: 4px 10px; border-radius: 4px; transition: background 0.2s; }
 .open-task-cell:hover { background: var(--red-bg); text-decoration: underline; }
 
-/* Поп-ап цонхыг доошоо наалдаж гардаг болгох, дундаа ямар ч хоосон зайгүй */
 .task-popover { 
   display: none; 
   position: absolute; 
@@ -264,7 +263,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   text-align: left; 
 }
 
-/* Энэ хэсэг нь хулгана тооноос холдож поп-ап руу очих үед нээлттэй байлгах үүрэгтэй */
 .open-task-cell:hover .task-popover,
 .task-popover:hover { 
   display: block; 
@@ -276,7 +274,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .popover-item:hover { background: var(--blue-bg); border-color: var(--blue); color: var(--blue-text); }
 .popover-pname { font-size: 9px; font-weight: 700; background: var(--bg3); padding: 2px 5px; border-radius: 4px; color: var(--text2); text-transform: uppercase; white-space: nowrap;}
 
-/* TEAM PERFORMANCE KPI BLOCK STYLE */
 .team-kpi-card { display: flex; align-items: center; gap: 20px; background: var(--bg2); border-radius: var(--rl); padding: 16px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
 .team-pie-container { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
 .team-pie-chart { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s ease; }
@@ -318,669 +315,699 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="main" id="main"></div>
   </div>
 </div>
-<div id="modal-overlay" class="modal-overlay" style="display:none">
-  <div class="modal-bg" id="modal-bg"></div>
-  <div class="modal-box" id="modal-box"></div>
-</div>
-<div class="eco-tooltip" id="eco-tt"></div>
+
+<div id="modal-container" style="display:none"></div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
-    authDomain: "omni-products.firebaseapp.com",
-    databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
-    projectId: "omni-products",
-    storageBucket: "omni-products.firebasestorage.app",
-    messagingSenderId: "879805024712",
-    appId: "1:879805024712:web:9b694019cf8388953998fd",
-    measurementId: "G-KQND2ECQ33"
+const firebaseConfig = {
+  apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
+  authDomain: "omni-products.firebaseapp.com",
+  databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
+  projectId: "omni-products",
+  storageBucket: "omni-products.firebasestorage.app",
+  messagingSenderId: "879805024712",
+  appId: "1:879805024712:web:9b694019cf8388953998fd",
+  measurementId: "G-KQND2ECQ33"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const analytics = getAnalytics(app);
+const dbRef = ref(database, 'product_os_data');
+
+/* ── UTILS ── */
+window.$ = function(id){return document.getElementById(id);}
+window.esc = function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+window.uid = function(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
+
+/* ── ACTIVE USER ── */
+window.currentUser = localStorage.getItem('selected_user') || 'Анар';
+document.addEventListener("DOMContentLoaded", () => {
+  if($('current-user')) $('current-user').value = window.currentUser;
+});
+window.changeUser = function(val) {
+  window.currentUser = val;
+  localStorage.setItem('selected_user', val);
+}
+
+/* ── CONSTANTS ── */
+window.SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
+window.LANES=['now','next','later'];
+window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
+
+/* ── STATE ── */
+window.D={};
+window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
+window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
+
+/* ── DATA HELPERS ── */
+window.projs = function(){return Object.values(window.D.projects||{});}
+window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
+window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
+window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
+window.getMeta = function(pid){return(window.D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
+window.getItems = function(pid){return getMeta(pid).items||[];}
+window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
+window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
+window.badge = function(s,click){const m=window.SM[s]||window.SM.progress;return '<span class="bdg '+m.b+'"'+(click?' onclick="'+click+'"':'')+'>'+sdot(s)+m.l+'</span>';}
+
+window.save = function(){
+  set(dbRef, window.D);
+}
+
+function defaultData(){
+  return {
+    projects:{
+      moni:{id:'moni',name:'Moni App Core',local:'Мони Хэтвч',type:'customer',status:'progress',desc:'Core mobile wallet platform handling ledger, payments, card integration, and onboarding.',tags:['Mobile','Core','Payments']},
+      omnipay:{id:'omnipay',name:'OmniPay Gateway',local:'ОмниПэй',type:'b2b',status:'live',desc:'Merchant checkout API and merchant portal supporting QR, deep-links, and split settlements.',tags:['API','Merchant','B2B']},
+      keep:{id:'keep',name:'Keep Financial',local:'Киип ББСБ',type:'internal',status:'progress',desc:'Loan origination system and credit scoring engine managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']}
+    },
+    tasks:{},road:{},conns:{},
+    pmeta:{
+      moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
+    },
+    eco:JSON.parse(JSON.stringify(window.DEF_ECO))
   };
+}
 
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
-  const analytics = getAnalytics(app);
-  const dbRef = ref(database, 'product_os_data');
-
-  /* ── UTILS ── */
-  window.$ = function(id){return document.getElementById(id);}
-  window.esc = function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  window.uid = function(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
-  window.toArr = function(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
-
-  /* ── ACTIVE USER ── */
-  window.currentUser = localStorage.getItem('selected_user') || 'Анар';
-  document.addEventListener("DOMContentLoaded", () => {
-    if($('current-user')) $('current-user').value = window.currentUser;
-  });
-
-  window.changeUser = function(val) {
-    window.currentUser = val;
-    localStorage.setItem('selected_user', val);
+/* ── REALTIME DATA SYNC ── */
+onValue(dbRef, (snapshot) => {
+  const data = snapshot.val();
+  if(data && data.projects) {
+    window.D = data;
+  } else {
+    window.D = defaultData();
+    window.save();
   }
-
-  /* ── CONSTANTS ── */
-  window.SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
-  window.LANES=['now','next','later'];
-  window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
-
-  /* ── STATE ── */
-  window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
-  window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
-
-  /* ── DATA HELPERS ── */
-  window.projs = function(){return Object.values(window.D.projects||{});}
-  window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
-  window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
-  window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
-  window.getMeta = function(pid){return(window.D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
-  window.getItems = function(pid){return getMeta(pid).items||[];}
-  window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
-  window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
-  window.badge = function(s,click){const m=window.SM[s]||window.SM.progress;return '<span class="bdg '+m.b+'"'+(click?' onclick="toggleSmenu(event)" title="Click to change"':'')+'>'+sdot(s)+m.l+'</span>';}
-  window.connRow = function(c,del){
-    const arr=c.st==='active'?'\u2192':'\u2194';
-    const sb=c.st==='active'?'<span class="csa">active</span>':'<span class="csp">planned</span>';
-    const db=del?'<button class="cdel" onclick="delConn(\''+c.id+'\')">&#10005;</button>':'';
-    return'<div class="conn-row"><span class="cproj">'+esc(pName(c.fp))+'</span>'+(c.fi?'<span class="citem">/ '+esc(c.fi)+'</span>':'')+
-      '<span class="carr">'+arr+'</span><span class="crel">'+esc(c.rel)+'</span><span class="carr">'+arr+'</span>'+
-      '<span class="cproj">'+esc(pName(c.tp))+'</span>'+(c.ti?'<span class="citem">/ '+esc(c.ti)+'</span>':'')+sb+db+'</div>';}
-
-  /* ── FIREBASE SAVE ── */
-  window.save = function(){
-    try{
-      set(dbRef, window.D);
-    }catch(e){
-      console.error('Firebase save error:',e);
-    }
+  if(!window.ui.sel && window.projs().length > 0){
+    window.ui.sel = window.projs()[0].id;
   }
+  window.render();
+});
 
-  window.exportData = function(){
-    const blob=new Blob([JSON.stringify(window.D,null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download='nbfi_'+new Date().toISOString().slice(0,10)+'.json';a.click();
-  }
+/* ── RENDER CORE ── */
+window.render = function(){
+  renderSb();
+  renderTeamBar();
+  renderMain();
+}
 
-  window.importData = function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const parsedData = JSON.parse(e.target.result);
-        if (!parsedData.projects) {
-          alert("Error: Invalid backup format!");
-          return;
-        }
-        if (confirm("Overwrite Firebase storage with this data?")) {
-          window.D = parsedData;
-          window.save();
-          if (window.projs().length > 0) window.ui.sel = window.projs()[0].id;
-          window.render();
-        }
-      } catch (err) {
-        alert("Upload error: " + err.message);
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-  }
-
-  /* ── SEED DATA ── */
-  function defaultData(){
-    const tasks={},road={},conns={};
-    [{id:'t1',p:'moni',txt:'Review eSIM Boxo API integration',a:'',done:false,by:'Халиунаа',at:'2026-05-10 14:20'},
-     {id:'t2',p:'moni',txt:'Write BRD for loyalty system',a:'',done:false,by:'Халиунаа',at:'2026-05-11 09:15'},
-     {id:'t3',p:'moni',txt:'Define OmniPay merchant requirements',a:'',done:false,by:'Анар',at:'2026-05-12 11:30'}
-    ].forEach(t=>tasks[t.id]=t);
-    return {
-      projects:{
-        moni:{id:'moni',name:'Moni App',local:'Moni',type:'customer',status:'live',desc:'Main consumer financial app offering micro-loans, wallet services, and utility payments.',tags:['Core','B2C','Mobile']},
-        omnipay:{id:'omnipay',name:'OmniPay',local:'OmniPay',type:'platform',status:'progress',desc:'Payment gateway ecosystem handling merchant QR, settlements, and BNPL configurations.',tags:['Payments','Infrastructure','B2B']},
-        los:{id:'los',name:'Loan Origination',local:'LOS',type:'internal',status:'progress',desc:'Internal automated scoring and underwriting desk managing risk analysis and approvals.',tags:['Risk','Credit','Backoffice']}
-      },
-      tasks,road,conns,
-      pmeta:{
-        moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
-      },
-      eco:JSON.parse(JSON.stringify(window.DEF_ECO))
-    };
-  }
-
-  /* ── REALTIME DATA SYNC ── */
-  onValue(dbRef, (snapshot) => {
-    const data = snapshot.val();
-    if(data && data.projects) {
-      window.D = data;
-    } else {
-      window.D = defaultData();
-      window.save();
-    }
-    if(!window.ui.sel && window.projs().length > 0){
-      window.ui.sel = window.projs()[0].id;
-    }
-    window.render();
-  });
-
-  /* ── RENDER CORE ── */
-  window.render = function(){
-    renderSb();
-    renderTeamBar();
-    renderMain();
-  }
-  
-  function renderSb(){
-    let h='<div class="sb-sec"><span>Projects</span></div>';
-    projs().forEach(p=>{
-      const sel=window.ui.sel===p.id?' on':'';
-      const ot=openTasks(p.id);
-      const cnt=ot?'<span class="pcnt">'+ot+'</span>':'';
-      h+='<div class="pitem'+sel+'" onclick="selProj(\''+p.id+'\')">'+
-         sdot(p.status)+'<span class="pname">'+esc(p.name)+'</span>'+cnt+
-         '<div class="pitem-act"><button class="piabtn del" onclick="event.stopPropagation();openModal(\'del-project\',{pid:\''+p.id+'\'})">&#10005;</button></div>'+
-         '</div>';
-    });
-    h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
-       '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
-       '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
-       '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
-    $('sb-scroll').innerHTML=h;
-    $('sb-foot').innerHTML='<div class="gbtn" onclick="openModal(\'reset\',{})">&#8634; Reset Database</div>';
-  }
-
-  function renderTeamBar(){
-    const tb=$('team-bar');
-    if(!window.ui.showTeam){tb.style.display='none';$('team-btn').classList.remove('on');return;}
-    tb.style.display='flex';$('team-btn').classList.add('on');
-    let m=new Set();projs().forEach(p=>{const meta=getMeta(p.id);if(meta.leader)m.add(meta.leader);(meta.devs||[]).forEach(d=>m.add(d));});
-    let h='<span class="tlbl">&#128100; Roster:</span>';
-    if(m.size===0)h+='<span class="muted" style="font-size:12px;padding:0">No team members allocated.</span>';
-    else m.forEach(name=>h+='<span class="mchip">'+esc(name)+'</span>');
-    tb.innerHTML=h;
-  }
-
-  function renderMain(){
-    const m=$('main');
-    if(window.ui.gview!=='project'){renderGlobalView(m);return;}
-    const p=(window.D.projects||{})[window.ui.sel];
-    if(!p){m.innerHTML='<div class="muted" style="padding:20px">Project not found.</div>';return;}
-    const meta=getMeta(p.id);const tasks=pTasks(p.id);const dn=tasks.filter(t=>t.done).length;const tot=tasks.length;const pct=tot?Math.round((dn/tot)*100):0;
-    let h='<div class="phdr"><div class="ptrow"><span class="pt">'+esc(p.name)+'</span>';
-    if(p.local)h+='<span class="plocal">('+esc(p.local)+')</span>';
-    h+=badge(p.status,true)+'<span class="ptype">'+esc(p.type).toUpperCase()+'</span></div>'+
-       '<div class="pmeta-row">'+
-       '<div class="pmeta-g"><span class="pmeta-l">Lead:</span><span class="pmeta-v">'+esc(meta.leader||'Unassigned')+'</span></div>'+
-       '<div class="pmeta-sep"></div><div class="pmeta-g"><span class="pmeta-l">Devs:</span>';
-    if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
-    else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
-    h+='</div></div><div class="tabs">'+
-       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
-       '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
-       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
-       '</div></div><div class="mbody">';
-    if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
-    else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
-    else h+=renderProjectMeta(p,meta);
-    h+'</div>';m.innerHTML=h;
-    if(window.ui.statusMenu)renderStatusMenu(p);
-  }
-
-  function renderStatusMenu(p){
-    let div=$('smenu-box');if(!div){div=document.createElement('div');div.id='smenu-box';div.className='smenu';document.body.appendChild(div);}
-    let h='';Object.entries(window.SM).forEach(([k,v])=>{h+='<div class="sopt" onclick="setProjStatus(\''+p.id+'\',\''+k+'\')">'+sdot(k)+' '+v.l+'</div>';});
-    div.innerHTML=h;const b=document.querySelector('.bdg');if(b){const r=b.getBoundingClientRect();div.style.top=(r.bottom+window.scrollY)+'px';div.style.left=(r.left+window.scrollX)+'px';div.style.display='block';}
-  }
-
-  function renderProjectTasks(p,tasks,dn,tot,pct){
-    let h='<div class="tmeta"><span>'+pct+'% Complete ('+dn+'/'+tot+' tasks)</span>'+(dn>0?'<button class="clr" onclick="clearDone(\''+p.id+'\')">Clear completed</button>':'')+'</div>'+
-       '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
-       '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket or task description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
-       '<select id="t_tag"><option value="">No context item</option>';
-    getItems(p.id).forEach(i=>h+='<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>');
-    h+='</select><button onclick="addTask(\''+p.id+'\')">+ Add</button></div>';
-    const active=tasks.filter(t=>!t.done);const done=tasks.filter(t=>t.done);
-    h+='<div class="tlist">';
-    if(active.length===0&&done.length===0)h+='<div class="muted">No scope items created yet.</div>';
-    else{
-      active.forEach(t=>h+=taskRow(t));
-      if(done.length>0){h+='<div class="donesec"><div class="dnhdr">Completed</div>';done.forEach(t=>h+=taskRow(t));h+='</div>';}
-    }
-    return h+'</div>';
-  }
-
-  function taskRow(t){
-    const ck=t.done?' ck':'';const dn=t.done?' dn':'';
-    const createdBy = t.by ? esc(t.by) : 'Unknown';
-    const createdAt = t.at ? esc(t.at) : 'N/A';
-    
-    return'<div class="titem"><div class="chk'+ck+'" onclick="toggleTask(\''+t.p+'\',\''+t.id+'\')"></div>'+
-       '<div style="flex:1;"><span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+
-       '<span class="ts-meta">Added by <b>'+createdBy+'</b> on '+createdAt+'</span></div>'+
-       (t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
-       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';
-  }
-
-  function renderProjectRoadmap(p){
-    const items=roadItems(p.id);
-    let h='<div class="rcols">';
-    window.LANES.forEach(l=>{
-      const li=items.filter(i=>i.lane===l);
-      h+='<div class="rcol"><div class="rch"><span class="rct" style="text-transform:uppercase">'+l+'</span><span class="rcc">'+li.length+'</span></div><div class="rlist">';
-      if(li.length===0)h+='<div class="muted" style="font-size:11px">Empty</div>';
-      else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
-         '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
-         '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
-      h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
-         '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
-    });
-    return h+'</div>';
-  }
-
-  function renderProjectMeta(p,meta){
-    let h='<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
-       '<div class="stitle">Tags</div><div class="tags">';
-    if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
-    else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
-    h+='</div><div class="ps-grid">'+
-       '<div class="ps-col"><div class="ps-col-title">Context & Core Architecture Items</div><div class="ps-items" id="meta-items-list">';
-    const items=meta.items||[];
-    if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
-    else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
-    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
-       '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
-       '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
-    ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
-    h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
-    (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
-    h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
-    ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
-    return h+'</select></div></div></div></div></div>';
-  }
-
-  function renderGlobalView(m){
-    if(window.ui.gview==='overview')renderOverview(m);
-    else if(window.ui.gview==='ecosystem')renderEcosystem(m);
-    else renderMatrix(m);
-  }
-
-  /* ── OVERVIEW VIEW WITH DYNAMIC PIE CHART & AGGREGATED METRICS ── */
-  function renderOverview(m){
-    let tot=projs().length;
-    let live=projs().filter(p=>p.status==='live').length;
-    let prog=projs().filter(p=>p.status==='progress').length;
-    let bug=projs().filter(p=>p.status==='bugs').length;
-    
-    let userStats = {
-      'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
-      'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
-      'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] }
-    };
-
-    projs().forEach(p => {
-      const meta = getMeta(p.id);
-      if (meta.leader && userStats[meta.leader]) {
-        userStats[meta.leader].mainTasks += 1;
-      }
-    });
-
-    Object.values(window.D.tasks || {}).forEach(t => {
-      if (t.by && userStats[t.by]) {
-        userStats[t.by].totalSub += 1;
-        if (t.done) {
-          userStats[t.by].doneSub += 1;
-        } else {
-          userStats[t.by].openItems.push({ id: t.id, txt: t.txt, pid: t.p });
-        }
-      }
-    });
-
-    let teamTotalTasks = 0;
-    let teamTotalDone = 0;
-    Object.entries(userStats).forEach(([name, stat]) => {
-      teamTotalTasks += stat.totalSub;
-      teamTotalDone += stat.doneSub;
-    });
-    let teamTotalOpen = teamTotalTasks - teamTotalDone;
-    let teamPct = teamTotalTasks ? Math.round((teamTotalDone / teamTotalTasks) * 100) : 0;
-
-    let pieBg = `conic-gradient(var(--green) 0% ${teamPct}%, var(--bg3) ${teamPct}% 100%)`;
-
-    let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
-       '<div class="ov-stats">'+
-       '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
-       '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
-       '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
-       '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
+function renderSb(){
+  let h='<div class="sb-sec"><span>Projects</span></div>';
+  projs().forEach(p=>{
+    const sel=window.ui.sel===p.id?' on':'';
+    const ot=openTasks(p.id);
+    const cnt=ot?'<span class="pcnt">'+ot+'</span>':'';
+    h+='<div class="pitem'+sel+'" onclick="selProj(\''+p.id+'\')">'+
+       sdot(p.status)+'<span class="pname">'+esc(p.name)+'</span>'+cnt+
+       '<div class="pitem-act"><button class="piabtn del" onclick="event.stopPropagation();openModal(\'del-project\',{pid:\''+p.id+'\'})">&#10005;</button></div>'+
        '</div>';
+  });
+  h+='<div class="sb-sec" style="margin-top:10px"><span>Views</span></div>'+
+     '<div class="gbtn'+(window.ui.gview==='overview'?' on':'')+'" onclick="selGview(\'overview\')">&#128202; Overview</div>'+
+     '<div class="gbtn'+(window.ui.gview==='ecosystem'?' on':'')+'" onclick="selGview(\'ecosystem\')">&#128376; Ecosystem</div>'+
+     '<div class="gbtn'+(window.ui.gview==='matrix'?' on':'')+'" onclick="selGview(\'matrix\')">&#128338; Roadmaps</div>';
+  $('sb-scroll').innerHTML=h;
+  $('sb-foot').innerHTML=''; /* RESET DATABASE товчийг бүрмөсөн хасав */
+}
 
-    h += '<div class="ov-sec">Dev Team Ажиллагаа</div>'+
-         '<div class="team-kpi-card">'+
-           '<div class="team-pie-container">'+
-             '<div class="team-pie-chart" style="background: ' + pieBg + ';">'+
-               '<div class="team-pie-inner">' + teamPct + '%</div>'+
-             '</div>'+
-           '</div>'+
-           '<div class="team-kpi-details">'+
-             '<div class="team-kpi-title">Багийн Нийт Гүйцэтгэл</div>'+
-             '<div class="team-kpi-subtitle">Хөгжүүлэлтийн багийн 3 ажилтны нийт таск ажиллагаа <b>' + teamPct + '%</b>-тай байна. Тооцоолол: Нийт <b>' + teamTotalTasks + '</b> таскаас <span class="done-txt">✓ ' + teamTotalDone + ' болсон</span>, <span class="open-txt">' + teamTotalOpen + ' хүлээгдэж буй</span>.</div>'+
-           '</div>'+
+function renderTeamBar(){
+  const tb=$('team-bar');
+  if(!window.ui.showTeam){tb.style.display='none';$('team-btn').classList.remove('on');return;}
+  tb.style.display='flex';$('team-btn').classList.add('on');
+  let m=new Set();projs().forEach(p=>{const meta=getMeta(p.id);if(meta.leader)m.add(meta.leader);(meta.devs||[]).forEach(d=>m.add(d));});
+  let h='<span class="tlbl">&#128100; Roster:</span>';
+  if(m.size===0)h+='<span class="muted" style="font-size:12px;padding:0">No team members allocated.</span>';
+  else m.forEach(name=>h+='<span class="mchip">'+esc(name)+'</span>');
+  tb.innerHTML=h;
+}
+
+function renderMain(){
+  const m=$('main');
+  if(window.ui.gview!=='project'){renderGlobalView(m);return;}
+  const p=(window.D.projects||{})[window.ui.sel];
+  if(!p){m.innerHTML='<div class="muted" style="padding:20px">Project not found.</div>';return;}
+  const meta=getMeta(p.id);const tasks=pTasks(p.id);const dn=tasks.filter(t=>t.done).length;const tot=tasks.length;const pct=tot?Math.round((dn/tot)*100):0;
+  let h='<div class="phdr"><div class="ptrow"><span class="pt">'+esc(p.name)+'</span>';
+  if(p.local)h+='<span class="plocal">('+esc(p.local)+')</span>';
+  h+=badge(p.status,'toggleSmenu(event)')+'<span class="ptype">'+esc(p.type).toUpperCase()+' System</span></div>';
+  if(window.ui.statusMenu){
+    h+='<div class="smenu" id="smenu-box" style="left:auto;right:18px;top:40px" onclick="event.stopPropagation()">';
+    Object.keys(window.SM).forEach(st=>{
+      h+='<div class="sopt" onclick="setProjStatus(\''+p.id+'\',\''+st+'\')">'+sdot(st)+' '+window.SM[st].l+'</div>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="tabs">'+
+     '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tickets ('+tot+')</div>'+
+     '<div class="tab'+(window.ui.tab==='road'?' on':'')+'" onclick="selTab(\'road\')">Milestones</div>'+
+     '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Architecture & Allocation</div>'+
+     '<div class="tab'+(window.ui.tab==='conns'?' on':'')+'" onclick="selTab(\'conns\')">Interfaces ('+pConns(p.id).length+')</div>'+
+     '</div></div><div class="mbody">';
+  if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
+  else if(window.ui.tab==='road')h+=renderProjectRoad(p);
+  else if(window.ui.tab==='meta')h+=renderProjectMeta(p,meta);
+  else h+=renderProjectConns(p);
+  m.innerHTML=h+'</div>';
+}
+
+function pConns(pid){
+  return Object.values(window.D.conns||{}).filter(c=>c.fp===pid||c.tp===pid);
+}
+
+function renderProjectTasks(p,tasks,dn,tot,pct){
+  let openT=tasks.filter(t=>!t.done);let doneT=tasks.filter(t=>t.done);
+  let h='<div class="tmeta"><span>Overall Progress</span><span>'+dn+'/'+tot+' tickets completed ('+pct+'%)</span></div>'+
+     '<div class="prog"><div class="pfill" style="width:'+pct+'%"></div></div>'+
+     '<div class="ar"><input type="text" id="t_inp" placeholder="Add scope ticket description..." onkeydown="if(event.key===\'Enter\')addTask(\''+p.id+'\')">'+
+     '<select id="t_tag"><option value="">-- No Tag --</option>';
+  (p.tags||[]).forEach(t=>h+='<option value="'+t+'">'+t+'</option>');
+  h+='</select><button onclick="addTask(\''+p.id+'\')">Add Ticket</button></div><div class="tlist">';
+  if(openT.length===0 && doneT.length===0)h+='<div class="muted">No engineering tasks slotted for this scope.</div>';
+  if(openT.length>0){
+    openT.forEach(t=>h+=tRow(t));
+  }
+  if(doneT.length>0){
+    h+='<div class="donesec"><div class="dnhdr">Archived & Completed</div>';
+    doneT.forEach(t=>h+=tRow(t));
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+
+function tRow(t){
+  const ck=t.done?' ck':'';const dn=t.done?' dn':'';
+  const tag=t.tag?'<span class="atag">'+esc(t.tag)+'</span>':'';
+  const uInfo=t.u?`<span class="ts-meta">By ${esc(t.u)} on ${t.ts||''}</span>`:'';
+  return '<div class="titem">'+
+         '<div class="chk'+ck+'" onclick="toggleTask(\''+t.id+'\')"></div>'+
+         '<div class="ttxt'+dn+'">'+esc(t.txt)+uInfo+'</div>'+tag+
+         '<button class="xbtn" onclick="delTask(\''+t.id+'\')">&#10005;</button>'+
          '</div>';
+}
 
-    h += '<div class="ov-sec">User Workload & Performance Overview</div>';
-    h += '<table class="stat-table">'+
-         '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
-         '<tbody>';
-    
-    Object.entries(userStats).forEach(([name, stat]) => {
-      const openSub = stat.totalSub - stat.doneSub;
-      const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
-      
-      let popoverHtml = '';
-      if(openSub > 0) {
-        popoverHtml += `<div class="task-popover" onclick="event.stopPropagation();">`;
-        popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
-        popoverHtml += `<div class="popover-list">`;
-        stat.openItems.forEach(item => {
-          popoverHtml += `<div class="popover-item" onclick="window.goToTask('${item.pid}');">` +
-                         `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
-                         `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.txt)}</span>` +
-                         `</div>`;
-        });
-        popoverHtml += `</div></div>`;
-      }
+function renderProjectRoad(p){
+  let h='<div class="rcols">';
+  window.LANES.forEach(l=>{
+    const items=roadItems(p.id).filter(r=>r.lane===l);
+    h+='<div class="rcol"><div class="rch"><span class="rct" style="text-transform:capitalize">'+l+'</span><span class="rcc">'+items.length+'</span></div><div class="rlist">';
+    items.forEach(r=>h+='<div class="rcard"><div class="rcard-t">'+esc(r.txt)+'</div><button class="rxb" onclick="delRoad(\''+r.id+'\')">&#10005;</button></div>');
+    h+='</div><div class="radd"><input type="text" id="ri_'+l+'" placeholder="Schedule release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
+       '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
+  });
+  return h+'</div>';
+}
 
-      h += `<tr>`+
-           `<td><b>${esc(name)}</b></td>`+
-           `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
-           `<td>${stat.totalSub} таск</td>`+
-           `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
-           `<td>`+
-             `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; background:${openSub > 0 ? 'var(--red-bg)' : 'transparent'};">`+
-               `${openSub}${popoverHtml}`+
-             `</div>`+
-           `</td>`+
-           `<td>`+
-             `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
-             `<span class="stat-pct">${pct}%</span>`+
-           `</td>`+
-           `</tr>`;
-    });
-    h += '</tbody></table>';
+function renderProjectMeta(p,meta){
+  let h='<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
+     '<div class="stitle">Tags</div><div class="tags">';
+  if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
+  else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
+  h+='</div><div class="ps-grid">'+
+     '<div class="ps-col"><div class="ps-col-title">Context & Core Architecture Items</div><div class="ps-items" id="meta-items-list">';
+  const items=meta.items||[];
+  if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
+  else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
+  h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
+     '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
+     '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
+  ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
+  h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
+  (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
+  h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
+  ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
+  return h+'</select></div></div></div></div></div>';
+}
 
-    h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
-    projs().forEach(p=>{
-      const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
-      h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
-         '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
-         '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
-         '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
-         '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
-      (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
-      h+='</div></div>';
-    });
-    m.innerHTML=h+'</div></div>';
-  }
+function renderGlobalView(m){
+  if(window.ui.gview==='overview')renderOverview(m);
+  else if(window.ui.gview==='ecosystem')renderEcosystem(m);
+  else renderMatrix(m);
+}
 
-  /* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
-  window.goToTask = function(pid) {
-    window.ui.sel = pid;
-    window.ui.gview = 'project';
-    window.ui.tab = 'tasks';
-    window.ui.statusMenu = false;
-    window.render();
-  }
-
-  function renderEcosystem(m){
-    let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
-       '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
-       '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
-       '</div><div class="eco-wrap" id="eco-wrap" style="height:100%">'+
-       '<div class="eco-legend"><div class="eco-legend-title">System Class</div>'+
-       '<div class="eco-lr"><span class="dot dl"></span> Live Core</div>'+
-       '<div class="eco-lr"><span class="dot dp"></span> Progress</div>'+
-       '<div class="eco-lr"><span class="dot db"></span> Impacted / Bugs</div>'+
-       '<div class="eco-lr"><span class="dot dpl"></span> Pipeline</div>'+
-       '</div><div class="eco-hint">Drag platforms to map dependencies dynamically</div>'+
-       '<svg id="eco-svg" style="width:100%;height:100%;position:absolute;inset:0;z-index:1"></svg>';
-    projs().forEach(p=>{
-      const coord=(window.D.eco||{})[p.id]||window.DEF_ECO[p.id]||{x:150,y:150};const dotM=window.SM[p.status]||window.SM.progress;
-      h+='<div class="pitem" id="node-'+p.id+'" style="position:absolute;left:'+coord.x+'px;top:'+coord.y+'px;z-index:5;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:6px 11px;cursor:move;user-select:none;margin:0;display:flex;align-items:center;gap:6px" onmousedown="dragNode(event,\''+p.id+'\')">'+
-         '<span class="dot '+dotM.d+'"></span><span style="font-size:12px;font-weight:600">'+esc(p.name)+'</span></div>';
-    });
-    m.innerHTML=h+'</div>';drawConnections();
-  }
-
-  function drawConnections(){
-    const svg=$('eco-svg');if(!svg)return;let h='';const wrap=$('eco-wrap');if(!wrap)return;
-    Object.values(window.D.conns||{}).forEach(c=>{
-      if(window.ui.roadFilter!=='all'&&c.st!==window.ui.roadFilter)return;
-      const n1=$('node-'+c.fp);const n2=$('node-'+c.tp);if(!n1||!n2)return;
-      const x1=n1.offsetLeft+(n1.offsetWidth/2);const y1=n1.offsetTop+(n1.offsetHeight/2);
-      const x2=n2.offsetLeft+(n2.offsetWidth/2);const y2=n2.offsetTop+(n2.offsetHeight/2);
-      const col=c.st==='active'?'var(--blue)':'var(--amber)';const dash=c.st==='active'?'':' stroke-dasharray="4,4"';
-      h+='<g class="edge" style="cursor:pointer" onclick="openConnModal(\''+c.id+'\')">'+
-         '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="2" opacity="0.35"'+dash+'/>'+
-         '<circle cx="'+((x1+x2)/2)+'" cy="'+((y1+y2)/2)+'" r="4" fill="'+col+'" opacity="0.8"/>'+
-         '</g>';
-    });
-    svg.innerHTML=h;
-  }
-
-  window.dragNode = function(e,pid){
-    e.preventDefault();const n=$('node-'+pid);if(!n)return;const wrap=$('eco-wrap');if(!wrap)return;
-    const sx=e.clientX-n.offsetLeft;const sy=e.clientY-n.offsetTop;
-    document.onmousemove=function(ev){
-      let x=ev.clientX-sx;let y=ev.clientY-sy;
-      x=Math.max(10,Math.min(wrap.offsetWidth-n.offsetWidth-10,x));y=Math.max(10,Math.min(wrap.offsetHeight-n.offsetHeight-10,y));
-      n.style.left=x+'px';n.style.top=y+'px';drawConnections();
-      if(!window.D.eco)window.D.eco={};window.D.eco[pid]={x,y};
-    };
-    document.onmouseup=function(){document.onmousemove=null;document.onmouseup=null;window.save();};
-  }
-
-  function renderMatrix(m){
-    let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap Matrix</div><div class="gsub">Consolidated multi-product sprint lanes</div></div><div class="scrollbody">';
-    window.LANES.forEach(lane=>{
-      let items=[];projs().forEach(p=>{roadItems(p.id).filter(r=>r.lane===lane).forEach(r=>{items.push({p:p.id,txt:r.txt});});});
-      h+='<div class="lsec"><div class="lhdr"><span class="llbl" style="text-transform:uppercase">'+lane+'</span><span class="lcnt">'+items.length+'</span></div><div class="lgrid">';
-      if(items.length===0)h+='<div class="muted">No deliverables slotted.</div>';
-      else{
-        let grouped={};items.forEach(i=>{if(!grouped[i.p])grouped[i.p]=[];grouped[i.p].push(i.txt);});
-        Object.entries(grouped).forEach(([pid,txts])=>{
-          h+='<div class="lcard" onclick="selProj(\''+pid+'\')"><div class="lcard-n">'+esc(pName(pid))+'<span class="lcard-cnt">'+txts.length+'</span></div>';
-          txts.forEach(t=>h+='<div class="litem">'+esc(t)+'</div>');
-          h+='</div>';
-        });
-      }
-      h+='</div></div>';
-    });
-    h+='<div class="ov-sec" style="margin-top:20px;margin-bottom:8px">System Dependency Register</div>'+
-       '<div class="tbtn prim" style="margin-bottom:10px" onclick="window.ncSet(\'fp\',\'\');openModal(\'add-conn\',{})">+ Establish Relationship Link</div>'+
-       '<div id="conn-matrix-list">';
-    const conns=Object.values(window.D.conns||{});
-    if(conns.length===0)h+='<div class="muted">No structural interfaces defined.</div>';
-    else conns.forEach(c=>h+=window.connRow(c,true));
-    m.innerHTML=h+'</div></div>';
-  }
-
-  /* ── INTERACTIONS ── */
-  window.selProj = function(id){window.ui.sel=id;window.ui.gview='project';window.ui.statusMenu=false;window.render();}
-  window.selGview = function(v){window.ui.gview=v;window.ui.statusMenu=false;window.render();}
-  window.selTab = function(t){window.ui.tab=t;window.render();}
-  window.toggleTeam = function(){window.ui.showTeam=!window.ui.showTeam;window.render();}
-  window.setRoadFilter = function(f){window.ui.roadFilter=f;window.render();}
-  window.toggleSmenu = function(e){e.stopPropagation();window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
-  function closeSmenu(){window.ui.statusMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
+/* ── OVERVIEW VIEW WITH DYNAMIC PIE CHART & AGGREGATED METRICS ── */
+function renderOverview(m){
+  let tot=projs().length;
+  let live=projs().filter(p=>p.status==='live').length;
+  let prog=projs().filter(p=>p.status==='progress').length;
+  let bug=projs().filter(p=>p.status==='bugs').length;
   
-  window.setProjStatus = function(pid,st){
-    if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
-  }
-
-  /* ── MUTATIONS ── */
-  window.addTask = function(pid){
-    const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
-    const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
-    
-    const now = new Date();
-    const timeStr = now.getFullYear() + '-' + 
-                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
-                    String(now.getDate()).padStart(2,'0') + ' ' + 
-                    String(now.getHours()).padStart(2,'0') + ':' + 
-                    String(now.getMinutes()).padStart(2,'0');
-
-    if(!window.D.tasks)window.D.tasks={};
-    
-    window.D.tasks[id]={
-      id,
-      p:pid,
-      txt,
-      a:tagVal,
-      done:false,
-      by: window.currentUser,
-      at: timeStr
-    };
-    
-    if(inp)inp.value='';window.save();window.render();
-  }
+  let userStats = {
+    'Халиунаа': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
+    'Зул-Эрдэнэ': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] },
+    'Анар': { mainTasks: 0, totalSub: 0, doneSub: 0, openItems: [] }
+  };
   
-  window.toggleTask = function(pid,tid){
-    if(window.D.tasks[tid]){
-      window.D.tasks[tid].done=!window.D.tasks[tid].done;
-      window.D.tasks[tid].modifiedBy = window.currentUser; 
-      window.save();
-      window.render();
+  projs().forEach(p => {
+    const meta = getMeta(p.id);
+    if(meta.leader && userStats[meta.leader]) {
+      userStats[meta.leader].mainTasks++;
     }
-  }
-  window.delTask = function(pid,tid){
-    if(window.D.tasks[tid]){delete window.D.tasks[tid];window.save();window.render();}
-  }
-  window.clearDone = function(pid){
-    Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid&&t.done)delete window.D.tasks[t.id];});
-    window.save();window.render();
-  }
-
-  window.addRoad = function(pid,lane){
-    const inp=$('r_inp_'+lane);const txt=(inp?inp.value:'').trim();if(!txt)return;
-    const id='r'+window.uid();if(!window.D.road)window.D.road={};window.D.road[id]={id,p:pid,txt,lane};
-    if(inp)inp.value='';window.save();window.render();
-  }
-  window.moveRoad = function(pid,rid,currLane){
-    const idx=window.LANES.indexOf(currLane);const nxt=window.LANES[(idx+1)%window.LANES.length];
-    if(window.D.road[rid]){window.D.road[rid].lane=nxt;window.save();window.render();}
-  }
-  window.delRoad = function(pid,rid){
-    if(window.D.road[rid]){delete window.D.road[rid];window.save();window.render();}
-  }
-
-  window.setLeader = function(val){
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,leader:val};window.save();window.render();
-  }
-  window.addDev = function(name){
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    if(!(m.devs||[]).includes(name)){window.D.pmeta[window.ui.sel]={...m,devs:[...(m.devs||[]),name]};window.save();window.render();}
-  }
-  window.removeDev = function(i){
-    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);const d=[...(m.devs||[])];d.splice(i,1);
-    window.D.pmeta[window.ui.sel]={...m,devs:d};window.save();window.render();
-  }
-  window.addItem = function(kind){
-    const inp=$(kind==='feature'?'fi_inp':'si_inp');const name=(inp?inp.value:'').trim();if(!name)return;
-    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,items:[...(m.items||[]),{id:'i'+window.uid(),name,kind}]};
-    if(inp)inp.value='';window.save();window.render();
-  }
-  window.removeItem = function(iid){
-    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
-    window.D.pmeta[window.ui.sel]={...m,items:(m.items||[]).filter(i=>i.id!==iid)};window.save();window.render();
-  }
-
-  window.ncSet = function(key,val){
-    window.ui.nc[key]=val;if(key==='fp')window.ui.nc.fi='';if(key==='tp')window.ui.nc.ti='';renderModalContent();
-  }
-  window.ncSetSt = function(val){window.ui.nc.st=val;renderModalContent();}
+    const tasks = pTasks(p.id);
+    tasks.forEach(t => {
+      if(meta.leader && userStats[meta.leader]) {
+        userStats[meta.leader].totalSub++;
+        if(t.done) userStats[meta.leader].doneSub++;
+        else userStats[meta.leader].openItems.push({ pid: p.id, txt: t.txt });
+      }
+      (meta.devs || []).forEach(dev => {
+        if(userStats[dev]) {
+          userStats[dev].totalSub++;
+          if(t.done) userStats[dev].doneSub++;
+          else userStats[dev].openItems.push({ pid: p.id, txt: t.txt });
+        }
+      });
+    });
+  });
   
-  window.addConn = function(){
-    if(!window.ui.nc.fp||!window.ui.nc.tp){alert('Select both projects.');return;}
-    const rel=(($('nc_rel')?$('nc_rel').value:'').trim()||'integration');const id='c'+window.uid();
-    if(!window.D.conns)window.D.conns={};window.D.conns[id]={id,fp:window.ui.nc.fp,fi:window.ui.nc.fi,tp:window.ui.nc.tp,ti:window.ui.nc.ti,rel,st:window.ui.nc.st};
-    window.save();closeModal();window.render();
-  }
-  window.delConn = function(cid){if(window.D.conns[cid]){delete window.D.conns[cid];window.save();window.render();}}
-
-  /* ── MODALS ENGINE ── */
-  window.openModal = function(kind,opts){
-    window.ui.modal={kind,opts};$('modal-overlay').style.display='flex';renderModalContent();
-  }
-  window.closeModal = function(){window.ui.modal=null;$('modal-overlay').style.display='none';}
-  $('modal-bg').onclick=window.closeModal;
-
-  function renderModalContent(){
-    const b=$('modal-box');if(!window.ui.modal)return;const k=window.ui.modal.kind;const opts=window.ui.modal.opts;
-    if(k==='add-project'){
-      b.className='modal-box';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Create Product Core Slot</div></div>'+
-         '<div class="modal-body">'+
-         '<div class="mfld"><label>Product Ref Key (Single word, lowercase)</label><input type="text" id="m_id" placeholder="e.g. moni-loans"></div>'+
-         '<div class="mfld"><label>Product Title Name</label><input type="text" id="m_name" placeholder="e.g. Moni Loans"></div>'+
-         '<div class="mfld"><label>Local Handle</label><input type="text" id="m_local" placeholder="e.g. Loans"></div>'+
-         '<div class="mfld"><label>Architecture Class</label><select id="m_type"><option value="customer">Customer Facing (B2C)</option><option value="platform">Platform Infrastructure</option><option value="service">Shared Microservice</option><option value="internal">Internal Suite</option></select></div>'+
-         '<div class="mfld"><label>Description Scope</label><textarea id="m_desc" placeholder="Scope description..."></textarea></div>'+
-         '<div class="mfld"><label>Tags (Comma-separated)</label><input type="text" id="m_tags" placeholder="e.g. Core, Risk"></div>'+
-         '</div><div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="submitProject()">Create Index</button></div>';
-    }else if(k==='del-project'){
-      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Purge System Node</div></div>'+
-         '<div class="modal-body"><div class="del-warn">Are you sure you want to permanently delete <strong>'+esc(pName(opts.pid))+'</strong>? This action wipes all associated scope tickets, dependencies, and timelines.</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitDelProject(\''+opts.pid+'\')">Confirm Wipe</button></div>';
-    }else if(k==='add-conn'){
-      b.className='modal-box';let p1Opts='<option value="">-- Select System --</option>';let p2Opts='<option value="">-- Select System --</option>';
-      projs().forEach(p=>{p1Opts+='<option value="'+p.id+'"'+(window.ui.nc.fp===p.id?' selected':'')+'>'+p.name+'</option>';p2Opts+='<option value="'+p.id+'"'+(window.ui.nc.tp===p.id?' selected':'')+'>'+p.name+'</option>';});
-      let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+window.ui.nc.fi===i.name?' selected':''+'">'+i.name+'</option>');
-      let f2Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.tp)getItems(window.ui.nc.tp).forEach(i=>f2Opts+='<option value="'+window.ui.nc.ti===i.name?' selected':''+'">'+i.name+'</option>');
-      b.innerHTML='<div class="modal-hdr"><div class="modal-title">Establish Architecture Interface Link</div></div>'+
-         '<div class="modal-body">'+
-         '<div class="add-conn-form" style="margin-top:0; padding:0; background:transparent;">'+
-         '<div class="mfld"><label>Source System Node</label><select onchange="window.ncSet(\'fp\',this.value)">'+p1Opts+'</select></div>'+
-         '<div class="mfld"><label>Source Sub-feature (Optional)</label><select onchange="window.ncSet(\'fi\',this.value)">'+f1Opts+'</select></div>'+
-         '<div class="mfld"><label>Relationship / Sync Interface Protocol</label><input type="text" id="nc_rel" placeholder="e.g. gRPC Core Sync, API, webhook" value="'+esc(window.ui.nc.rel)+'" onchange="window.ui.nc.rel=this.value"></div>'+
-         '<div class="mfld"><label>Target System Node</label><select onchange="window.ncSet(\'tp\',this.value)">'+p2Opts+'</select></div>'+
-         '<div class="mfld"><label>Target Sub-feature (Optional)</label><select onchange="window.ncSet(\'ti\',this.value)">'+f2Opts+'</select></div>'+
-         '<div class="mfld"><label>Lifecycle State</label><div class="stog"><button class="'+(window.ui.nc.st==='active'?'on':'')+'" onclick="window.ncSetSt(\'active\')">Active Connection</button><button class="'+(window.ui.nc.st==='planned'?'on':'')+'" onclick="window.ncSetSt(\'planned\')">Pipeline Integration</button></div></div>'+
-         '</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="window.addConn()">Form Structural Interface</button></div>';
-    }else if(k==='reset'){
-      b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Reset Realtime Database</div></div>'+
-         '<div class="modal-body"><div class="del-warn">This will reset your Firebase database to default seed data. Proceed?</div></div>'+
-         '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitReset()">Reset</button></div>';
+  let teamTotalTasks = 0;
+  let teamTotalDone = 0;
+  Object.values(userStats).forEach(s => {
+    teamTotalTasks += s.totalSub;
+    teamTotalDone += s.doneSub;
+  });
+  const teamTotalOpen = teamTotalTasks - teamTotalDone;
+  const teamPct = teamTotalTasks ? Math.round((teamTotalDone / teamTotalTasks) * 100) : 0;
+  
+  let pieColor = `conic-gradient(var(--green) ${teamPct}%, var(--bg3) ${teamPct}% 100%)`;
+  
+  let h = '<div class="scrollbody" style="padding-top:18px">'+
+          '<div class="ov-title">Product Architecture Hub</div>'+
+          '<div class="ov-sub">Aggregated technical oversight and pipeline statuses across cross-functional systems</div>'+
+          '<div class="ov-stats">'+
+          '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Subsystems</div></div>'+
+          '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Production</div></div>'+
+          '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">Active Pipelines</div></div>'+
+          '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
+          '</div>';
+          
+  h += '<div class="ov-sec">Team Operations KPI</div>'+
+       '<div class="team-kpi-card">'+
+       '<div class="team-pie-container">'+
+       '<div class="team-pie-chart" style="background:' + pieColor + '">'+
+       '<div class="team-pie-inner">' + teamPct + '%</div>'+
+       '</div>'+
+       '</div>'+
+       '<div class="team-kpi-details">'+
+       '<div class="team-kpi-title">Engineering Velocity</div>'+
+       '<div class="team-kpi-subtitle">Нийт хамт олны хэмжээнд <b>' + teamTotalTasks + '</b> жижиг таск бүртгэгдсэнээс <span class="done-txt">' + teamTotalDone + ' хийгдсэн</span>, <span class="open-txt">' + teamTotalOpen + ' хүлээгдэж буй</span>.</div>'+
+       '</div>'+
+       '</div>';
+       
+  h += '<div class="ov-sec">User Workload & Performance Overview</div>';
+  h += '<table class="stat-table">'+
+       '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
+       '<tbody>';
+       
+  Object.entries(userStats).forEach(([name, stat]) => {
+    const openSub = stat.totalSub - stat.doneSub;
+    const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
+    let popoverHtml = '';
+    if(openSub > 0) {
+      popoverHtml += `<div class="task-popover" onclick="event.stopPropagation();">`;
+      popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
+      popoverHtml += `<div class="popover-list">`;
+      stat.openItems.forEach(item => {
+        popoverHtml += `<div class="popover-item" onclick="window.goToTask('${item.pid}');">` +
+                       `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
+                       `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.txt)}</span>` +
+                       `</div>`;
+      });
+      popoverHtml += `</div></div>`;
     }
-  }
+    
+    h += `<tr>`+
+         `<td><b>${esc(name)}</b></td>`+
+         `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
+         `<td>${stat.totalSub} таск</td>`+
+         `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
+         `<td>`+
+         `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; background:${openSub > 0 ? 'var(--red-bg)' : 'transparent'};">`+
+         `${openSub}${popoverHtml}`+
+         `</div>`+
+         `</td>`+
+         `<td>`+
+         `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
+         `<span class="stat-pct">${pct}%</span>`+
+         `</td>`+
+         `</tr>`;
+  });
+  
+  h += '</tbody></table>';
+  h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
+  projs().forEach(p=>{
+    const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
+    h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
+       '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
+       '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
+       '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
+       '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
+    (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
+    h+='</div></div>';
+  });
+  m.innerHTML=h+'</div></div>';
+}
 
-  window.submitProject = function(){
-    const id=(($('m_id')?$('m_id').value:'').trim().toLowerCase());const name=(($('m_name')?$('m_name').value:'').trim());const local=(($('m_local')?$('m_local').value:'').trim());
-    const type=$('m_type')?$('m_type').value:'customer';const desc=(($('m_desc')?$('m_desc').value:'').trim());const tagsInp=$('m_tags')?$('m_tags').value:'';
-    if(!id||!name){alert('ID and Name required.');return;}
-    const tags=tagsInp.split(',').map(t=>t.trim()).filter(t=>t);
-    if(!window.D.projects)window.D.projects={};window.D.projects[id]={id,name,local,type,status:'planned',desc,tags};
-    window.ui.sel=id;window.ui.gview='project';window.save();window.closeModal();window.render();
+/* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
+window.goToTask = function(pid) {
+  window.ui.sel = pid;
+  window.ui.gview = 'project';
+  window.ui.tab = 'tasks';
+  window.ui.statusMenu = false;
+  window.render();
+}
+
+function renderEcosystem(m){
+  let h='<div class="ghdr"><div class="gtitle">System Ecosystem Mapping</div><div class="gsub">Interactive architectural dependencies and system relations</div></div>'+
+        '<div class="filter-bar"><span class="tlbl" style="line-height:22px">Filter Relations:</span>'+
+        '<button class="fbtn'+(window.ui.roadFilter==='all'?' on':'')+'" onclick="setRoadFilter(\'all\')">All Connections ('+Object.keys(window.D.conns||{}).length+')</button>'+
+        '<button class="fbtn'+(window.ui.roadFilter==='active'?' on':'')+'" onclick="setRoadFilter(\'active\')">Active Core</button>'+
+        '<button class="fbtn'+(window.ui.roadFilter==='planned'?' on':'')+'" onclick="setRoadFilter(\'planned\')">Planned Triggers</button>'+
+        '</div><div class="eco-wrap" id="eco-wrap">'+
+        '<div class="eco-legend"><div class="eco-legend-title">Interface Dictionary</div>'+
+        '<div class="eco-lr"><span class="csa">API</span> <span class="eco-legend-text">Sync Endpoint Request</span></div>'+
+        '<div class="eco-lr"><span class="csp">EVENT</span> <span class="eco-legend-text">Async Broker Message</span></div>'+
+        '</div><div class="eco-hint">Drag system capsules to structure infrastructure topologies</div>'+
+        '<svg id="eco-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1"></svg>'+
+        '<div id="eco-nodes" style="position:absolute;inset:0;z-index:2;pointer-events:auto"></div>'+
+        '<div class="eco-tooltip" id="eco-tt"></div>'+
+        '</div>';
+  m.innerHTML=h;
+  setTimeout(initEcosystemView,20);
+}
+
+function initEcosystemView(){
+  const container=$('eco-nodes');if(!container)return;
+  let h='';
+  projs().forEach(p=>{
+    const eco=(window.D.eco||{})[p.id]||window.DEF_ECO[p.id]||{x:100,y:100};
+    h+='<div class="opc" id="node-'+p.id+'" style="position:absolute;left:'+eco.x+'px;top:'+eco.y+'px;width:150px;margin:0;padding:8px 10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);user-select:none" onmousedown="dragNode(event,\''+p.id+'\')">'+
+       '<div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div>'+
+       '<div style="font-size:9px;color:var(--text3);margin-top:1px">'+esc(p.type).toUpperCase()+'</div>'+
+       '</div>';
+  });
+  container.innerHTML=h;
+  drawConnections();
+}
+
+function drawConnections(){
+  const svg=$('eco-svg');const wrap=$('eco-wrap');if(!svg||!wrap)return;
+  svg.innerHTML='';
+  const filter=window.ui.roadFilter;
+  Object.values(window.D.conns||{}).forEach(c=>{
+    if(filter==='active'&&c.st!=='active')return;
+    if(filter==='planned'&&c.st!=='planned')return;
+    const n1=$('node-'+c.fp);const n2=$('node-'+c.tp);
+    if(!n1||!n2)return;
+    const x1=n1.offsetLeft+(n1.offsetWidth/2);const y1=n1.offsetTop+(n1.offsetHeight/2);
+    const x2=n2.offsetLeft+(n2.offsetWidth/2);const y2=n2.offsetTop+(n2.offsetHeight/2);
+    const path=document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d",`M ${x1} ${y1} Q ${(x1+x2)/2} ${(y1+y2)/2 - 20} ${x2} ${y2}`);
+    path.setAttribute("stroke",c.rel==='api'?'var(--blue)':'var(--amber)');
+    path.setAttribute("stroke-width",c.st==='active'?'2':'1.5');
+    if(c.st==='planned')path.setAttribute("stroke-dasharray","4,4");
+    path.setAttribute("fill","none");path.setAttribute("style","cursor:pointer;pointer-events:auto");
+    path.onmouseenter=function(e){
+      const tt=$('eco-tt');tt.style.display='block';
+      let scopeTxt=c.fi?`Endpoint: ${c.fi}`:'Root Level Pipe';
+      tt.innerHTML=`<div class="eco-tt-name">${pName(c.fp)} &rarr; ${pName(c.tp)}</div>`+
+                   `<div class="eco-tt-type">${c.rel.toUpperCase()} Interface (${c.st})</div>`+
+                   `<div class="eco-tt-row"><span class="eco-tt-key">Scope:</span><span>${esc(scopeTxt)}</span></div>`+
+                   `<div class="eco-tt-row"><span class="eco-tt-key">Context:</span><span>${esc(c.desc||'No documentation.')}</span></div>`;
+      tt.style.left=(e.clientX-wrap.getBoundingClientRect().left+15)+'px';
+      tt.style.top=(e.clientY-wrap.getBoundingClientRect().top+15)+'px';
+    };
+    path.onmouseleave=function(){$('eco-tt').style.display='none';};
+    svg.appendChild(path);
+  });
+}
+
+window.dragNode = function(e,pid){
+  e.preventDefault();const n=$('node-'+pid);const wrap=$('eco-wrap');if(!n||!wrap)return;
+  const sx=e.clientX-n.offsetLeft;const sy=e.clientY-n.offsetTop;
+  document.onmousemove=function(ev){
+    let x=ev.clientX-sx;let y=ev.clientY-sy;
+    x=Math.max(10,Math.min(wrap.offsetWidth-n.offsetWidth-10,x));y=Math.max(10,Math.min(wrap.offsetHeight-n.offsetHeight-10,y));
+    n.style.left=x+'px';n.style.top=y+'px';drawConnections();
+    if(!window.D.eco)window.D.eco={};window.D.eco[pid]={x,y};
+  };
+  document.onmouseup=function(){document.onmousemove=null;document.onmouseup=null;window.save();};
+}
+
+function renderMatrix(m){
+  let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap Matrix</div><div class="gsub">Consolidated multi-product sprint lanes</div></div><div class="scrollbody">';
+  window.LANES.forEach(lane=>{
+    let items=[];projs().forEach(p=>{roadItems(p.id).filter(r=>r.lane===lane).forEach(r=>{items.push({p:p.id,txt:r.txt});});});
+    h+='<div class="lsec"><div class="lhdr"><span class="llbl" style="text-transform:uppercase">'+lane+'</span><span class="lcnt">'+items.length+'</span></div><div class="lgrid">';
+    if(items.length===0)h+='<div class="muted">No deliverables slotted.</div>';
+    else{
+      let grouped={};items.forEach(i=>{if(!grouped[i.p])grouped[i.p]=[];grouped[i.p].push(i.txt);});
+      Object.entries(grouped).forEach(([pid,txts])=>{
+        h+='<div class="lcard" onclick="selProj(\''+pid+'\')"><div class="lcard-n">'+esc(pName(pid))+'<span class="lcard-cnt">'+txts.length+'</span></div>';
+        txts.forEach(t=>h+='<div class="litem">'+esc(t)+'</div>');
+        h+='</div>';
+      });
+    }
+    h+='</div></div>';
+  });
+  h+='<div class="ov-sec" style="margin-top:20px;margin-bottom:8px">System Dependency Register</div>'+
+     '<div class="tbtn prim" style="margin-bottom:10px" onclick="window.ncSet(\'fp\',\'\');openModal(\'add-conn\',{})">+ Establish Relationship Link</div>'+
+     '<div id="conn-matrix-list">';
+  const conns=Object.values(window.D.conns||{});
+  if(conns.length===0)h+='<div class="muted">No structural interfaces defined.</div>';
+  else conns.forEach(c=>h+=window.connRow(c,true));
+  m.innerHTML=h+'</div></div>';
+}
+
+/* ── INTERACTIONS ── */
+window.selProj = function(id){window.ui.sel=id;window.ui.gview='project';window.ui.statusMenu=false;window.render();}
+window.selGview = function(v){window.ui.gview=v;window.ui.statusMenu=false;window.render();}
+window.selTab = function(t){window.ui.tab=t;window.render();}
+window.toggleTeam = function(){window.ui.showTeam=!window.ui.showTeam;window.render();}
+window.setRoadFilter = function(f){window.ui.roadFilter=f;window.render();}
+window.toggleSmenu = function(e){e.stopPropagation();window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
+function closeSmenu(){window.ui.statusMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
+window.setProjStatus = function(pid,st){
+  if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
+}
+
+/* ── MUTATIONS ── */
+window.addTask = function(pid){
+  const inp=$('t_inp');const txt=(inp?inp.value:'').trim();if(!txt)return;
+  const tagVal=$('t_tag')?$('t_tag').value:'';const id='t'+window.uid();
+  const now = new Date();
+  const timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  if(!window.D.tasks)window.D.tasks={};
+  window.D.tasks[id]={id,p:pid,txt,done:false,tag:tagVal,u:window.currentUser,ts:timeStr};inp.value='';window.save();window.render();
+}
+window.toggleTask = function(id){
+  if(window.D.tasks[id]){window.D.tasks[id].done=!window.D.tasks[id].done;window.save();window.render();}
+}
+window.delTask = function(id){
+  if(window.D.tasks[id]){delete window.D.tasks[id];window.save();window.render();}
+}
+window.addRoad = function(pid,lane){
+  const inp=$('ri_'+lane);const txt=(inp?inp.value:'').trim();if(!txt)return;
+  const id='r'+window.uid();if(!window.D.road)window.D.road={};
+  window.D.road[id]={id,p:pid,lane,txt};inp.value='';window.save();window.render();
+}
+window.delRoad = function(id){
+  if(window.D.road[id]){delete window.D.road[id];window.save();window.render();}
+}
+window.addItem = function(kind){
+  const inp=$('fi_inp');const name=(inp?inp.value:'').trim();if(!name)return;
+  const pid=window.ui.sel;if(!window.D.pmeta)window.D.pmeta={};if(!window.D.pmeta[pid])window.D.pmeta[pid]={leader:'',devs:[],items:[]};
+  if(!window.D.pmeta[pid].items)window.D.pmeta[pid].items=[];
+  window.D.pmeta[pid].items.push({id:'i'+window.uid(),name,kind});inp.value='';window.save();window.render();
+}
+window.removeItem = function(id){
+  const pid=window.ui.sel;const meta=window.D.pmeta[pid];if(meta&&meta.items){
+    meta.items=meta.items.filter(i=>i.id!==id);window.save();window.render();
   }
-  window.submitDelProject = function(pid){
-    if(window.D.projects[pid])delete window.D.projects[pid];
-    Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid)delete window.D.tasks[t.id];});
-    Object.values(window.D.road||{}).forEach(r=>{if(r.p===pid)delete window.D.road[r.id];});
-    Object.values(window.D.conns||{}).forEach(c=>{if(c.fp===pid||c.tp===pid)delete window.D.conns[c.id];});
-    if(window.D.pmeta&&window.D.pmeta[pid])delete window.D.pmeta[pid];
-    if(window.D.eco&&window.D.eco[pid])delete window.D.eco[pid];
-    if(window.ui.sel===pid)window.ui.sel=window.projs().length?window.projs()[0].id:null;
-    window.ui.gview='overview';window.save();window.closeModal();window.render();
+}
+window.setLeader = function(val){
+  const pid=window.ui.sel;if(!window.D.pmeta)window.D.pmeta={};if(!window.D.pmeta[pid])window.D.pmeta[pid]={leader:'',devs:[],items:[]};
+  window.D.pmeta[pid].leader=val;window.save();window.render();
+}
+window.addDev = function(val){
+  const pid=window.ui.sel;if(!window.D.pmeta)window.D.pmeta={};if(!window.D.pmeta[pid])window.D.pmeta[pid]={leader:'',devs:[],items:[]};
+  if(!window.D.pmeta[pid].devs)window.D.pmeta[pid].devs=[];
+  if(!window.D.pmeta[pid].devs.includes(val))window.D.pmeta[pid].devs.push(val);window.save();window.render();
+}
+window.removeDev = function(idx){
+  const pid=window.ui.sel;const meta=window.D.pmeta[pid];if(meta&&meta.devs){
+    meta.devs.splice(idx,1);window.save();window.render();
   }
-  window.submitReset = function(){
-    window.D = defaultData();window.save();window.closeModal();window.render();
+}
+
+/* ── INTERFACE REGISTER CODES ── */
+function renderProjectConns(p){
+  let h='<div class="ov-sec">System Interfaces Registry</div><div id="p-conn-list">';
+  const list=pConns(p.id);
+  if(list.length===0)h+='<div class="muted">No structural connections map to this system root.</div>';
+  else list.forEach(c=>h+=window.connRow(c,false));
+  h+='</div><div class="add-conn-form">'+
+     '<div class="ov-sec" style="margin-bottom:8px;font-size:10px">Map New Interface Pipeline Link</div>'+
+     '<div class="acr"><span class="tlbl">From:</span><select id="nc_fp" onchange="window.ncSet(\'fp\',this.value)"><option value="'+p.id+'">'+p.name+'</option></select>'+
+     '<span class="tlbl">Pipe Feature:</span><select id="nc_fi"></select></div>'+
+     '<div class="acr"><span class="tlbl">Target System (To):</span><select id="nc_tp" onchange="window.ncSet(\'tp\',this.value)"><option value="">-- Select Target --</option>';
+  projs().forEach(pr=>{if(pr.id!==p.id)h+='<option value="'+pr.id+'">'+pr.name+'</option>';});
+  h+='</select></div><div class="acr"><span class="tlbl">Protocol Type:</span><div class="stog">'+
+     '<button id="stog-api" class="on" onclick="window.ncSetRel(\'api\')">Synchronous API</button>'+
+     '<button id="stog-event" onclick="window.ncSetRel(\'event\')">Event Pub/Sub</button>'+
+     '</div><span class="tlbl" style="margin-left:8px">Lifecycle:</span><div class="stog">'+
+     '<button id="stog-active" class="on" onclick="window.ncSetSt(\'active\')">Active Core</button>'+
+     '<button id="stog-planned" onclick="window.ncSetSt(\'planned\')">Planned Pipe</button>'+
+     '</div></div><div class="acr" style="margin-bottom:0"><input type="text" id="nc_desc" placeholder="Operational payload context..." style="flex:1">'+
+     '<button class="primary" onclick="window.addConnSubmit()">Establish Link Interface</button></div></div>';
+  setTimeout(window.refreshNcFeatures,10);
+  return h;
+}
+
+window.connRow = function(c,showAllNames){
+  const t1=showAllNames?pName(c.fp):'This Subsystem';const t2=pName(c.tp);
+  const ftxt=c.fi?` &middot; <span class="citem" style="font-weight:500">${esc(c.fi)}</span>`:'';
+  const rBdg=c.rel==='api'?'<span class="csa">API</span>':'<span class="csp">EVENT</span>';
+  const sBdg=c.st==='active'?'<span class="mchip" style="font-size:9px;padding:1px 5px;background:var(--green-bg);color:var(--green-text);border:none">Active</span>':'<span class="mchip" style="font-size:9px;padding:1px 5px;background:var(--amber-bg);color:var(--amber-text);border:none">Planned</span>';
+  return '<div class="conn-row">'+
+         '<span class="cproj">'+esc(t1)+'</span>'+ftxt+' <span class="carr">&rarr;</span> <span class="cproj">'+esc(t2)+'</span>'+
+         '<div style="display:flex;gap:4px;margin-left:8px">'+rBdg+sBdg+'</div>'+
+         '<div style="width:100%;font-size:11px;color:var(--text3);margin-top:3px;padding-left:4px">'+esc(c.desc||'No implementation description.')+'</div>'+
+         '<button class="cdel" onclick="window.delConn(\''+c.id+'\')">&#10005;</button>'+
+         '</div>';
+}
+window.ncSet = function(k,v){window.ui.nc[k]=v;if(k==='fp')window.refreshNcFeatures();}
+window.ncSetRel = function(r){window.ui.nc.rel=r;$('stog-api').className=r==='api'?'on':'';$('stog-event').className=r==='event'?'on':'';}
+window.ncSetSt = function(s){window.ui.nc.st=s;$('stog-active').className=s==='active'?'on':'';$('stog-planned').className=s==='planned'?'on':'';}
+window.refreshNcFeatures = function(){
+  const sel=$('nc_fi');if(!sel)return;
+  let h='<option value="">Entire System Package Node</option>';
+  const fp=window.ui.nc.fp||window.ui.sel;
+  getItems(fp).forEach(i=>h+='<option value="'+i.name+'">'+i.name+' ('+i.kind+')</option>');
+  sel.innerHTML=h;
+}
+window.addConnSubmit = function(){
+  const fp=window.ui.nc.fp||window.ui.sel;const tp=$('nc_tp')?$('nc_tp').value:'';if(!fp||!tp){alert('Target downstream node required.');return;}
+  const fi=$('nc_fi')?$('nc_fi').value:'';const desc=$('nc_desc')?$('nc_desc').value:'';
+  const id='c'+window.uid();if(!window.D.conns)window.D.conns={};
+  window.D.conns[id]={id,fp,tp,fi,rel:window.ui.nc.rel,st:window.ui.nc.st,desc};
+  if($('nc_desc'))$('nc_desc').value='';window.save();window.render();
+}
+window.delConn = function(id){
+  if(window.D.conns[id]){delete window.D.conns[id];window.save();window.render();}
+}
+
+/* ── MODAL UTILS ── */
+window.openModal = function(k,opts){
+  window.ui.modal={k,opts};if(k==='add-project')window.mFormState={name:'',local:'',type:'customer',status:'progress',desc:'',tags:[]};
+  const m=$('modal-container');m.style.display='flex';
+  m.innerHTML='<div class="modal-overlay"><div class="modal-bg" onclick="window.closeModal()"></div><div class="modal-box" id="m-box"></div></div>';
+  const b=$('m-box');
+  if(k==='add-project'){
+    b.innerHTML='<div class="modal-hdr"><div class="modal-title">Initialize Architecture Node</div><div class="modal-sub">Spin up a new subsystem micro-index</div></div>'+
+       '<div class="modal-body">'+
+       '<div class="mfld"><label>System Blueprint Identifier (Slug/ID)</label><input type="text" id="m_id" placeholder="e.g. omnipay, core-ledger"></div>'+
+       '<div class="mfld"><label>Core Product Name</label><input type="text" id="m_name" placeholder="e.g. OmniPay Gateway"></div>'+
+       '<div class="mfld"><label>Local Custom Localization Label</label><input type="text" id="m_local" placeholder="e.g. ОмниПэй"></div>'+
+       '<div class="mfld"><label>System Architecture Classification</label><select id="m_type"><option value="customer">Customer Facing App</option><option value="b2b">Merchant / B2B Gateway</option><option value="internal">Internal Infrastructure Operations</option></select></div>'+
+       '<div class="mfld"><label>Operational Functional Scope Summary</label><textarea id="m_desc" placeholder="Document pipeline capabilities..."></textarea></div>'+
+       '<div class="mfld"><label>Subsystem Labels / Tags (Comma-separated)</label><input type="text" id="m_tags" placeholder="Core, API, Mobile, Security"></div>'+
+       '</div><div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="submitProject()">Create Index</button></div>';
+  }else if(k==='del-project'){
+    b.className='modal-box sm';b.innerHTML='<div class="modal-hdr"><div class="modal-title">Purge System Node</div></div>'+
+       '<div class="modal-body"><div class="del-warn">Are you sure you want to permanently delete <strong>'+esc(pName(opts.pid))+'</strong>? This action wipes all associated scope tickets, dependencies, and timelines.</div></div>'+
+       '<div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn danger" onclick="submitDelProject(\''+opts.pid+'\')">Confirm Wipe</button></div>';
+  }else if(k==='add-conn'){
+    b.className='modal-box';let p1Opts='<option value="">-- Select System --</option>';let p2Opts='<option value="">-- Select System --</option>';
+    projs().forEach(p=>{p1Opts+='<option value="'+p.id+'"'+(window.ui.nc.fp===p.id?' selected':'')+'>'+p.name+'</option>';p2Opts+='<option value="'+p.id+'"'+(window.ui.nc.tp===p.id?' selected':'')+'>'+p.name+'</option>';});
+    let f1Opts='<option value="">Entire Product Root</option>';if(window.ui.nc.fp)getItems(window.ui.nc.fp).forEach(i=>f1Opts+='<option value="'+i.name+'">'+i.name+'</option>');
+    b.innerHTML='<div class="modal-hdr"><div class="modal-title">Establish Relationship Link Interface</div></div>'+
+       '<div class="modal-body">'+
+       '<div class="mfld"><label>Source Subsystem (From)</label><select onchange="window.ncSet(\'fp\',this.value);openModal(\'add-conn\',{})">'+p1Opts+'</select></div>'+
+       '<div class="mfld"><label>Source Functional Feature</label><select id="m_nc_fi">'+f1Opts+'</select></div>'+
+       '<div class="mfld"><label>Downstream Target System (To)</label><select id="m_nc_tp">'+p2Opts+'</select></div>'+
+       '<div class="mfld"><label>Protocol Type</label><select id="m_nc_rel"><option value="api">Synchronous API</option><option value="event">Event Broker Pub/Sub</option></select></div>'+
+       '<div class="mfld"><label>Lifecycle</label><select id="m_nc_st"><option value="active">Active Core</option><option value="planned">Planned Pipe</option></select></div>'+
+       '<div class="mfld"><label>Operational Payload Context</label><input type="text" id="m_nc_desc" placeholder="e.g. Sync user auth validation tokens"></div>'+
+       '</div><div class="modal-foot"><button class="mbtn" onclick="window.closeModal()">Cancel</button><button class="mbtn prim" onclick="submitMatrixConn()">Establish Mapping Connection</button></div>';
   }
+}
+window.closeModal = function(){$('modal-container').style.display='none';window.ui.modal=null;}
+window.submitProject = function(){
+  const id=(($('m_id')?$('m_id').value:'').trim().toLowerCase());const name=(($('m_name')?$('m_name').value:'').trim());const local=(($('m_local')?$('m_local').value:'').trim());
+  const type=$('m_type')?$('m_type').value:'customer';const desc=(($('m_desc')?$('m_desc').value:'').trim());const tagsInp=$('m_tags')?$('m_tags').value:'';
+  if(!id||!name){alert('ID and Name required.');return;}
+  const tags=tagsInp.split(',').map(t=>t.trim()).filter(t=>t);
+  if(!window.D.projects)window.D.projects={};window.D.projects[id]={id,name,local,type,status:'planned',desc,tags};
+  window.ui.sel=id;window.ui.gview='project';window.save();window.closeModal();window.render();
+}
+window.submitDelProject = function(pid){
+  if(window.D.projects[pid])delete window.D.projects[pid];
+  Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid)delete window.D.tasks[t.id];});
+  Object.values(window.D.road||{}).forEach(r=>{if(r.p===pid)delete window.D.road[r.id];});
+  Object.values(window.D.conns||{}).forEach(c=>{if(c.fp===pid||c.tp===pid)delete window.D.conns[c.id];});
+  if(window.D.pmeta&&window.D.pmeta[pid])delete window.D.pmeta[pid];
+  if(window.D.eco&&window.D.eco[pid])delete window.D.eco[pid];
+  window.ui.sel=window.projs().length>0?window.projs()[0].id:null;window.save();window.closeModal();window.render();
+}
+window.submitMatrixConn = function(){
+  const fp=window.ui.nc.fp;const tp=$('m_nc_tp')?$('m_nc_tp').value:'';if(!fp||!tp){alert('Both nodes required.');return;}
+  const fi=$('m_nc_fi')?$('m_nc_fi').value:'';const rel=$('m_nc_rel')?$('m_nc_rel').value:'api';
+  const st=$('m_nc_st')?$('m_nc_st').value:'active';const desc=$('m_nc_desc')?$('m_nc_desc').value:'';
+  const id='c'+window.uid();if(!window.D.conns)window.D.conns={};
+  window.D.conns[id]={id,fp,tp,fi,rel,st,desc};window.save();window.closeModal();window.render();
+}
+
+/* ── EXPORT DATA (PASSWORD PROTECTED: 425879) ── */
+window.exportData = function() {
+  const code = prompt("Нэвтрэх кодоо оруулна уу (Export JSON):");
+  if (code !== "425879") {
+    alert("Нууц код буруу байна! Үйлдэл цуцлагдлаа.");
+    return;
+  }
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.D, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `nbfi_product_os_backup_${Date.now()}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
+/* ── IMPORT DATA (PASSWORD PROTECTED: 425879) ── */
+window.importData = function(event) {
+  const code = prompt("Нэвтрэх кодоо оруулна уу (Import JSON):");
+  if (code !== "425879") {
+    alert("Нууц код буруу байна! Үйлдэл цуцлагдлаа.");
+    event.target.value = '';
+    return;
+  }
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (parsed && parsed.projects) {
+        window.D = parsed;
+        window.save();
+        window.render();
+        alert("Өгөгдлийг амжилттай импортлолоо!");
+      } else {
+        alert("Алдаа: Буруу JSON бүтэц байна.");
+      }
+    } catch(err) {
+      alert("JSON файлыг уншихад алдаа гарлаа.");
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
 </script>
 </body>
 </html>
