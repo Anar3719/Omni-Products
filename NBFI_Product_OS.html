@@ -1,26 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBFI · Product OS</title>
     <style>
-        /* CSS үндсэн загварууд */
-        :root { --bg:#fff; --bg2:#f7f7f5; --bg3:#f0efe9; --text:#1a1a18; --text2:#5a5a56; --text3:#9a9a94; --border:rgba(0,0,0,0.09); --blue:#378ADD; --r:8px; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); height: 100vh; overflow: hidden; }
-
-        /* Login Overlay */
-        #auth-overlay { position: fixed; inset: 0; background: var(--bg3); z-index: 99999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; text-align: center; border: 1px solid var(--border); }
-        .auth-card input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; }
-        .auth-card button { width: 100%; padding: 12px; background: var(--blue); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-
-        /* Аппликейшны үндсэн хэсэг */
-        #app-wrapper { display: none; height: 100vh; width: 100%; }
-        .app { display: flex; flex-direction: column; height: 100vh; }
+        /* Login Overlay загвар */
+        #auth-overlay { position: fixed; inset: 0; background: #f0efe9; z-index: 99999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+        .auth-card input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .auth-card button { width: 100%; padding: 12px; background: #378ADD; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+        #app-wrapper { display: none; }
+    </style>
+    <style>
+        /* Таны анхны бүх CSS энд орно */
     </style>
 </head>
 <body>
@@ -28,7 +23,6 @@
     <div id="auth-overlay">
         <div class="auth-card">
             <h2>NBFI Login</h2>
-            <br>
             <input type="email" id="email-input" placeholder="Email">
             <input type="password" id="pass-input" placeholder="Password">
             <button onclick="handleLogin()">Sign In</button>
@@ -36,11 +30,7 @@
     </div>
 
     <div id="app-wrapper">
-        <div class="app">
-            <header class="topbar"><h1>NBFI Product OS</h1></header>
-            <main>Аппликейшн ачаалагдлаа...</main>
         </div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -49,41 +39,36 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
             authDomain: "omni-products.firebaseapp.com",
+            databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
             projectId: "omni-products",
             storageBucket: "omni-products.firebasestorage.app",
-            appId: "1:879805024712:web:9b694019cf8388953998fd"
+            messagingSenderId: "879805024712",
+            appId: "1:879805024712:web:9b694019cf8388953998fd",
+            measurementId: "G-KQND2ECQ33"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Login хийх функц
         window.handleLogin = async () => {
             const email = document.getElementById('email-input').value;
             const pass = document.getElementById('pass-input').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) {
-                alert("Нэвтрэхэд алдаа гарлаа: " + e.message);
-            }
+            try { await signInWithEmailAndPassword(auth, email, pass); }
+            catch (e) { alert("Алдаа: " + e.message); }
         };
 
-        // Нэвтэрсэн эсэхийг шалгах
         onAuthStateChanged(auth, (user) => {
-            const authOverlay = document.getElementById('auth-overlay');
-            const appWrapper = document.getElementById('app-wrapper');
-            
             if (user) {
-                authOverlay.style.display = 'none';
-                appWrapper.style.display = 'block';
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('app-wrapper').style.display = 'block';
             } else {
-                authOverlay.style.display = 'flex';
-                appWrapper.style.display = 'none';
+                document.getElementById('auth-overlay').style.display = 'flex';
+                document.getElementById('app-wrapper').style.display = 'none';
             }
         });
     </script>
 </body>
-</html>
+</html>  
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -371,75 +356,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .team-kpi-subtitle b { color: var(--text); }
 .team-kpi-subtitle span.done-txt { color: var(--green); font-weight: 600; }
 .team-kpi-subtitle span.open-txt { color: var(--red); font-weight: 600; }
-  <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBFI · Product OS</title>
-    <style>
-        /* Login Overlay загвар */
-        #auth-overlay { position: fixed; inset: 0; background: #f0efe9; z-index: 99999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; text-align: center; }
-        .auth-card input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .auth-card button { width: 100%; padding: 12px; background: #378ADD; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-        #app-wrapper { display: none; }
-    </style>
-    <style>
-        /* Таны анхны бүх CSS энд орно */
-    </style>
-</head>
-<body>
-
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <h2>NBFI Login</h2>
-            <input type="email" id="email-input" placeholder="Email">
-            <input type="password" id="pass-input" placeholder="Password">
-            <button onclick="handleLogin()">Sign In</button>
-        </div>
-    </div>
-
-    <div id="app-wrapper">
-        </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
-            authDomain: "omni-products.firebaseapp.com",
-            databaseURL: "https://omni-products-default-rtdb.firebaseio.com",
-            projectId: "omni-products",
-            storageBucket: "omni-products.firebasestorage.app",
-            messagingSenderId: "879805024712",
-            appId: "1:879805024712:web:9b694019cf8388953998fd",
-            measurementId: "G-KQND2ECQ33"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        window.handleLogin = async () => {
-            const email = document.getElementById('email-input').value;
-            const pass = document.getElementById('pass-input').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); }
-            catch (e) { alert("Алдаа: " + e.message); }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('app-wrapper').style.display = 'block';
-            } else {
-                document.getElementById('auth-overlay').style.display = 'flex';
-                document.getElementById('app-wrapper').style.display = 'none';
-            }
-        });
-    </script>
-</body>
-</html>
 </style>
 </head>
 <body>
