@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- AUTH: Firebase Email + Google Sign-In -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -288,8 +288,130 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .team-kpi-subtitle span.done-txt { color: var(--green); font-weight: 600; }
 .team-kpi-subtitle span.open-txt { color: var(--red); font-weight: 600; }
 </style>
+<style>
+/* ── AUTH OVERLAY ── */
+#auth-overlay{position:fixed;inset:0;background:var(--bg3);z-index:99999;display:flex;align-items:center;justify-content:center;}
+.auth-card{background:var(--bg);border:1px solid var(--border2);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.12);width:360px;padding:36px 32px;text-align:center;}
+.auth-logo{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.auth-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.auth-sub{font-size:13px;color:var(--text3);margin-bottom:24px;}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text3);font-size:12px;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-inp{width:100%;padding:11px 13px;border:1px solid var(--border2);border-radius:8px;font-size:14px;background:var(--bg2);color:var(--text);outline:none;margin-bottom:10px;transition:border .15s;}
+.auth-inp:focus{border-color:var(--blue);}
+.auth-btn-email{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .15s;}
+.auth-btn-email:hover{opacity:.88;}
+.auth-btn-google{width:100%;padding:11px;background:var(--bg);color:var(--text);border:1px solid var(--border2);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;}
+.auth-btn-google:hover{background:var(--bg2);}
+.auth-google-icon{width:18px;height:18px;flex-shrink:0;}
+.auth-error{font-size:12px;color:var(--red);margin-top:4px;min-height:16px;}
+#app-wrapper{display:none;height:100vh;width:100%;}
+</style>
 </head>
 <body>
+
+<!-- ══ AUTH OVERLAY ══ -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">NBFI</div>
+    <div class="auth-title">Product OS</div>
+    <div class="auth-sub">Нэвтэрч үргэлжлүүлнэ үү</div>
+
+    <!-- Google Sign-In -->
+    <button class="auth-btn-google" onclick="handleGoogleLogin()">
+      <svg class="auth-google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Gmail / Google-ээр нэвтрэх
+    </button>
+
+    <div class="auth-divider">эсвэл</div>
+
+    <!-- Email / Password -->
+    <input class="auth-inp" type="email" id="auth-email" placeholder="И-мэйл хаяг" autocomplete="email">
+    <input class="auth-inp" type="password" id="auth-pass" placeholder="Нууц үг" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleEmailLogin()">
+    <div class="auth-error" id="auth-err"></div>
+    <button class="auth-btn-email" onclick="handleEmailLogin()">Нэвтрэх</button>
+  </div>
+</div>
+
+<!-- ══ FIREBASE AUTH SCRIPT ══ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
+    authDomain: "omni-products.firebaseapp.com",
+    projectId: "omni-products",
+    storageBucket: "omni-products.firebasestorage.app",
+    messagingSenderId: "879805024712",
+    appId: "1:879805024712:web:9b694019cf8388953998fd"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const auth = getAuth(fbApp);
+  const googleProvider = new GoogleAuthProvider();
+
+  function showErr(msg) {
+    const el = document.getElementById('auth-err');
+    if (el) el.textContent = msg;
+  }
+
+  window.handleGoogleLogin = async () => {
+    showErr('');
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (e) {
+      if (e.code === 'auth/popup-closed-by-user') return;
+      showErr('Google нэвтрэлт амжилтгүй: ' + (e.message || e.code));
+    }
+  };
+
+  window.handleEmailLogin = async () => {
+    showErr('');
+    const email = (document.getElementById('auth-email')?.value || '').trim();
+    const pass = document.getElementById('auth-pass')?.value || '';
+    if (!email || !pass) { showErr('И-мэйл болон нууц үгээ оруулна уу.'); return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+      const msgs = {
+        'auth/user-not-found': 'Бүртгэлтэй хэрэглэгч олдсонгүй.',
+        'auth/wrong-password': 'Нууц үг буруу байна.',
+        'auth/invalid-email': 'И-мэйл хаяг буруу байна.',
+        'auth/too-many-requests': 'Хэт олон удаа оролдлоо. Түр хүлээнэ үү.',
+        'auth/invalid-credential': 'И-мэйл эсвэл нууц үг буруу байна.',
+      };
+      showErr(msgs[e.code] || 'Алдаа: ' + e.message);
+    }
+  };
+
+  window.handleLogout = () => signOut(auth);
+
+  onAuthStateChanged(auth, (user) => {
+    const overlay = document.getElementById('auth-overlay');
+    const wrapper = document.getElementById('app-wrapper');
+    if (user) {
+      if (overlay) overlay.style.display = 'none';
+      if (wrapper) { wrapper.style.display = 'block'; }
+      // Нэвтэрсэн хэрэглэгчийн нэрийг topbar-д харуулах
+      const nameEl = document.getElementById('auth-user-name');
+      if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
+      const photoEl = document.getElementById('auth-user-photo');
+      if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.style.display = 'inline-block'; }
+    } else {
+      if (overlay) overlay.style.display = 'flex';
+      if (wrapper) wrapper.style.display = 'none';
+    }
+  });
+</script>
+
+<!-- ══ APP WRAPPER ══ -->
+<div id="app-wrapper">
 <div class="app">
   <div class="topbar">
     <span class="brand">NBFI <span>&middot; Product OS</span></span>
@@ -307,6 +429,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="tbtn" onclick="exportData()">&#8659; Export JSON</button>
     <button class="tbtn" style="background: var(--bg3); font-weight: 600;" onclick="document.getElementById('json-file-input').click()">&#8657; Import JSON</button>
     <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="importData(event)">
+    <span style="color:var(--border2)">|</span>
+    <img id="auth-user-photo" src="" alt="" style="display:none;width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--border2);">
+    <span id="auth-user-name" style="font-size:12px;color:var(--text2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <button class="tbtn" onclick="handleLogout()" title="Гарах" style="color:var(--red);border-color:var(--red-bg);">&#8594; Гарах</button>
   </div>
   <div class="team-bar" id="team-bar" style="display:none"></div>
   <div class="layout">
@@ -981,5 +1107,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     window.D = defaultData();window.save();window.closeModal();window.render();
   }
 </script>
+</div><!-- /#app-wrapper -->
 </body>
 </html>
