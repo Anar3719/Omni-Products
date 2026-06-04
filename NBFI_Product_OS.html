@@ -1,67 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBFI · Product OS</title>
-    <style>
-        #auth-overlay { position: fixed; inset: 0; background: #f0efe9; z-index: 99999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; text-align: center; }
-        .google-btn { width: 100%; padding: 12px; background: #4285F4; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        #app-wrapper { display: none; }
-    </style>
-    <style>
-        /* (Таны үндсэн CSS бүхэлдээ энд үргэлжилнэ) */
-    </style>
-</head>
-<body>
-
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <h2>NBFI Login</h2>
-            <button class="google-btn" onclick="handleLogin()">Google-ээр нэвтрэх</button>
-        </div>
-    </div>
-
-    <div id="app-wrapper">
-        <button onclick="handleLogout()">Гарах</button>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        // АНХААР: Өөрийн мэдээллээр солих!
-        const firebaseConfig = {
-            apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
-            authDomain: "omni-products.firebaseapp.com",
-            projectId: "omni-products",
-            storageBucket: "omni-products.firebasestorage.app",
-            messagingSenderId: "879805024712",
-            appId: "1:879805024712:web:9b694019cf8388953998fd"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        window.handleLogin = async () => {
-            try { await signInWithPopup(auth, provider); }
-            catch (e) { alert("Алдаа: " + e.message); }
-        };
-
-        window.handleLogout = () => signOut(auth);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('app-wrapper').style.display = 'block';
-            } else {
-                document.getElementById('auth-overlay').style.display = 'flex';
-                document.getElementById('app-wrapper').style.display = 'none';
-            }
-        });
-    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NBFI · Product OS</title>
