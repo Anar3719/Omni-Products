@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NBFI · Product OS</title>
-<link rel="icon" type="image/png" href="DevTeamLogo.png">
 <style>
 :root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--green:#639922;--green-bg:#EAF3DE;--green-text:#3B6D11;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#A32D2D;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#854F0B;--r:8px;--rl:12px}
 @media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--text:#f0efe9;--text2:#a0a09a;--text3:#68685f;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--green-bg:#1a2e0a;--green-text:#97C459;--blue-bg:#0a1e35;--blue-text:#85B7EB;--red-bg:#2e0a0a;--red-text:#F09595;--amber-bg:#2e1e0a;--amber-text:#EF9F27}}
@@ -314,7 +313,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ══ AUTH OVERLAY ══ -->
 <div id="auth-overlay">
   <div class="auth-card">
-    <div class="auth-logo"><img src="DevTeamLogo.png" alt="NBFI Logo" style="height:54px;width:auto;object-fit:contain;margin-bottom:2px;"></div>
+    <div class="auth-logo">NBFI</div>
     <div class="auth-title">Product OS</div>
     <div class="auth-sub">Нэвтэрч үргэлжлүүлнэ үү</div>
 
@@ -343,7 +342,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="app-wrapper">
 <div class="app">
   <div class="topbar">
-    <span class="brand"><img src="DevTeamLogo.png" alt="NBFI" style="height:22px;width:auto;object-fit:contain;vertical-align:middle;"> <span>&middot; Product OS</span></span>
+    <span class="brand">NBFI <span>&middot; Product OS</span></span>
     <div class="spacer"></div>
     <span style="font-size:12px; color:var(--text2); font-weight:600;">Active User:</span>
     <select id="current-user" class="user-selector" onchange="window.changeUser(this.value)">
@@ -366,7 +365,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="team-bar" id="team-bar" style="display:none"></div>
   <div class="layout">
     <div class="sb">
-      <div class="sb-head"><div class="sb-org"><img src="DevTeamLogo.png" alt="NBFI" style="height:18px;width:auto;object-fit:contain;vertical-align:middle;opacity:.7;"></div><div class="sb-title">Product OS</div></div>
+      <div class="sb-head"><div class="sb-org">NBFI</div><div class="sb-title">Product OS</div></div>
       <div class="sb-scroll" id="sb-scroll"></div>
       <div class="sb-foot" id="sb-foot"></div>
     </div>
@@ -384,6 +383,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
   import { getAuth, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
@@ -400,6 +400,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   const database = getDatabase(app);
   const analytics = getAnalytics(app);
   const dbRef = ref(database, 'product_os_data');
+  const db = getFirestore(app);
 
   /* ── AUTH SETUP ── */
   const auth = getAuth(app);
@@ -441,16 +442,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   window.handleLogout = () => signOut(auth);
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     const overlay = document.getElementById('auth-overlay');
     const wrapper = document.getElementById('app-wrapper');
     if (user) {
-      if (overlay) overlay.style.display = 'none';
-      if (wrapper) wrapper.style.display = 'block';
-      const nameEl = document.getElementById('auth-user-name');
-      if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
-      const photoEl = document.getElementById('auth-user-photo');
-      if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.style.display = 'inline-block'; }
+      // Firestore-оос зөвшөөрөгдсөн email жагсаалт шалгах
+      try {
+        const snap = await getDoc(doc(db, 'allowed_users', 'list'));
+        const allowed = snap.exists() ? (snap.data().emails || []) : [];
+        if (allowed.includes(user.email)) {
+          // ✅ Зөвшөөрөгдсөн хэрэглэгч
+          if (overlay) overlay.style.display = 'none';
+          if (wrapper) wrapper.style.display = 'block';
+          const nameEl = document.getElementById('auth-user-name');
+          if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
+          const photoEl = document.getElementById('auth-user-photo');
+          if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.style.display = 'inline-block'; }
+        } else {
+          // ❌ Зөвшөөрөгдөөгүй хэрэглэгч — гаргах
+          await signOut(auth);
+          if (overlay) overlay.style.display = 'flex';
+          if (wrapper) wrapper.style.display = 'none';
+          showAuthErr('⛔ Таны бүртгэл (' + user.email + ') нэвтрэх эрхгүй байна.');
+        }
+      } catch (e) {
+        await signOut(auth);
+        showAuthErr('Шалгалтад алдаа гарлаа: ' + e.message);
+      }
     } else {
       if (overlay) overlay.style.display = 'flex';
       if (wrapper) wrapper.style.display = 'none';
