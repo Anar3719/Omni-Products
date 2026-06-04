@@ -338,78 +338,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- ══ FIREBASE AUTH SCRIPT ══ -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
-    authDomain: "omni-products.firebaseapp.com",
-    projectId: "omni-products",
-    storageBucket: "omni-products.firebasestorage.app",
-    messagingSenderId: "879805024712",
-    appId: "1:879805024712:web:9b694019cf8388953998fd"
-  };
-
-  const fbApp = initializeApp(firebaseConfig);
-  const auth = getAuth(fbApp);
-  const googleProvider = new GoogleAuthProvider();
-
-  function showErr(msg) {
-    const el = document.getElementById('auth-err');
-    if (el) el.textContent = msg;
-  }
-
-  window.handleGoogleLogin = async () => {
-    showErr('');
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (e) {
-      if (e.code === 'auth/popup-closed-by-user') return;
-      showErr('Google нэвтрэлт амжилтгүй: ' + (e.message || e.code));
-    }
-  };
-
-  window.handleEmailLogin = async () => {
-    showErr('');
-    const email = (document.getElementById('auth-email')?.value || '').trim();
-    const pass = document.getElementById('auth-pass')?.value || '';
-    if (!email || !pass) { showErr('И-мэйл болон нууц үгээ оруулна уу.'); return; }
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-      const msgs = {
-        'auth/user-not-found': 'Бүртгэлтэй хэрэглэгч олдсонгүй.',
-        'auth/wrong-password': 'Нууц үг буруу байна.',
-        'auth/invalid-email': 'И-мэйл хаяг буруу байна.',
-        'auth/too-many-requests': 'Хэт олон удаа оролдлоо. Түр хүлээнэ үү.',
-        'auth/invalid-credential': 'И-мэйл эсвэл нууц үг буруу байна.',
-      };
-      showErr(msgs[e.code] || 'Алдаа: ' + e.message);
-    }
-  };
-
-  window.handleLogout = () => signOut(auth);
-
-  onAuthStateChanged(auth, (user) => {
-    const overlay = document.getElementById('auth-overlay');
-    const wrapper = document.getElementById('app-wrapper');
-    if (user) {
-      if (overlay) overlay.style.display = 'none';
-      if (wrapper) { wrapper.style.display = 'block'; }
-      // Нэвтэрсэн хэрэглэгчийн нэрийг topbar-д харуулах
-      const nameEl = document.getElementById('auth-user-name');
-      if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
-      const photoEl = document.getElementById('auth-user-photo');
-      if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.style.display = 'inline-block'; }
-    } else {
-      if (overlay) overlay.style.display = 'flex';
-      if (wrapper) wrapper.style.display = 'none';
-    }
-  });
-</script>
-
 <!-- ══ APP WRAPPER ══ -->
 <div id="app-wrapper">
 <div class="app">
@@ -454,6 +382,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+  import { getAuth, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAshzmrzmBPPhADwrASmQQAUnTqdnD5MM4",
@@ -470,6 +399,62 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   const database = getDatabase(app);
   const analytics = getAnalytics(app);
   const dbRef = ref(database, 'product_os_data');
+
+  /* ── AUTH SETUP ── */
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  function showAuthErr(msg) {
+    const el = document.getElementById('auth-err');
+    if (el) el.textContent = msg;
+  }
+
+  window.handleGoogleLogin = async () => {
+    showAuthErr('');
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (e) {
+      if (e.code === 'auth/popup-closed-by-user') return;
+      showAuthErr('Google нэвтрэлт амжилтгүй: ' + (e.message || e.code));
+    }
+  };
+
+  window.handleEmailLogin = async () => {
+    showAuthErr('');
+    const email = (document.getElementById('auth-email')?.value || '').trim();
+    const pass = document.getElementById('auth-pass')?.value || '';
+    if (!email || !pass) { showAuthErr('И-мэйл болон нууц үгээ оруулна уу.'); return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+      const msgs = {
+        'auth/user-not-found': 'Бүртгэлтэй хэрэглэгч олдсонгүй.',
+        'auth/wrong-password': 'Нууц үг буруу байна.',
+        'auth/invalid-email': 'И-мэйл хаяг буруу байна.',
+        'auth/too-many-requests': 'Хэт олон удаа оролдлоо. Түр хүлээнэ үү.',
+        'auth/invalid-credential': 'И-мэйл эсвэл нууц үг буруу байна.',
+      };
+      showAuthErr(msgs[e.code] || 'Алдаа: ' + e.message);
+    }
+  };
+
+  window.handleLogout = () => signOut(auth);
+
+  onAuthStateChanged(auth, (user) => {
+    const overlay = document.getElementById('auth-overlay');
+    const wrapper = document.getElementById('app-wrapper');
+    if (user) {
+      if (overlay) overlay.style.display = 'none';
+      if (wrapper) wrapper.style.display = 'block';
+      const nameEl = document.getElementById('auth-user-name');
+      if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
+      const photoEl = document.getElementById('auth-user-photo');
+      if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.style.display = 'inline-block'; }
+    } else {
+      if (overlay) overlay.style.display = 'flex';
+      if (wrapper) wrapper.style.display = 'none';
+    }
+  });
 
   /* ── UTILS ── */
   window.$ = function(id){return document.getElementById(id);}
