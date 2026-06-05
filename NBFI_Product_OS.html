@@ -306,6 +306,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .auth-google-icon{width:18px;height:18px;flex-shrink:0;}
 .auth-error{font-size:12px;color:var(--red);margin-top:4px;min-height:16px;}
 #app-wrapper{display:none;height:100vh;width:100%;}
+
+/* ── REPORT STYLES ── */
+.report-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.report-member-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;padding:6px 14px;border:2px solid var(--border2);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;font-weight:500;transition:all .15s;}
+.report-member-btn:hover{border-color:var(--blue);color:var(--blue);}
+.report-member-btn.active{border-color:var(--blue);background:var(--blue-bg);color:var(--blue-text);font-weight:700;}
+.report-section{margin-bottom:18px;}
+.report-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.report-section-title .rs-badge{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;}
+.rs-inprog{background:var(--blue-bg);color:var(--blue-text);}
+.rs-done{background:var(--green-bg);color:var(--green-text);}
+.rs-todo{background:var(--amber-bg);color:var(--amber-text);}
+.report-row{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);margin-bottom:4px;}
+.report-row.inprog{border-left:3px solid var(--blue);}
+.report-row.done{border-left:3px solid var(--green);opacity:.75;}
+.report-row.todo{border-left:3px solid var(--amber);}
+.report-row-proj{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--text3);white-space:nowrap;}
+.report-row-txt{flex:1;font-size:13px;color:var(--text);}
+.report-row.done .report-row-txt{text-decoration:line-through;color:var(--text3);}
+.report-row-status{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;}
+.rrs-ip{background:var(--blue-bg);color:var(--blue-text);}
+.rrs-dn{background:var(--green-bg);color:var(--green-text);}
+.rrs-td{background:var(--amber-bg);color:var(--amber-text);}
+.report-row-date{font-size:11px;color:var(--text3);white-space:nowrap;}
+.report-empty{font-size:13px;color:var(--text3);padding:8px 0;}
+.report-summary-bar{display:flex;gap:12px;padding:12px 15px;background:var(--bg2);border-radius:var(--rl);border:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap;}
+.rsb-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rsb-val{font-size:22px;font-weight:700;line-height:1;}
+.rsb-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.rsb-val.blue{color:var(--blue);}
+.rsb-val.green{color:var(--green);}
+.rsb-val.amber{color:var(--amber);}
+.rsb-sep{width:1px;background:var(--border);align-self:stretch;}
+.ov-tabs{display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--border);}
+.ov-tab{padding:8px 15px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.ov-tab:hover{color:var(--text);}
+.ov-tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+/* lock icon on tasks not owned */
+.task-locked{font-size:11px;color:var(--text3);padding:2px 5px;background:var(--bg3);border-radius:4px;flex-shrink:0;}
+
 </style>
 </head>
 <body>
@@ -442,6 +482,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   window.handleLogout = () => signOut(auth);
 
+  /* ── EMAIL → MEMBER NAME MAP ── */
+  const EMAIL_TO_MEMBER = {
+    'khaliunaa@omnicapital.mn': 'Халиунаа',
+    'zulerden@omnicapital.mn': 'Зул-Эрдэнэ',
+    'anar@omnicapital.mn': 'Анар',
+    // Gmail-ийн хэрэгжүүлэлтэд тохируулна уу
+  };
+
   onAuthStateChanged(auth, async (user) => {
     const overlay = document.getElementById('auth-overlay');
     const wrapper = document.getElementById('app-wrapper');
@@ -458,6 +506,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
           const photoEl = document.getElementById('auth-user-photo');
           if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.style.display = 'inline-block'; }
+          
+          // Email-аас member нэр олж currentUser тохируулах
+          const mappedName = EMAIL_TO_MEMBER[user.email];
+          if (mappedName) {
+            window.currentUser = mappedName;
+            window.authUserEmail = user.email;
+            const sel = document.getElementById('current-user');
+            if (sel) sel.value = mappedName;
+          } else {
+            // Map байхгүй бол dropdown-оос сонгосон утгыг хэрэглэнэ
+            window.authUserEmail = user.email;
+          }
         } else {
           // ❌ Зөвшөөрөгдөөгүй хэрэглэгч — гаргах
           await signOut(auth);
@@ -470,10 +530,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         showAuthErr('Шалгалтад алдаа гарлаа: ' + e.message);
       }
     } else {
+      window.authUserEmail = null;
       if (overlay) overlay.style.display = 'flex';
       if (wrapper) wrapper.style.display = 'none';
     }
   });
+
+  /* ── OWNERSHIP CHECK ── */
+  window.canEditTask = function(task) {
+    // Таскийг нэмсэн хүн эсвэл admin л засаж болно
+    if (!task.by) return true; // хуучин таскуудад by байхгүй бол бүгд засаж болно
+    return task.by === window.currentUser;
+  }
 
   /* ── UTILS ── */
   window.$ = function(id){return document.getElementById(id);}
@@ -499,7 +567,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   /* ── STATE ── */
   window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
+  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
   window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
 
   /* ── DATA HELPERS ── */
@@ -685,12 +753,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     const ck=t.done?' ck':'';const dn=t.done?' dn':'';
     const createdBy = t.by ? esc(t.by) : 'Unknown';
     const createdAt = t.at ? esc(t.at) : 'N/A';
+    const canEdit = window.canEditTask(t);
     
-    return'<div class="titem"><div class="chk'+ck+'" onclick="toggleTask(\''+t.p+'\',\''+t.id+'\')"></div>'+
+    const chkHtml = canEdit
+      ? `<div class="chk${ck}" onclick="toggleTask('${t.p}','${t.id}')"></div>`
+      : `<div class="chk${ck}" style="cursor:not-allowed;opacity:.5;" title="Зөвхөн ${esc(t.by||'')} засах боломжтой"></div>`;
+    
+    const delHtml = canEdit
+      ? `<button class="xbtn" onclick="delTask('${t.p}','${t.id}')">&#10005;</button>`
+      : `<span class="task-locked" title="${esc(t.by||'')} нэмсэн">🔒</span>`;
+    
+    return'<div class="titem">'+chkHtml+
        '<div style="flex:1;"><span class="ttxt'+dn+'">'+esc(t.txt)+'</span>'+
        '<span class="ts-meta">Added by <b>'+createdBy+'</b> on '+createdAt+'</span></div>'+
        (t.a?'<span class="atag">'+esc(t.a)+'</span>':'')+
-       '<button class="xbtn" onclick="delTask(\''+t.p+'\',\''+t.id+'\')">&#10005;</button></div>';
+       delHtml+'</div>';
   }
 
   function renderProjectRoadmap(p){
@@ -775,83 +852,194 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     });
     let teamTotalOpen = teamTotalTasks - teamTotalDone;
     let teamPct = teamTotalTasks ? Math.round((teamTotalDone / teamTotalTasks) * 100) : 0;
-
     let pieBg = `conic-gradient(var(--green) 0% ${teamPct}%, var(--bg3) ${teamPct}% 100%)`;
 
-    let h='<div class="ov-body"><div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>'+
-       '<div class="ov-stats">'+
-       '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
-       '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
-       '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
-       '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
-       '</div>';
+    const ovTab = window.ui.ovTab || 'dashboard';
 
-    h += '<div class="ov-sec">Dev Team Ажиллагаа</div>'+
-         '<div class="team-kpi-card">'+
-           '<div class="team-pie-container">'+
-             '<div class="team-pie-chart" style="background: ' + pieBg + ';">'+
-               '<div class="team-pie-inner">' + teamPct + '%</div>'+
-             '</div>'+
-           '</div>'+
-           '<div class="team-kpi-details">'+
-             '<div class="team-kpi-title">Багийн Нийт Гүйцэтгэл</div>'+
-             '<div class="team-kpi-subtitle">Хөгжүүлэлтийн багийн 3 ажилтны нийт таск ажиллагаа <b>' + teamPct + '%</b>-тай байна. Тооцоолол: Нийт <b>' + teamTotalTasks + '</b> таскаас <span class="done-txt">✓ ' + teamTotalDone + ' болсон</span>, <span class="open-txt">' + teamTotalOpen + ' хүлээгдэж буй</span>.</div>'+
-           '</div>'+
+    let h='<div class="ov-body">';
+    h += '<div class="ov-title">NBFI Portfolio Dashboard</div><div class="ov-sub">Overview of active products, core systems, and architecture scope</div>';
+    
+    // Tabs
+    h += '<div class="ov-tabs">' +
+         '<div class="ov-tab'+(ovTab==='dashboard'?' on':'')+'" onclick="window.ui.ovTab=\'dashboard\';window.render()">📊 Dashboard</div>' +
+         '<div class="ov-tab'+(ovTab==='report'?' on':'')+'" onclick="window.ui.ovTab=\'report\';window.render()">📋 Тайлан / Report</div>' +
          '</div>';
 
-    h += '<div class="ov-sec">User Workload & Performance Overview</div>';
-    h += '<table class="stat-table">'+
-         '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
-         '<tbody>';
-    
-    Object.entries(userStats).forEach(([name, stat]) => {
-      const openSub = stat.totalSub - stat.doneSub;
-      const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
+    if (ovTab === 'dashboard') {
+      // ── DASHBOARD TAB ──
+      h += '<div class="ov-stats">'+
+           '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
+           '<div class="sc green"><div class="sv">'+live+'</div><div class="sl">Live Systems</div></div>'+
+           '<div class="sc blue"><div class="sv">'+prog+'</div><div class="sl">In Development</div></div>'+
+           '<div class="sc red"><div class="sv">'+bug+'</div><div class="sl">Has Active Bugs</div></div>'+
+           '</div>';
+
+      h += '<div class="ov-sec">Dev Team Ажиллагаа</div>'+
+           '<div class="team-kpi-card">'+
+             '<div class="team-pie-container">'+
+               '<div class="team-pie-chart" style="background: ' + pieBg + ';">'+
+                 '<div class="team-pie-inner">' + teamPct + '%</div>'+
+               '</div>'+
+             '</div>'+
+             '<div class="team-kpi-details">'+
+               '<div class="team-kpi-title">Багийн Нийт Гүйцэтгэл</div>'+
+               '<div class="team-kpi-subtitle">Хөгжүүлэлтийн багийн 3 ажилтны нийт таск ажиллагаа <b>' + teamPct + '%</b>-тай байна. Тооцоолол: Нийт <b>' + teamTotalTasks + '</b> таскаас <span class="done-txt">✓ ' + teamTotalDone + ' болсон</span>, <span class="open-txt">' + teamTotalOpen + ' хүлээгдэж буй</span>.</div>'+
+             '</div>'+
+           '</div>';
+
+      h += '<div class="ov-sec">User Workload & Performance Overview</div>';
+      h += '<table class="stat-table">'+
+           '<thead><tr><th>Ажилтан</th><th>Том таск (Lead)</th><th>Жижиг таск (Нийт)</th><th>Болсон (Done)</th><th>Болоогүй (Open)</th><th>Гүйцэтгэл (%)</th></tr></thead>'+
+           '<tbody>';
       
-      let popoverHtml = '';
-      if(openSub > 0) {
-        popoverHtml += `<div class="task-popover" onclick="event.stopPropagation();">`;
-        popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
-        popoverHtml += `<div class="popover-list">`;
-        stat.openItems.forEach(item => {
-          popoverHtml += `<div class="popover-item" onclick="window.goToTask('${item.pid}');">` +
-                         `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
-                         `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.txt)}</span>` +
-                         `</div>`;
+      Object.entries(userStats).forEach(([name, stat]) => {
+        const openSub = stat.totalSub - stat.doneSub;
+        const pct = stat.totalSub ? Math.round((stat.doneSub / stat.totalSub) * 100) : 0;
+        
+        let popoverHtml = '';
+        if(openSub > 0) {
+          popoverHtml += `<div class="task-popover" onclick="event.stopPropagation();">`;
+          popoverHtml += `<div class="popover-title">${esc(name)}-ийн Болоогүй Таскууд</div>`;
+          popoverHtml += `<div class="popover-list">`;
+          stat.openItems.forEach(item => {
+            popoverHtml += `<div class="popover-item" onclick="window.goToTask('${item.pid}');">` +
+                           `<span class="popover-pname">${esc(pName(item.pid))}</span> ` +
+                           `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.txt)}</span>` +
+                           `</div>`;
+          });
+          popoverHtml += `</div></div>`;
+        }
+
+        h += `<tr>`+
+             `<td><b>${esc(name)}</b></td>`+
+             `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
+             `<td>${stat.totalSub} таск</td>`+
+             `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
+             `<td>`+
+               `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; background:${openSub > 0 ? 'var(--red-bg)' : 'transparent'};">`+
+                 `${openSub}${popoverHtml}`+
+               `</div>`+
+             `</td>`+
+             `<td>`+
+               `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
+               `<span class="stat-pct">${pct}%</span>`+
+             `</td>`+
+             `</tr>`;
+      });
+      h += '</tbody></table>';
+
+      h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
+      projs().forEach(p=>{
+        const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
+        h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
+           '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
+           '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
+           '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
+           '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
+        (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
+        h+='</div></div>';
+      });
+      h += '</div>';
+
+    } else {
+      // ── REPORT TAB ──
+      const members = Object.keys(userStats);
+      const selMember = window.ui.reportMember || window.currentUser || members[0];
+      if (!window.ui.reportMember) window.ui.reportMember = selMember;
+
+      // Member selector buttons
+      h += '<div class="report-toolbar">';
+      h += '<span style="font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Ажилтан:</span>';
+      members.forEach(m => {
+        h += `<button class="report-member-btn${m===selMember?' active':''}" onclick="window.ui.reportMember='${m}';window.render();">${esc(m)}</button>`;
+      });
+      h += '</div>';
+
+      // Collect tasks for selected member
+      const allTasks = Object.values(window.D.tasks||{}).filter(t => t.by === selMember);
+      const inProgTasks = allTasks.filter(t => !t.done);
+      const doneTasks   = allTasks.filter(t => t.done);
+
+      const stat = userStats[selMember];
+      const openCount = stat.totalSub - stat.doneSub;
+      const pct = stat.totalSub ? Math.round((stat.doneSub/stat.totalSub)*100) : 0;
+
+      // Summary bar
+      h += '<div class="report-summary-bar">' +
+           `<div class="rsb-item"><div class="rsb-val">${stat.totalSub}</div><div class="rsb-lbl">Нийт таск</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item"><div class="rsb-val blue">${openCount}</div><div class="rsb-lbl">Хийгдэж байгаа</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item"><div class="rsb-val green">${stat.doneSub}</div><div class="rsb-lbl">Хийгдсэн</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item"><div class="rsb-val" style="color:var(--text)">${pct}%</div><div class="rsb-lbl">Гүйцэтгэл</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item" style="flex:1;align-items:flex-start;justify-content:center;padding-left:10px;">` +
+             `<div class="prog" style="width:100%;margin-top:10px;margin-bottom:0;height:6px;"><div class="pfill" style="width:${pct}%"></div></div>` +
+           `</div>` +
+           '</div>';
+
+      // In Progress section
+      h += '<div class="report-section">' +
+           `<div class="report-section-title"><span>Хийгдэж байгаа (In Progress)</span><span class="rs-badge rs-inprog">${inProgTasks.length}</span></div>`;
+      if (inProgTasks.length === 0) {
+        h += '<div class="report-empty">Одоогоор хийгдэж байгаа таск байхгүй байна.</div>';
+      } else {
+        inProgTasks.forEach(t => {
+          h += `<div class="report-row inprog">` +
+               `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
+               `<span class="report-row-txt">${esc(t.txt)}</span>` +
+               `<span class="report-row-status rrs-ip">In Progress</span>` +
+               `<span class="report-row-date">${esc(t.at||'')}</span>` +
+               `</div>`;
         });
-        popoverHtml += `</div></div>`;
       }
+      h += '</div>';
 
-      h += `<tr>`+
-           `<td><b>${esc(name)}</b></td>`+
-           `<td><span class="pcnt" style="background:var(--bg3); font-weight:600;">${stat.mainTasks}</span> прожект</td>`+
-           `<td>${stat.totalSub} таск</td>`+
-           `<td><span style="color:var(--green); font-weight:600;">✓ ${stat.doneSub}</span></td>`+
-           `<td>`+
-             `<div class="open-task-cell" style="color:${openSub > 0 ? 'var(--red)' : 'var(--text3)'}; background:${openSub > 0 ? 'var(--red-bg)' : 'transparent'};">`+
-               `${openSub}${popoverHtml}`+
-             `</div>`+
-           `</td>`+
-           `<td>`+
-             `<div class="stat-prog-bar"><div class="stat-prog-fill" style="width:${pct}%"></div></div>`+
-             `<span class="stat-pct">${pct}%</span>`+
-           `</td>`+
-           `</tr>`;
-    });
-    h += '</tbody></table>';
+      // Done section
+      h += '<div class="report-section">' +
+           `<div class="report-section-title"><span>Хийгдсэн (Done)</span><span class="rs-badge rs-done">${doneTasks.length}</span></div>`;
+      if (doneTasks.length === 0) {
+        h += '<div class="report-empty">Хийгдсэн таск байхгүй байна.</div>';
+      } else {
+        doneTasks.forEach(t => {
+          h += `<div class="report-row done">` +
+               `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
+               `<span class="report-row-txt">${esc(t.txt)}</span>` +
+               `<span class="report-row-status rrs-dn">✓ Дууссан</span>` +
+               `<span class="report-row-date">${esc(t.at||'')}</span>` +
+               `</div>`;
+        });
+      }
+      h += '</div>';
 
-    h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
-    projs().forEach(p=>{
-      const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
-      h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
-         '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
-         '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
-         '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
-         '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
-      (p.tags||[]).slice(0,2).forEach(tg=>h+='<span class="opc-chip">'+esc(tg)+'</span>');
-      h+='</div></div>';
-    });
-    m.innerHTML=h+'</div></div>';
+      // Cross-project breakdown
+      h += '<div class="report-section">' +
+           '<div class="report-section-title"><span>Прожектоор задаргаа</span></div>';
+      const byProj = {};
+      allTasks.forEach(t => {
+        if (!byProj[t.p]) byProj[t.p] = { done: 0, open: 0 };
+        t.done ? byProj[t.p].done++ : byProj[t.p].open++;
+      });
+      if (Object.keys(byProj).length === 0) {
+        h += '<div class="report-empty">Таск байхгүй байна.</div>';
+      } else {
+        Object.entries(byProj).forEach(([pid, cnt]) => {
+          const tot2 = cnt.done + cnt.open;
+          const pp = Math.round((cnt.done/tot2)*100);
+          h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
+               `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
+               `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
+               `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
+               `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
+               `<span class="stat-pct">${pp}%</span>` +
+               `</div>`;
+        });
+      }
+      h += '</div>';
+    }
+
+    m.innerHTML = h + '</div>';
   }
 
   /* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
@@ -980,6 +1168,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   
   window.toggleTask = function(pid,tid){
     if(window.D.tasks[tid]){
+      if(!window.canEditTask(window.D.tasks[tid])){
+        alert('🔒 Зөвхөн ' + (window.D.tasks[tid].by||'нэмсэн хүн') + ' энэ таскийг өөрчлөх боломжтой.');
+        return;
+      }
       window.D.tasks[tid].done=!window.D.tasks[tid].done;
       window.D.tasks[tid].modifiedBy = window.currentUser; 
       window.save();
@@ -987,7 +1179,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     }
   }
   window.delTask = function(pid,tid){
-    if(window.D.tasks[tid]){delete window.D.tasks[tid];window.save();window.render();}
+    if(window.D.tasks[tid]){
+      if(!window.canEditTask(window.D.tasks[tid])){
+        alert('🔒 Зөвхөн ' + (window.D.tasks[tid].by||'нэмсэн хүн') + ' энэ таскийг устгах боломжтой.');
+        return;
+      }
+      delete window.D.tasks[tid];window.save();window.render();
+    }
   }
   window.clearDone = function(pid){
     Object.values(window.D.tasks||{}).forEach(t=>{if(t.p===pid&&t.done)delete window.D.tasks[t.id];});
