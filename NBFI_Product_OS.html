@@ -228,6 +228,84 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .del-warn{font-size:13px;color:var(--text2);line-height:1.6}.del-warn strong{color:var(--text)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
 
+
+/* ── NEW: PRIORITY & HEALTH BADGES ── */
+.bph{background:var(--red-bg);color:var(--red-text)}.bpm{background:var(--amber-bg);color:var(--amber-text)}.bpl2{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.bot{background:var(--green-bg);color:var(--green-text)}.bar2{background:var(--amber-bg);color:var(--amber-text)}.bbl{background:var(--red-bg);color:var(--red-text)}
+.ppri{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.ppri.h{background:var(--red-bg);color:var(--red-text)}.ppri.m{background:var(--amber-bg);color:var(--amber-text)}.ppri.l{background:var(--bg3);color:var(--text3)}
+/* ── NEW: ALERT BANNER ── */
+.alert-banner{background:var(--red-bg);border:1px solid var(--red);border-radius:var(--rl);padding:12px 15px;margin-bottom:18px}
+.alert-title{font-size:12px;font-weight:700;color:var(--red-text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.alert-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-top:1px solid rgba(226,75,74,.15);font-size:12px;cursor:pointer}
+.alert-item:first-of-type{border-top:none}.alert-item:hover{color:var(--text)}
+.alert-proj{font-weight:600;color:var(--red-text);min-width:90px}.alert-note{color:var(--text2)}
+/* ── NEW: END GOALS ── */
+.goal-list{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+.goal-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:var(--r);border-left:3px solid var(--blue);font-size:13px;line-height:1.4}
+.goal-txt{flex:1}
+.goal-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;opacity:0;flex-shrink:0}
+.goal-item:hover .goal-del{opacity:1}.goal-del:hover{color:var(--red)}
+.goal-add{display:flex;gap:6px;margin-top:4px}
+.goal-add input{flex:1;font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:7px 9px;background:var(--bg2);color:var(--text);outline:none}
+.goal-add input:focus{border-color:var(--blue)}
+.goal-add button{display:inline-flex;align-items:center;font-size:13px;padding:7px 11px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer}
+.goal-add button:hover{background:var(--bg2)}
+/* ── NEW: PHASES ── */
+.phase-card{background:var(--bg2);border-radius:var(--rl);padding:11px 13px;margin-bottom:8px;border:1px solid var(--border)}
+.phase-hdr{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.phase-name{font-size:13px;font-weight:600;flex:1}
+.phase-ssel{font-size:11px;border:1px solid var(--border);border-radius:var(--r);padding:3px 6px;background:var(--bg);color:var(--text2);cursor:pointer;outline:none}
+.psdone{color:var(--green-text);background:var(--green-bg);border-color:var(--green)!important}
+.psprog{color:var(--blue-text);background:var(--blue-bg);border-color:var(--blue)!important}
+.psplan{color:var(--amber-text);background:var(--amber-bg);border-color:var(--amber)!important}
+.phase-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px}.phase-del:hover{color:var(--red)}
+.phase-feats{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.phase-feat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);padding:3px 0}
+.phase-feat::before{content:"\2022";color:var(--text3);flex-shrink:0}
+.pf-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;opacity:0;margin-left:auto}
+.phase-feat:hover .pf-del{opacity:1}.pf-del:hover{color:var(--red)}
+.phase-fadd{display:flex;gap:4px}
+.phase-fadd input{flex:1;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:4px 7px;background:var(--bg);color:var(--text);outline:none}
+.phase-fadd input:focus{border-color:var(--blue)}
+.phase-fadd button{display:inline-flex;align-items:center;font-size:12px;padding:4px 7px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer}
+.add-phase-btn{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;padding:7px;border:1px dashed var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;width:100%;margin-top:4px}
+.add-phase-btn:hover{background:var(--bg2)}
+/* ── NEW: SERVICES ── */
+.svc-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.svc-item{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 9px;border-radius:999px;background:var(--blue-bg);border:1px solid var(--border);color:var(--blue-text)}
+.svc-del{background:none;border:none;cursor:pointer;color:var(--blue-text);font-size:12px;opacity:.6;line-height:1}.svc-del:hover{opacity:1;color:var(--red)}
+.svc-add{display:flex;gap:5px}
+.svc-add input{flex:1;font-size:12px;border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;background:var(--bg2);color:var(--text);outline:none}
+.svc-add input:focus{border-color:var(--blue)}
+.svc-add button{display:inline-flex;align-items:center;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer}
+/* ── NEW: NOTES ── */
+.notes-area{width:100%;font-size:13px;border:1px solid var(--border2);border-radius:var(--r);padding:9px 11px;background:var(--bg2);color:var(--text);outline:none;font-family:inherit;resize:vertical;min-height:80px;line-height:1.6}
+.notes-area:focus{border-color:var(--blue)}
+/* ── NEW: GANTT TIMELINE ── */
+.road-toolbar{padding:9px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.gantt-body{flex:1;overflow:auto;background:var(--bg)}
+.gantt-table{min-width:900px;width:100%;border-collapse:collapse;table-layout:fixed}
+.gh-yr td,.gh-half td,.gh-q td,.gh-month td{border-bottom:1px solid var(--border2);text-align:center;font-weight:600;white-space:nowrap}
+.gh-yr td{font-size:13px;font-weight:700;padding:6px 0;background:var(--bg3)}
+.gh-half td{font-size:11px;padding:4px 0;background:var(--bg2);color:var(--text2)}
+.gh-q td{font-size:11px;padding:4px 0;background:var(--bg2);color:var(--text2)}
+.gh-month td{font-size:11px;padding:5px 2px;background:var(--bg2);color:var(--text2);border-right:1px solid var(--border)}
+.gh-month td.curr{background:var(--blue-bg);color:var(--blue-text)}
+.g-lbl{width:120px;min-width:120px;padding:0;background:var(--bg2);border-right:1px solid var(--border2)}
+.g-lbl-inner{padding:8px 10px;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;cursor:pointer;height:100%}
+.g-lbl-inner:hover{background:var(--bg3)}
+.g-cell{padding:0;border-right:1px solid var(--border)}
+.g-cell.curr{background:rgba(55,138,221,0.04)}
+.g-prow td{border-bottom:1px solid var(--border);height:44px}
+.g-bar{position:absolute;top:4px;bottom:4px;border-radius:6px;display:flex;align-items:center;padding:0 9px;font-size:11px;font-weight:600;cursor:pointer;overflow:hidden;white-space:nowrap;border-width:1.5px;border-style:solid}
+.g-bar:hover{filter:brightness(1.1)}
+.gantt-unsched{padding:14px 18px;border-top:1px solid var(--border);background:var(--bg)}
+.gantt-unsched-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.gantt-unitem{display:inline-flex;align-items:center;font-size:11px;padding:3px 9px;background:var(--bg2);border-radius:999px;color:var(--text2);border:1px solid var(--border);cursor:pointer;margin:2px}
+.rdate{font-size:10px;border:1px solid var(--border);border-radius:4px;padding:1px 3px;background:var(--bg2);color:var(--text2);cursor:pointer;outline:none;max-width:80px}
+.rdate:focus{border-color:var(--blue)}
+
 /* USER STATS STYLE */
 .user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
 .ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
@@ -564,10 +642,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.SM={live:{l:'Live',d:'dl',b:'bl'},progress:{l:'In Progress',d:'dp',b:'bp'},bugs:{l:'Has Bugs',d:'db',b:'bb'},planned:{l:'Planned',d:'dpl',b:'bpl'}};
   window.LANES=['now','next','later'];
   window.DEF_ECO={moni:{x:440,y:230},omnipay:{x:285,y:130},'moni-transfer':{x:605,y:130},keep:{x:195,y:310},khurimtlal:{x:195,y:420},los:{x:670,y:310},omnicars:{x:670,y:420},erp:{x:440,y:420},crm:{x:550,y:420}};
+  window.PRI={high:{l:'P1 ↑ High',b:'bph'},medium:{l:'P2 Medium',b:'bpm'},low:{l:'P3 Low',b:'bpl2'}};
+  window.HLT={on_track:{l:'✔ On Track',b:'bot'},at_risk:{l:'⚠ At Risk',b:'bar2'},blocked:{l:'■ Blocked',b:'bbl'}};
+  window.PHST={done:{l:'Done',c:'psdone'},'in-progress':{l:'In Progress',c:'psprog'},planned:{l:'Planned',c:'psplan'}};
+  window.MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  window.CY=2026; window.CM=6;
+  window.PCOL={moni:'#2563EB',los:'#059669',khurimtlal:'#7C3AED',omnicars:'#DC2626',omnipay:'#D97706',keep:'#0891B2','moni-transfer':'#6B7280',erp:'#9333EA',crm:'#DB2777','moni app':'#2563EB','loan origination':'#059669'};
+  window.pcol=function(pid){return window.PCOL[pid]||window.PCOL[(window.D.projects&&window.D.projects[pid]&&window.D.projects[pid].name||'').toLowerCase()]||'#378ADD';};
+  window.priBdg=function(p,clickable){const m=window.PRI[p]||window.PRI.medium;return'<span class="bdg '+m.b+'"'+(clickable?' onclick="window.togglePriMenu(event)" title="Click to change"':'')+'>'+m.l+'</span>';};
+  window.hltBdg=function(h,clickable){const m=window.HLT[h]||window.HLT.on_track;return'<span class="bdg '+m.b+'"'+(clickable?' onclick="window.toggleHltMenu(event)" title="Click to change"':'')+'>'+m.l+'</span>';};
+  window.dateLabel=function(r){if(!r.month)return'';const sm=window.MONTHS[r.month-1];const em=r.endMonth&&r.endMonth!==r.month?window.MONTHS[r.endMonth-1]:'';return(em?sm+'–'+em:sm)+(r.year&&r.year!==window.CY?' '+r.year:'');};
 
   /* ── STATE ── */
   window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,showTeam:false,modal:null,roadFilter:'all',statusMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
+  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,showTeam:false,modal:null,roadFilter:'all',roadView:'lanes',tlYear:2026,statusMenu:false,priMenu:false,hltMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
   window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
 
   /* ── DATA HELPERS ── */
@@ -575,7 +663,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
   window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
   window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
-  window.getMeta = function(pid){return(window.D.pmeta||{})[pid]||{leader:'',devs:[],items:[]};}
+  window.getMeta = function(pid){const d=(window.D.pmeta||{})[pid]||{};return{leader:d.leader||'',devs:window.toArr(d.devs),items:window.toArr(d.items),goals:window.toArr(d.goals),phases:window.toArr(d.phases),services:window.toArr(d.services),notes:d.notes||''};}
   window.getItems = function(pid){return getMeta(pid).items||[];}
   window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
   window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
@@ -708,7 +796,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     const meta=getMeta(p.id);const tasks=pTasks(p.id);const dn=tasks.filter(t=>t.done).length;const tot=tasks.length;const pct=tot?Math.round((dn/tot)*100):0;
     let h='<div class="phdr"><div class="ptrow"><span class="pt">'+esc(p.name)+'</span>';
     if(p.local)h+='<span class="plocal">('+esc(p.local)+')</span>';
-    h+=badge(p.status,true)+'<span class="ptype">'+esc(p.type).toUpperCase()+'</span></div>'+
+    const smenu2=window.ui.statusMenu?'<div class="smenu">'+Object.entries(window.SM).map(([k,v])=>'<div class="sopt" onclick="window.setProjStatus(\''+p.id+'\',\''+k+'\')">'+window.sdot(k)+v.l+'</div>').join('')+'</div>':'';
+    const pmenu2=window.ui.priMenu?'<div class="smenu">'+Object.entries(window.PRI).map(([k,v])=>'<div class="sopt" onclick="window.setProjPriority(\''+p.id+'\',\''+k+'\')">'+v.l+'</div>').join('')+'</div>':'';
+    const hmenu2=window.ui.hltMenu?'<div class="smenu">'+Object.entries(window.HLT).map(([k,v])=>'<div class="sopt" onclick="window.setProjHealth(\''+p.id+'\',\''+k+'\')">'+v.l+'</div>').join('')+'</div>':'';
+    h+='<div style="position:relative;display:inline-flex">'+badge(p.status,true)+smenu2+'</div>'+
+       '<div style="position:relative;display:inline-flex">'+window.priBdg(p.priority||'medium',true)+pmenu2+'</div>'+
+       '<div style="position:relative;display:inline-flex">'+window.hltBdg(p.health||'on_track',true)+hmenu2+'</div>'+
+       '<span class="ptype">'+esc(p.type).toUpperCase()+'</span></div>'+
        '<div class="pmeta-row">'+
        '<div class="pmeta-g"><span class="pmeta-l">Lead:</span><span class="pmeta-v">'+esc(meta.leader||'Unassigned')+'</span></div>'+
        '<div class="pmeta-sep"></div><div class="pmeta-g"><span class="pmeta-l">Devs:</span>';
@@ -722,8 +816,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
     else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
     else h+=renderProjectMeta(p,meta);
-    h+'</div>';m.innerHTML=h;
-    if(window.ui.statusMenu)renderStatusMenu(p);
+    h+='</div>';m.innerHTML=h;
   }
 
   function renderStatusMenu(p){
@@ -777,9 +870,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       const li=items.filter(i=>i.lane===l);
       h+='<div class="rcol"><div class="rch"><span class="rct" style="text-transform:uppercase">'+l+'</span><span class="rcc">'+li.length+'</span></div><div class="rlist">';
       if(li.length===0)h+='<div class="muted" style="font-size:11px">Empty</div>';
-      else li.forEach(item=>{h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
-         '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
-         '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
+      else li.forEach(function(item){
+        function mkOpts(sel){return'<option value="">--</option>'+[2025,2026,2027].flatMap(function(yr){return window.MONTHS.map(function(m,mi){var v=yr+'-'+(mi+1<10?'0':'')+(mi+1);return'<option value="'+v+'"'+(sel===v?' selected':'')+'>'+m+' '+yr+'</option>';});}).join('');}
+        var sv=item.month?((item.year||window.CY)+'-'+(item.month<10?'0':'')+item.month):'';
+        var ev=item.endMonth?((item.year||window.CY)+'-'+(item.endMonth<10?'0':'')+item.endMonth):'';
+        h+='<div class="rcard"><span class="rcard-t">'+esc(item.txt)+'</span>'+
+           '<select class="rdate" title="Start" onchange="window.setRoadDate(\''+item.id+'\',this.value)">'+mkOpts(sv)+'</select>'+
+           '<span style="font-size:9px;color:var(--text3)">\u2192</span>'+
+           '<select class="rdate" title="End" onchange="window.setRoadEnd(\''+item.id+'\',this.value)">'+mkOpts(ev)+'</select>'+
+           '<button class="mvb" onclick="moveRoad(\''+p.id+'\',\''+item.id+'\',\''+l+'\')">&#8594;</button>'+
+           '<button class="rxb" onclick="delRoad(\''+p.id+'\',\''+item.id+'\')">&#10005;</button></div>';});
       h+='</div><div class="radd"><input type="text" id="r_inp_'+l+'" placeholder="Add release feature..." onkeydown="if(event.key===\'Enter\')addRoad(\''+p.id+'\',\''+l+'\')">'+
          '<button onclick="addRoad(\''+p.id+'\',\''+l+'\')">+</button></div></div>';
     });
@@ -787,7 +887,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
 
   function renderProjectMeta(p,meta){
-    let h='<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
+    // ── END GOALS ──
+    const goals=meta.goals||[];
+    let goalsHtml='<div class="goal-list">'+(goals.length?goals.map(g=>'<div class="goal-item"><span class="goal-txt">'+esc(g.text)+'</span><button class="goal-del" onclick="window.removeGoal(\''+g.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 0">No end goals defined yet.</div>')+'</div>'+
+      '<div class="goal-add"><input id="goal-inp" type="text" placeholder="Define an end goal or success metric..." onkeydown="if(event.key===\'Enter\')window.addGoal()"><button onclick="window.addGoal()">+ Add</button></div>';
+    // ── PHASES ──
+    const phases=meta.phases||[];
+    let phasesHtml=phases.map(ph=>{
+      const feats=window.toArr(ph.features||[]);
+      const sc=(window.PHST[ph.status]||window.PHST.planned).c;
+      const sopts=Object.entries(window.PHST).map(([k,v])=>'<option value="'+k+'"'+(ph.status===k?' selected':'')+'>'+v.l+'</option>').join('');
+      return'<div class="phase-card"><div class="phase-hdr"><span class="phase-name">'+esc(ph.name)+'</span>'+
+        '<select class="phase-ssel '+sc+'" onchange="window.setPhaseStatus(\''+ph.id+'\',this.value)">'+sopts+'</select>'+
+        '<button class="phase-del" onclick="window.deletePhase(\''+ph.id+'\')">&#10005;</button></div>'+
+        '<div class="phase-feats">'+(feats.length?feats.map(f=>'<div class="phase-feat"><span style="flex:1">'+esc(f.name)+'</span><button class="pf-del" onclick="window.removePF(\''+ph.id+'\',\''+f.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:12px;color:var(--text3)">No features in this phase.</div>')+'</div>'+
+        '<div class="phase-fadd"><input id="pf_'+ph.id+'" type="text" placeholder="Add feature..." onkeydown="if(event.key===\'Enter\')window.addPF(\''+ph.id+'\')"><button onclick="window.addPF(\''+ph.id+'\')">+</button></div></div>';
+    }).join('')+'<button class="add-phase-btn" onclick="window.addPhase()">+ Add phase</button>';
+    // ── SERVICES ──
+    const svcs=meta.services||[];
+    let svcsHtml='<div class="svc-list">'+(svcs.length?svcs.map(s=>'<div class="svc-item">'+esc(s.name)+'<button class="svc-del" onclick="window.removeSvc(\''+s.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:12px;color:var(--text3);padding:2px 0">None listed.</div>')+'</div>'+
+      '<div class="svc-add"><input id="svc-inp" type="text" placeholder="e.g. Boxo API, Payment gateway..." onkeydown="if(event.key===\'Enter\')window.addSvc()"><button onclick="window.addSvc()">+ Add</button></div>';
+    let h='<div class="stitle">End Goals</div>'+goalsHtml+
+      '<div class="stitle" style="margin-top:16px">Development Phases</div>'+phasesHtml+
+      '<div class="stitle" style="margin-top:16px">External Services &amp; APIs</div>'+svcsHtml+
+      '<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">'+
+      '<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
        '<div class="stitle">Tags</div><div class="tags">';
     if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
     else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
@@ -804,7 +928,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
     h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
     ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
-    return h+'</select></div></div></div></div></div>';
+    h+='</select></div></div></div></div></div>';
+    h+='<div class="stitle" style="margin-top:14px">Notes &amp; Decisions</div>'+
+       '<textarea class="notes-area" placeholder="Key decisions, blockers, context for the team..." oninput="window.setNotes(this.value)">'+esc(meta.notes||'')+'</textarea>';
+    return h;
   }
 
   function renderGlobalView(m){
@@ -866,6 +993,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
          '</div>';
 
     if (ovTab === 'dashboard') {
+      // ── ALERT BANNER for at-risk projects ──
+      const atRisk=window.projs().filter(p=>p.health==='at_risk'||p.health==='blocked');
+      if(atRisk.length){
+        h+='<div class="alert-banner"><div class="alert-title">&#9888; Needs attention ('+atRisk.length+')</div>'+
+          atRisk.map(ap=>{const am=window.getMeta(ap.id);return'<div class="alert-item" onclick="window.selProj(\''+ap.id+'\')"><span class="alert-proj">'+esc(ap.name)+'</span><span class="alert-note">'+(window.HLT[ap.health]||window.HLT.on_track).l+' &mdash; '+(window.SM[ap.status]||window.SM.progress).l+(am.notes?' &mdash; '+esc(am.notes.substring(0,80)):'')+'</span></div>';}).join('')+'</div>';
+      }
       // ── DASHBOARD TAB ──
       h += '<div class="ov-stats">'+
            '<div class="sc"><div class="sv">'+tot+'</div><div class="sl">Total Products</div></div>'+
@@ -931,8 +1064,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       h += '<div class="ov-sec">Product Catalog</div><div class="ov-grid">';
       projs().forEach(p=>{
         const t=pTasks(p.id);const dn=t.filter(tk=>tk.done).length;const pct=t.length?Math.round((dn/t.length)*100):0;
-        h+='<div class="opc" onclick="selProj(\''+p.id+'\')">'+
-           '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+'</div>'+
+        const priC={high:'opc-pri-h',medium:'opc-pri-m',low:'opc-pri-l'}[p.priority||'medium'];
+        h+='<div class="opc '+priC+'" style="border-top:3px solid '+(p.priority==='high'?'var(--red)':p.priority==='low'?'var(--border)':'var(--amber)')+'" onclick="selProj(\''+p.id+'\')">'+
+           '<div class="opc-top"><span class="opc-name">'+esc(p.name)+'</span>'+badge(p.status)+window.priBdg(p.priority||'medium',false)+'</div>'+
            '<div class="opc-type">'+esc(p.type).toUpperCase()+' &middot; '+openTasks(p.id)+' active tickets</div>'+
            '<div class="opc-row"><span>Scope Progress</span><span>'+pct+'%</span></div>'+
            '<div class="opc-prog"><div class="opc-pfill" style="width:'+pct+'%"></div></div><div class="ov-meta">';
@@ -1101,8 +1235,72 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     document.onmouseup=function(){document.onmousemove=null;document.onmouseup=null;window.save();};
   }
 
+  function buildGantt(){
+    const year=window.ui.tlYear;
+    const allItems=Object.values(window.D.road||{});
+    const ps=window.projs();
+    const sched={};ps.forEach(p=>{sched[p.id]=[];});
+    const unsched=[];
+    allItems.forEach(r=>{
+      if(!sched[r.p])return;
+      if(r.month&&(r.year===year||(!r.year&&year===window.CY))){sched[r.p].push(r);}
+      else{unsched.push(r);}
+    });
+    ps.forEach(p=>{sched[p.id].sort((a,b)=>(a.month||1)-(b.month||1));});
+    const activePs=ps;  // show all projects — empty rows guide users to add roadmap items
+    let t='<div class="gantt-body"><table class="gantt-table">';
+    t+='<tr class="gh-yr"><td class="g-lbl" style="border-right:1px solid var(--border2)"></td><td colspan="12" style="text-align:center;padding:6px;border-right:1px solid var(--border)">'+year+'</td></tr>';
+    t+='<tr class="gh-half"><td class="g-lbl" style="border-right:1px solid var(--border2)"></td><td colspan="6" style="border-right:1px solid var(--border2)">H1</td><td colspan="6" style="border-right:1px solid var(--border)">H2</td></tr>';
+    t+='<tr class="gh-q"><td class="g-lbl" style="border-right:1px solid var(--border2)"></td>';
+    ['Q1','Q2','Q3','Q4'].forEach(q=>{t+='<td colspan="3" style="border-right:1px solid var(--border2)">'+q+'</td>';});
+    t+='</tr><tr class="gh-month"><td class="g-lbl" style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;padding:6px 10px;text-align:left;border-right:1px solid var(--border2)">Project</td>';
+    window.MONTHS.forEach((m,i)=>{t+='<td class="'+(i+1===window.CM&&year===window.CY?'curr':'')+'">'+(i+1===window.CM&&year===window.CY?'&#9654; ':'')+m+'</td>';});
+    t+='</tr>';
+    activePs.forEach(p=>{
+      const col=window.pcol(p.id);
+      const items=sched[p.id];
+      t+='<tr class="g-prow"><td class="g-lbl"><div class="g-lbl-inner" onclick="window.selProj(\''+p.id+'\')">'+window.sdot(p.status)+'<span>'+esc(p.name)+'</span></div></td>';
+      for(let m=1;m<=12;m++){t+='<td class="g-cell'+(m===window.CM&&year===window.CY?' curr':'')+'" style="'+(m===12?'border-right:1px solid var(--border)':'')+'"></td>';}
+      t+='</tr>';
+      if(items.length){
+        t+='<tr style="height:0"><td style="padding:0;border:none"></td><td colspan="12" style="padding:0;border:none;position:relative">';
+        t+='<div style="position:relative;height:0"><div style="position:absolute;top:-43px;left:0;right:0;height:42px;pointer-events:none">';
+        items.forEach(r=>{
+          const sm=Math.max(1,Math.min(12,r.month||1));const em=Math.max(sm,Math.min(12,r.endMonth||sm));
+          const lp=((sm-1)/12*100).toFixed(2);const wp=((em-sm+1)/12*100).toFixed(2);
+          t+='<div class="g-bar" style="left:calc('+lp+'% + 3px);width:calc('+wp+'% - 6px);background:'+col+'20;color:'+col+';border-color:'+col+'55;pointer-events:auto" onclick="window.selProj(\''+p.id+'\')" title="'+esc(r.txt)+'">'+esc(r.txt)+'</div>';
+        });
+        t+='</div></div></td></tr>';
+      }
+    });
+    t+='</table>';
+    if(activePs.length===0){
+      t+='<div style="padding:32px 24px;text-align:center;color:var(--text3);font-size:13px">';
+      t+='<div style="font-size:22px;margin-bottom:8px">&#128197;</div>';
+      t+='<div style="font-weight:600;color:var(--text2);margin-bottom:4px">No projects yet</div>';
+      t+='<div>Add projects, then open each one &rarr; Roadmap tab to set item dates</div>';
+      t+='</div>';
+    }
+    if(unsched.length){
+      t+='<div class="gantt-unsched"><div class="gantt-unsched-title">Items without timeline dates ('+unsched.length+') \u2014 open each project \u2192 Roadmap tab to assign months</div><div>';
+      unsched.forEach(r=>{const proj=(window.D.projects||{})[r.p];t+='<span class="gantt-unitem" onclick="window.selProj(\''+r.p+'\')">'+(proj?esc(proj.name)+': ':'')+esc(r.txt)+'</span>';});
+      t+='</div></div>';
+    }
+    t+='</div>';  // close gantt-body — unsched is inside it and scrolls with the chart
+    return t;
+  }
+
   function renderMatrix(m){
-    let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap Matrix</div><div class="gsub">Consolidated multi-product sprint lanes</div></div><div class="scrollbody">';
+    const rv=window.ui.roadView||'lanes';
+    const yr=window.ui.tlYear||2026;
+    let h='<div class="ghdr"><div class="gtitle">Cross-Product Roadmap</div><div class="gsub">Consolidated multi-product sprint lanes &amp; timeline</div></div>'+
+      '<div class="road-toolbar">'+
+      '<div class="stog"><button class="'+(rv==='lanes'?'on':'')+'" onclick="window.ui.roadView=\'lanes\';window.render()">Lanes</button>'+
+      '<button class="'+(rv==='gantt'?'on':'')+'" onclick="window.ui.roadView=\'gantt\';window.render()">Timeline</button></div>'+
+      (rv==='gantt'?'<div class="stog"><button class="'+(yr===2025?'on':'')+'" onclick="window.ui.tlYear=2025;window.render()">2025</button><button class="'+(yr===2026?'on':'')+'" onclick="window.ui.tlYear=2026;window.render()">2026</button><button class="'+(yr===2027?'on':'')+'" onclick="window.ui.tlYear=2027;window.render()">2027</button></div>':'<div style="flex:1"></div>')+
+      '</div>';
+    if(rv==='gantt'){m.innerHTML=h+buildGantt();return;}
+    h+='<div class="scrollbody">';
     window.LANES.forEach(lane=>{
       let items=[];projs().forEach(p=>{roadItems(p.id).filter(r=>r.lane===lane).forEach(r=>{items.push({p:p.id,txt:r.txt});});});
       h+='<div class="lsec"><div class="lhdr"><span class="llbl" style="text-transform:uppercase">'+lane+'</span><span class="lcnt">'+items.length+'</span></div><div class="lgrid">';
@@ -1132,8 +1330,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.selTab = function(t){window.ui.tab=t;window.render();}
   window.toggleTeam = function(){window.ui.showTeam=!window.ui.showTeam;window.render();}
   window.setRoadFilter = function(f){window.ui.roadFilter=f;window.render();}
-  window.toggleSmenu = function(e){e.stopPropagation();window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
-  function closeSmenu(){window.ui.statusMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
+  window.toggleSmenu = function(e){e.stopPropagation();window.ui.priMenu=false;window.ui.hltMenu=false;window.ui.statusMenu=!window.ui.statusMenu;window.render();if(window.ui.statusMenu)document.addEventListener('click',closeSmenu);}
+  function closeSmenu(){window.ui.statusMenu=false;window.ui.priMenu=false;window.ui.hltMenu=false;const d=$('smenu-box');if(d)d.style.display='none';document.removeEventListener('click',closeSmenu);}
   
   window.setProjStatus = function(pid,st){
     if(window.D.projects[pid]){window.D.projects[pid].status=st;window.save();window.render();}
@@ -1241,6 +1439,83 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
   window.delConn = function(cid){if(window.D.conns[cid]){delete window.D.conns[cid];window.save();window.render();}}
 
+
+  /* ── NEW: PRIORITY / HEALTH ACTIONS ── */
+  window.togglePriMenu = function(e){e.stopPropagation();window.ui.priMenu=!window.ui.priMenu;window.ui.hltMenu=false;window.ui.statusMenu=false;window.render();if(window.ui.priMenu)document.addEventListener('click',closeSmenu);}
+  window.toggleHltMenu = function(e){e.stopPropagation();window.ui.hltMenu=!window.ui.hltMenu;window.ui.priMenu=false;window.ui.statusMenu=false;window.render();if(window.ui.hltMenu)document.addEventListener('click',closeSmenu);}
+  window.setProjPriority = function(pid,val){if(window.D.projects[pid]){window.D.projects[pid].priority=val;window.ui.priMenu=false;window.save();window.render();}}
+  window.setProjHealth = function(pid,val){if(window.D.projects[pid]){window.D.projects[pid].health=val;window.ui.hltMenu=false;window.save();window.render();}}
+
+  /* ── NEW: GOAL ACTIONS ── */
+  window.addGoal = function(){
+    const i=document.getElementById('goal-inp');const txt=(i?i.value:'').trim();if(!txt)return;
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,goals:[...(m.goals||[]),{id:'g'+window.uid(),text:txt}]};
+    if(i)i.value='';window.save();window.render();
+  }
+  window.removeGoal = function(gid){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,goals:(m.goals||[]).filter(g=>g.id!==gid)};window.save();window.render();
+  }
+
+  /* ── NEW: PHASE ACTIONS ── */
+  window.addPhase = function(){
+    const n='Phase '+(window.toArr(window.getMeta(window.ui.sel).phases).length+1);
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,phases:[...(m.phases||[]),{id:'ph'+window.uid(),name:n,status:'planned',features:[]}]};
+    window.save();window.render();
+  }
+  window.deletePhase = function(phid){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,phases:(m.phases||[]).filter(ph=>ph.id!==phid)};window.save();window.render();
+  }
+  window.setPhaseStatus = function(phid,status){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,phases:window.toArr(m.phases).map(ph=>ph.id===phid?{...ph,status}:ph)};window.save();window.render();
+  }
+  window.addPF = function(phid){
+    const i=document.getElementById('pf_'+phid);const name=(i?i.value:'').trim();if(!name)return;
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,phases:window.toArr(m.phases).map(ph=>ph.id===phid?{...ph,features:[...window.toArr(ph.features),{id:'f'+window.uid(),name}]}:ph)};
+    if(i)i.value='';window.save();window.render();
+  }
+  window.removePF = function(phid,fid){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,phases:window.toArr(m.phases).map(ph=>ph.id===phid?{...ph,features:window.toArr(ph.features).filter(f=>f.id!==fid)}:ph)};window.save();window.render();
+  }
+
+  /* ── NEW: SERVICE ACTIONS ── */
+  window.addSvc = function(){
+    const i=document.getElementById('svc-inp');const name=(i?i.value:'').trim();if(!name)return;
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,services:[...(m.services||[]),{id:'s'+window.uid(),name}]};
+    if(i)i.value='';window.save();window.render();
+  }
+  window.removeSvc = function(sid){
+    if(!window.D.pmeta)return;const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,services:(m.services||[]).filter(s=>s.id!==sid)};window.save();window.render();
+  }
+
+  /* ── NEW: NOTES ── */
+  window.setNotes = function(val){
+    if(!window.D.pmeta)window.D.pmeta={};const m=window.getMeta(window.ui.sel);
+    window.D.pmeta[window.ui.sel]={...m,notes:val};window.save();
+  }
+
+  /* ── NEW: ROAD DATE ACTIONS ── */
+  window.setRoadDate = function(id,val){
+    const r=(window.D.road||{})[id];if(!r)return;
+    if(!val){delete r.month;delete r.year;}
+    else{const[y,mo]=val.split('-');r.year=parseInt(y);r.month=parseInt(mo);}
+    window.save();window.render();
+  }
+  window.setRoadEnd = function(id,val){
+    const r=(window.D.road||{})[id];if(!r)return;
+    if(!val){delete r.endMonth;}
+    else{const[y,mo]=val.split('-');r.endMonth=parseInt(mo);}
+    window.save();window.render();
+  }
+
   /* ── MODALS ENGINE ── */
   window.openModal = function(kind,opts){
     window.ui.modal={kind,opts};$('modal-overlay').style.display='flex';renderModalContent();
@@ -1292,7 +1567,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     const type=$('m_type')?$('m_type').value:'customer';const desc=(($('m_desc')?$('m_desc').value:'').trim());const tagsInp=$('m_tags')?$('m_tags').value:'';
     if(!id||!name){alert('ID and Name required.');return;}
     const tags=tagsInp.split(',').map(t=>t.trim()).filter(t=>t);
-    if(!window.D.projects)window.D.projects={};window.D.projects[id]={id,name,local,type,status:'planned',desc,tags};
+    if(!window.D.projects)window.D.projects={};
+    window.D.projects[id]={id,name,local,type,status:'planned',priority:'medium',health:'on_track',desc,tags};
+    if(!window.D.pmeta)window.D.pmeta={};
+    window.D.pmeta[id]={leader:'',devs:[],items:[],goals:[],phases:[],services:[],notes:''};
     window.ui.sel=id;window.ui.gview='project';window.save();window.closeModal();window.render();
   }
   window.submitDelProject = function(pid){
