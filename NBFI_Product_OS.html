@@ -1165,9 +1165,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
       // ── KPI Cards ──
       h += `<div class="kpi-cards">`;
-      h += `<div class="kpi-card added"><div class="kv">${addedInPeriod.length}</div><div class="kl">Нэмэгдсэн таск</div></div>`;
-      h += `<div class="kpi-card done-c"><div class="kv">${completedInPeriod.length}</div><div class="kl">Дуусгасан (тухайн үе)</div></div>`;
-      h += `<div class="kpi-card open-c"><div class="kv">${currentlyOpen.length}</div><div class="kl">Одоо нээлттэй</div></div>`;
+      h += `<div class="kpi-card added"><div class="kv">${addedInPeriod.length}</div><div class="kl">Нийт таск</div></div>`;
+      h += `<div class="kpi-card done-c"><div class="kv">${completedInPeriod.length}</div><div class="kl">Дууссан</div></div>`;
+      h += `<div class="kpi-card open-c"><div class="kv">${currentlyOpen.length}</div><div class="kl">Ажиллаж байгаа</div></div>`;
       h += `<div class="kpi-card rate-c"><div class="kv">${kpiRate}%</div><div class="kl">KPI Гүйцэтгэл</div></div>`;
       h += `</div>`;
 
@@ -1306,7 +1306,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       });
       h += `</div>`;
       h += `<div style="display:flex;gap:12px;font-size:11px;color:var(--text3);margin-top:4px;">` +
-           `<span><span style="display:inline-block;width:10px;height:10px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:2px;margin-right:3px;"></span>Нэмэгдсэн таск</span>` +
+           `<span><span style="display:inline-block;width:10px;height:10px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:2px;margin-right:3px;"></span>Нийт таск</span>` +
            `<span style="font-size:11px;color:var(--text3);">Багана дарж тухайн сараар шүүнэ</span>` +
            `</div>`;
       h += `</div>`;
