@@ -1588,5 +1588,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
 </script>
 </div><!-- /#app-wrapper -->
+
+<!-- KPI REPORT EXTENSION -->
+<style>
+.kpi-wrap{padding:18px;overflow:auto;height:100%}.kpi-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px;margin-bottom:12px}.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.kpi-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px}.kpi-num{font-size:26px;font-weight:700}.kpi-label{font-size:11px;color:var(--text3)}.kpi-table{width:100%;border-collapse:collapse}.kpi-table th,.kpi-table td{padding:9px;border-bottom:1px solid var(--border);text-align:left;font-size:12px}
+</style>
+<script>
+window.generateKPIReport=function(){
+ const tasks=Object.values(window.D.tasks||{});
+ const month=new Date().getMonth()+1;
+ const year=new Date().getFullYear();
+ const members=['Анар','Зул-Эрдэнэ','Халиунаа'];
+ let rows=members.map(m=>{
+   let t=tasks.filter(x=>(x.by===m||x.owner===m||x.user===m));
+   let done=t.filter(x=>x.done).length;
+   let total=t.length;
+   return {m,total,done,open:total-done,pct:total?Math.round(done/total*100):0};
+ });
+ return `<div class="kpi-wrap"><h2>📈 KPI Monthly Report</h2>
+ <div class="kpi-grid">
+ <div class="kpi-box"><div class="kpi-num">${tasks.length}</div><div class="kpi-label">Нийт Task</div></div>
+ <div class="kpi-box"><div class="kpi-num">${tasks.filter(t=>t.done).length}</div><div class="kpi-label">Done</div></div>
+ <div class="kpi-box"><div class="kpi-num">${tasks.filter(t=>!t.done).length}</div><div class="kpi-label">Open</div></div>
+ </div>
+ <div class="kpi-card"><h3>Ажилтнаар</h3><table class="kpi-table"><tr><th>Ажилтан</th><th>Нийт</th><th>Done</th><th>Open</th><th>KPI</th></tr>
+ ${rows.map(r=>`<tr><td>${r.m}</td><td>${r.total}</td><td>${r.done}</td><td>${r.open}</td><td>${r.pct}%</td></tr>`).join('')}
+ </table></div>
+ <button class="tbtn prim" onclick="exportKPI()">Export KPI CSV</button></div>`;
+}
+window.exportKPI=function(){
+ const tasks=Object.values(window.D.tasks||{});
+ let csv='Employee,Total,Done,Open,KPI\n';
+ ['Анар','Зул-Эрдэнэ','Халиунаа'].forEach(m=>{let t=tasks.filter(x=>x.by===m);let d=t.filter(x=>x.done).length;csv+=`${m},${t.length},${d},${t.length-d},${t.length?Math.round(d/t.length*100):0}%\n`;});
+ let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv]));a.download='KPI_Report.csv';a.click();
+}
+</script>
 </body>
 </html>
