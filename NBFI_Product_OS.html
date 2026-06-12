@@ -423,7 +423,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
 /* lock icon on tasks not owned */
 .task-locked{font-size:11px;color:var(--text3);padding:2px 5px;background:var(--bg3);border-radius:4px;flex-shrink:0;}
-
+/* ── REPORT MONTH FILTER & KPI ── */
+.report-month-bar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;align-items:center;padding:9px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);}
+.month-btn{font-size:11px;padding:4px 9px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.month-btn:hover{background:var(--bg3);color:var(--text);}
+.month-btn.on{background:var(--text);color:var(--bg);font-weight:700;border-color:var(--text);}
+.month-btn.yr.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.kpi-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px;}
+.kpi-card{background:var(--bg2);border-radius:var(--rl);padding:14px;border:1px solid var(--border);text-align:center;}
+.kpi-card .kv{font-size:30px;font-weight:700;line-height:1.1;margin-bottom:4px;}
+.kpi-card .kl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
+.kpi-card.added .kv{color:var(--blue);}
+.kpi-card.done-c .kv{color:var(--green);}
+.kpi-card.open-c .kv{color:var(--amber);}
+.kpi-card.rate-c .kv{color:var(--text);}
+.print-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;margin-left:auto;}
+.print-btn:hover{background:var(--bg2);}
+.mbr-row{display:flex;align-items:center;gap:12px;padding:10px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;flex-wrap:wrap;}
+.mbr-name{font-size:13px;font-weight:700;color:var(--text);min-width:90px;}
+.mbr-added{font-size:12px;color:var(--blue);min-width:80px;}
+.mbr-done{font-size:12px;color:var(--green);min-width:80px;}
+.mbr-open{font-size:12px;color:var(--amber);min-width:60px;}
+.mbr-detail{font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;}
+.mbr-detail:hover{background:var(--bg3);}
+.period-lbl{font-size:12px;color:var(--text3);font-style:italic;margin-left:auto;}
+@media print{.topbar,.sb,.team-bar,.report-toolbar,.report-month-bar{display:none!important;}.ov-body{overflow:visible!important;padding:20px;}.kpi-cards{page-break-inside:avoid;}}
 </style>
 </head>
 <body>
@@ -655,7 +679,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   /* ── STATE ── */
   window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,showTeam:false,modal:null,roadFilter:'all',roadView:'lanes',tlYear:2026,statusMenu:false,priMenu:false,hltMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
+  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,reportMonth:null,reportYear:null,showTeam:false,modal:null,roadFilter:'all',roadView:'lanes',tlYear:2026,statusMenu:false,priMenu:false,hltMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
   window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
 
   /* ── DATA HELPERS ── */
@@ -1076,104 +1100,224 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       h += '</div>';
 
     } else {
-      // ── REPORT TAB ──
-      const members = Object.keys(userStats);
-      const selMember = window.ui.reportMember || window.currentUser || members[0];
-      if (!window.ui.reportMember) window.ui.reportMember = selMember;
+      // ── REPORT TAB (ENHANCED with Month Filter + KPI) ──
+      const allMemberNames = ['Халиунаа', 'Зул-Эрдэнэ', 'Анар'];
+      const selMember = window.ui.reportMember || 'all';
+      const selYear   = window.ui.reportYear  || null;
+      const selMonth  = window.ui.reportMonth || null;
+      const MONTHS_MN = ['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар','7-р сар','8-р сар','9-р сар','10-р сар','11-р сар','12-р сар'];
+      const periodLabel = selYear && selMonth ? (selYear+' оны '+MONTHS_MN[selMonth-1]) : (selYear ? selYear+' он' : 'Нийт хугацаа');
 
-      // Member selector buttons
-      h += '<div class="report-toolbar">';
+      // ── Helper: is task created in period ──
+      function taskCreatedInPeriod(t, yr, mo) {
+        if (!yr && !mo) return true;
+        const ds = (t.at||'').split(' ')[0];
+        if (!ds) return false;
+        const p = ds.split('-').map(Number);
+        if (yr && mo) return p[0]===yr && p[1]===mo;
+        if (yr) return p[0]===yr;
+        return true;
+      }
+      // ── Helper: is task completed in period ──
+      function taskDoneInPeriod(t, yr, mo) {
+        if (!t.done) return false;
+        if (!yr && !mo) return true;
+        const ds = (t.doneAt||t.at||'').split(' ')[0];
+        if (!ds) return false;
+        const p = ds.split('-').map(Number);
+        if (yr && mo) return p[0]===yr && p[1]===mo;
+        if (yr) return p[0]===yr;
+        return true;
+      }
+
+      // ── Member selector ──
+      h += '<div class="report-toolbar" style="gap:6px;margin-bottom:10px;flex-wrap:wrap;">';
       h += '<span style="font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Ажилтан:</span>';
-      members.forEach(m => {
-        h += `<button class="report-member-btn${m===selMember?' active':''}" onclick="window.ui.reportMember='${m}';window.render();">${esc(m)}</button>`;
+      h += `<button class="report-member-btn${selMember==='all'?' active':''}" onclick="window.ui.reportMember='all';window.render();">👥 Бүгд</button>`;
+      allMemberNames.forEach(mn => {
+        h += `<button class="report-member-btn${mn===selMember?' active':''}" onclick="window.ui.reportMember='${mn}';window.render();">${esc(mn)}</button>`;
+      });
+      h += '<button class="print-btn" onclick="window.printReport()">🖨 Хэвлэх / Export</button>';
+      h += '</div>';
+
+      // ── Month/Year filter bar ──
+      const AV_YEARS = [2025, 2026, 2027];
+      h += '<div class="report-month-bar">';
+      h += '<span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.05em;margin-right:4px;">📅 Хугацаа:</span>';
+      h += `<button class="month-btn${!selYear&&!selMonth?' on':''}" onclick="window.ui.reportYear=null;window.ui.reportMonth=null;window.render();">Нийт</button>`;
+      AV_YEARS.forEach(y => {
+        h += `<button class="month-btn yr${selYear===y&&!selMonth?' on':''}" onclick="window.ui.reportYear=${y};window.ui.reportMonth=null;window.render();">${y}</button>`;
+      });
+      h += '<span style="width:1px;background:var(--border2);align-self:stretch;margin:0 6px;flex-shrink:0;"></span>';
+      window.MONTHS.forEach((mn, i) => {
+        const isOn = selMonth===(i+1);
+        h += `<button class="month-btn${isOn?' on':''}" onclick="window.ui.reportYear=${selYear||2026};window.ui.reportMonth=${i+1};window.render();">${mn}</button>`;
       });
       h += '</div>';
 
-      // Collect tasks for selected member
-      const allTasks = Object.values(window.D.tasks||{}).filter(t => t.by === selMember);
-      const inProgTasks = allTasks.filter(t => !t.done);
-      const doneTasks   = allTasks.filter(t => t.done);
+      // ── Aggregate tasks across all members or single member ──
+      const allTasksAll = Object.values(window.D.tasks||{});
+      const memberTasks = selMember==='all' ? allTasksAll : allTasksAll.filter(t=>t.by===selMember);
+      const addedInPeriod     = memberTasks.filter(t => taskCreatedInPeriod(t, selYear, selMonth));
+      const completedInPeriod = memberTasks.filter(t => taskDoneInPeriod(t, selYear, selMonth));
+      const currentlyOpen     = memberTasks.filter(t => !t.done);
+      const kpiRate = addedInPeriod.length ? Math.round((addedInPeriod.filter(t=>t.done).length / addedInPeriod.length)*100) : 0;
 
-      const stat = userStats[selMember];
-      const openCount = stat.totalSub - stat.doneSub;
-      const pct = stat.totalSub ? Math.round((stat.doneSub/stat.totalSub)*100) : 0;
+      // ── KPI Cards ──
+      h += `<div class="kpi-cards">`;
+      h += `<div class="kpi-card added"><div class="kv">${addedInPeriod.length}</div><div class="kl">Нэмэгдсэн таск</div></div>`;
+      h += `<div class="kpi-card done-c"><div class="kv">${completedInPeriod.length}</div><div class="kl">Дуусгасан (тухайн үе)</div></div>`;
+      h += `<div class="kpi-card open-c"><div class="kv">${currentlyOpen.length}</div><div class="kl">Одоо нээлттэй</div></div>`;
+      h += `<div class="kpi-card rate-c"><div class="kv">${kpiRate}%</div><div class="kl">KPI Гүйцэтгэл</div></div>`;
+      h += `</div>`;
 
-      // Summary bar
-      h += '<div class="report-summary-bar">' +
-           `<div class="rsb-item"><div class="rsb-val">${stat.totalSub}</div><div class="rsb-lbl">Нийт таск</div></div>` +
-           '<div class="rsb-sep"></div>' +
-           `<div class="rsb-item"><div class="rsb-val blue">${openCount}</div><div class="rsb-lbl">Хийгдэж байгаа</div></div>` +
-           '<div class="rsb-sep"></div>' +
-           `<div class="rsb-item"><div class="rsb-val green">${stat.doneSub}</div><div class="rsb-lbl">Хийгдсэн</div></div>` +
-           '<div class="rsb-sep"></div>' +
-           `<div class="rsb-item"><div class="rsb-val" style="color:var(--text)">${pct}%</div><div class="rsb-lbl">Гүйцэтгэл</div></div>` +
-           '<div class="rsb-sep"></div>' +
-           `<div class="rsb-item" style="flex:1;align-items:flex-start;justify-content:center;padding-left:10px;">` +
-             `<div class="prog" style="width:100%;margin-top:10px;margin-bottom:0;height:6px;"><div class="pfill" style="width:${pct}%"></div></div>` +
-           `</div>` +
-           '</div>';
-
-      // In Progress section
-      h += '<div class="report-section">' +
-           `<div class="report-section-title"><span>Хийгдэж байгаа (In Progress)</span><span class="rs-badge rs-inprog">${inProgTasks.length}</span></div>`;
-      if (inProgTasks.length === 0) {
-        h += '<div class="report-empty">Одоогоор хийгдэж байгаа таск байхгүй байна.</div>';
-      } else {
-        inProgTasks.forEach(t => {
-          h += `<div class="report-row inprog">` +
-               `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
-               `<span class="report-row-txt">${esc(t.txt)}</span>` +
-               `<span class="report-row-status rrs-ip">In Progress</span>` +
-               `<span class="report-row-date">${esc(t.at||'')}</span>` +
+      // ── Breakdown section ──
+      if (selMember === 'all') {
+        // ── All members: per-member rows ──
+        h += `<div class="report-section"><div class="report-section-title"><span>Ажилтнаар KPI задаргаа</span><span class="rs-badge rs-inprog">${periodLabel}</span></div>`;
+        allMemberNames.forEach(mbr => {
+          const mt = allTasksAll.filter(t=>t.by===mbr);
+          const mAdded = mt.filter(t=>taskCreatedInPeriod(t,selYear,selMonth));
+          const mDone  = mt.filter(t=>taskDoneInPeriod(t,selYear,selMonth));
+          const mOpen  = mt.filter(t=>!t.done);
+          const mRate  = mAdded.length ? Math.round((mAdded.filter(t=>t.done).length/mAdded.length)*100) : 0;
+          h += `<div class="mbr-row">` +
+               `<span class="mbr-name">${esc(mbr)}</span>` +
+               `<span class="mbr-added">📥 +${mAdded.length} нэмэгдсэн</span>` +
+               `<span class="mbr-done">✅ ${mDone.length} дуусгасан</span>` +
+               `<span class="mbr-open">⏳ ${mOpen.length} нээлттэй</span>` +
+               `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${mRate}%"></div></div>` +
+               `<span class="stat-pct">${mRate}%</span>` +
+               `<button class="mbr-detail" onclick="window.ui.reportMember='${mbr}';window.render();">Дэлгэрэнгүй →</button>` +
                `</div>`;
         });
-      }
-      h += '</div>';
+        h += `</div>`;
 
-      // Done section
-      h += '<div class="report-section">' +
-           `<div class="report-section-title"><span>Хийгдсэн (Done)</span><span class="rs-badge rs-done">${doneTasks.length}</span></div>`;
-      if (doneTasks.length === 0) {
-        h += '<div class="report-empty">Хийгдсэн таск байхгүй байна.</div>';
-      } else {
-        doneTasks.forEach(t => {
-          h += `<div class="report-row done">` +
-               `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
-               `<span class="report-row-txt">${esc(t.txt)}</span>` +
-               `<span class="report-row-status rrs-dn">✓ Дууссан</span>` +
-               `<span class="report-row-date">${esc(t.at||'')}</span>` +
-               `</div>`;
+        // All members project breakdown
+        h += `<div class="report-section"><div class="report-section-title"><span>Прожектоор нийт задаргаа</span><span class="period-lbl">${periodLabel}</span></div>`;
+        const byProjAll = {};
+        addedInPeriod.forEach(t => {
+          if(!byProjAll[t.p]) byProjAll[t.p]={done:0,open:0,members:new Set()};
+          t.done ? byProjAll[t.p].done++ : byProjAll[t.p].open++;
+          if(t.by) byProjAll[t.p].members.add(t.by);
         });
-      }
-      h += '</div>';
+        if(Object.keys(byProjAll).length===0){
+          h += '<div class="report-empty">Таск байхгүй.</div>';
+        } else {
+          Object.entries(byProjAll).forEach(([pid,cnt])=>{
+            const tot2=cnt.done+cnt.open;
+            const pp=Math.round((cnt.done/tot2)*100);
+            h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
+                 `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
+                 `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
+                 `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
+                 `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
+                 `<span class="stat-pct">${pp}%</span>` +
+                 `</div>`;
+          });
+        }
+        h += `</div>`;
 
-      // Cross-project breakdown
-      h += '<div class="report-section">' +
-           '<div class="report-section-title"><span>Прожектоор задаргаа</span></div>';
-      const byProj = {};
-      allTasks.forEach(t => {
-        if (!byProj[t.p]) byProj[t.p] = { done: 0, open: 0 };
-        t.done ? byProj[t.p].done++ : byProj[t.p].open++;
+      } else {
+        // ── Individual member: task list ──
+        const doneList = addedInPeriod.filter(t=>t.done);
+        const openList = addedInPeriod.filter(t=>!t.done);
+
+        // Completed tasks
+        h += `<div class="report-section"><div class="report-section-title"><span>✅ Дуусгасан ажлууд</span><span class="rs-badge rs-done">${doneList.length}</span><span class="period-lbl">${periodLabel}</span></div>`;
+        if(doneList.length===0){
+          h += '<div class="report-empty">Энэ хугацаанд дуусгасан таск байхгүй байна.</div>';
+        } else {
+          doneList.forEach(t => {
+            const dDate = (t.doneAt||t.at||'').split(' ')[0];
+            h += `<div class="report-row done">` +
+                 `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
+                 `<span class="report-row-txt">${esc(t.txt)}</span>` +
+                 `<span class="report-row-status rrs-dn">✓ Дууссан</span>` +
+                 `<span class="report-row-date">${esc(dDate)}</span>` +
+                 `</div>`;
+          });
+        }
+        h += '</div>';
+
+        // Open tasks
+        h += `<div class="report-section"><div class="report-section-title"><span>⏳ Хийгдэж байгаа</span><span class="rs-badge rs-todo">${openList.length}</span></div>`;
+        if(openList.length===0){
+          h += '<div class="report-empty">Энэ хугацааны таскууд бүгд дуусгагдсан байна.</div>';
+        } else {
+          openList.forEach(t => {
+            h += `<div class="report-row inprog">` +
+                 `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
+                 `<span class="report-row-txt">${esc(t.txt)}</span>` +
+                 `<span class="report-row-status rrs-ip">In Progress</span>` +
+                 `<span class="report-row-date">${esc(t.at||'')}</span>` +
+                 `</div>`;
+          });
+        }
+        h += '</div>';
+
+        // Project breakdown
+        h += `<div class="report-section"><div class="report-section-title"><span>Прожектоор задаргаа</span><span class="period-lbl">${periodLabel}</span></div>`;
+        const byProj2 = {};
+        addedInPeriod.forEach(t => {
+          if(!byProj2[t.p]) byProj2[t.p]={done:0,open:0};
+          t.done ? byProj2[t.p].done++ : byProj2[t.p].open++;
+        });
+        if(Object.keys(byProj2).length===0){
+          h += '<div class="report-empty">Таск байхгүй байна.</div>';
+        } else {
+          Object.entries(byProj2).forEach(([pid,cnt])=>{
+            const tot2=cnt.done+cnt.open;
+            const pp=Math.round((cnt.done/tot2)*100);
+            h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
+                 `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
+                 `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
+                 `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
+                 `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
+                 `<span class="stat-pct">${pp}%</span>` +
+                 `</div>`;
+          });
+        }
+        h += '</div>';
+      }
+
+      // ── Monthly trend (mini bar chart) ──
+      h += `<div class="report-section"><div class="report-section-title"><span>📊 Сарын гүйцэтгэлийн чиг хандлага (${selYear||2026})</span></div>`;
+      const trendYear = selYear||2026;
+      const trendTasks = selMember==='all' ? allTasksAll : allTasksAll.filter(t=>t.by===selMember);
+      const trendData = window.MONTHS.map((_,i) => {
+        const mo = i+1;
+        const added2 = trendTasks.filter(t=>{ const ds=(t.at||'').split(' ')[0]; const p=ds.split('-').map(Number); return p[0]===trendYear&&p[1]===mo; }).length;
+        const done2  = trendTasks.filter(t=>{ const ds=(t.doneAt||t.at||'').split(' ')[0]; const p=ds.split('-').map(Number); return t.done&&p[0]===trendYear&&p[1]===mo; }).length;
+        return {mo, added: added2, done: done2};
       });
-      if (Object.keys(byProj).length === 0) {
-        h += '<div class="report-empty">Таск байхгүй байна.</div>';
-      } else {
-        Object.entries(byProj).forEach(([pid, cnt]) => {
-          const tot2 = cnt.done + cnt.open;
-          const pp = Math.round((cnt.done/tot2)*100);
-          h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
-               `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
-               `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
-               `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
-               `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
-               `<span class="stat-pct">${pp}%</span>` +
-               `</div>`;
-        });
-      }
-      h += '</div>';
+      const maxVal = Math.max(1, ...trendData.map(d=>d.added));
+      h += `<div style="display:flex;align-items:flex-end;gap:4px;height:70px;padding:0 2px;margin-bottom:4px;">`;
+      trendData.forEach(d => {
+        const hAdded = Math.round((d.added/maxVal)*60);
+        const hDone  = Math.round((d.done/maxVal)*60);
+        const isSelMo = selMonth===d.mo;
+        h += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="window.ui.reportYear=${trendYear};window.ui.reportMonth=${d.mo};window.render();" title="${window.MONTHS[d.mo-1]}: +${d.added} нэмэгдсэн, ✓${d.done} дуусгасан">` +
+             `<div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:64px;gap:1px;">` +
+             (d.added>0 ? `<div style="width:100%;background:${isSelMo?'var(--blue)':'var(--blue-bg)'};border-radius:3px 3px 0 0;height:${hAdded}px;border:1px solid var(--blue);opacity:${isSelMo?1:0.7};"></div>` : `<div style="height:4px;"></div>`) +
+             `</div>` +
+             `<span style="font-size:9px;color:${isSelMo?'var(--text)':'var(--text3)'};font-weight:${isSelMo?700:400};">${window.MONTHS[d.mo-1]}</span>` +
+             `</div>`;
+      });
+      h += `</div>`;
+      h += `<div style="display:flex;gap:12px;font-size:11px;color:var(--text3);margin-top:4px;">` +
+           `<span><span style="display:inline-block;width:10px;height:10px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:2px;margin-right:3px;"></span>Нэмэгдсэн таск</span>` +
+           `<span style="font-size:11px;color:var(--text3);">Багана дарж тухайн сараар шүүнэ</span>` +
+           `</div>`;
+      h += `</div>`;
     }
 
     m.innerHTML = h + '</div>';
+  }
+
+  /* ── PRINT REPORT ── */
+  window.printReport = function() {
+    window.print();
   }
 
   /* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
@@ -1370,8 +1514,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         alert('🔒 Зөвхөн ' + (window.D.tasks[tid].by||'нэмсэн хүн') + ' энэ таскийг өөрчлөх боломжтой.');
         return;
       }
-      window.D.tasks[tid].done=!window.D.tasks[tid].done;
-      window.D.tasks[tid].modifiedBy = window.currentUser; 
+      const nowDone = !window.D.tasks[tid].done;
+      window.D.tasks[tid].done = nowDone;
+      window.D.tasks[tid].modifiedBy = window.currentUser;
+      if (nowDone) {
+        const nd = new Date();
+        window.D.tasks[tid].doneAt = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0')+' '+String(nd.getHours()).padStart(2,'0')+':'+String(nd.getMinutes()).padStart(2,'0');
+      } else {
+        delete window.D.tasks[tid].doneAt;
+      }
       window.save();
       window.render();
     }
@@ -1588,40 +1739,5 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
 </script>
 </div><!-- /#app-wrapper -->
-
-<!-- KPI REPORT EXTENSION -->
-<style>
-.kpi-wrap{padding:18px;overflow:auto;height:100%}.kpi-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px;margin-bottom:12px}.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.kpi-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px}.kpi-num{font-size:26px;font-weight:700}.kpi-label{font-size:11px;color:var(--text3)}.kpi-table{width:100%;border-collapse:collapse}.kpi-table th,.kpi-table td{padding:9px;border-bottom:1px solid var(--border);text-align:left;font-size:12px}
-</style>
-<script>
-window.generateKPIReport=function(){
- const tasks=Object.values(window.D.tasks||{});
- const month=new Date().getMonth()+1;
- const year=new Date().getFullYear();
- const members=['Анар','Зул-Эрдэнэ','Халиунаа'];
- let rows=members.map(m=>{
-   let t=tasks.filter(x=>(x.by===m||x.owner===m||x.user===m));
-   let done=t.filter(x=>x.done).length;
-   let total=t.length;
-   return {m,total,done,open:total-done,pct:total?Math.round(done/total*100):0};
- });
- return `<div class="kpi-wrap"><h2>📈 KPI Monthly Report</h2>
- <div class="kpi-grid">
- <div class="kpi-box"><div class="kpi-num">${tasks.length}</div><div class="kpi-label">Нийт Task</div></div>
- <div class="kpi-box"><div class="kpi-num">${tasks.filter(t=>t.done).length}</div><div class="kpi-label">Done</div></div>
- <div class="kpi-box"><div class="kpi-num">${tasks.filter(t=>!t.done).length}</div><div class="kpi-label">Open</div></div>
- </div>
- <div class="kpi-card"><h3>Ажилтнаар</h3><table class="kpi-table"><tr><th>Ажилтан</th><th>Нийт</th><th>Done</th><th>Open</th><th>KPI</th></tr>
- ${rows.map(r=>`<tr><td>${r.m}</td><td>${r.total}</td><td>${r.done}</td><td>${r.open}</td><td>${r.pct}%</td></tr>`).join('')}
- </table></div>
- <button class="tbtn prim" onclick="exportKPI()">Export KPI CSV</button></div>`;
-}
-window.exportKPI=function(){
- const tasks=Object.values(window.D.tasks||{});
- let csv='Employee,Total,Done,Open,KPI\n';
- ['Анар','Зул-Эрдэнэ','Халиунаа'].forEach(m=>{let t=tasks.filter(x=>x.by===m);let d=t.filter(x=>x.done).length;csv+=`${m},${t.length},${d},${t.length-d},${t.length?Math.round(d/t.length*100):0}%\n`;});
- let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv]));a.download='KPI_Report.csv';a.click();
-}
-</script>
 </body>
 </html>
