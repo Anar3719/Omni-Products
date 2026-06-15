@@ -755,7 +755,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       },
       tasks,road,conns,
       pmeta:{
-        moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
+        moni:{leader:'Анар',devs:['Уртнасан','Баянмөнх'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
       },
       eco:JSON.parse(JSON.stringify(window.DEF_ECO))
     };
@@ -951,7 +951,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
     (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
     h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
-    ['Anand','Bilguun','Sukhbat','Ondrakh','Tuvshin','Zoloo'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
+    ['Баянмөнх','Итгэл','Нямбаяр','Нямдорж','Содбаяр','Төгөлдөр','Уртнасан'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
     h+='</select></div></div></div></div></div>';
     h+='<div class="stitle" style="margin-top:14px">Notes &amp; Decisions</div>'+
        '<textarea class="notes-area" placeholder="Key decisions, blockers, context for the team..." oninput="window.setNotes(this.value)">'+esc(meta.notes||'')+'</textarea>';
