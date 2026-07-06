@@ -306,6 +306,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rdate{font-size:10px;border:1px solid var(--border);border-radius:4px;padding:1px 3px;background:var(--bg2);color:var(--text2);cursor:pointer;outline:none;max-width:80px}
 .rdate:focus{border-color:var(--blue)}
 
+
+/* ── DASHBOARD ── */
+.dash-wrap{padding:4px 0}
+.dash-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px}
+.dash-table{width:100%;border-collapse:collapse;max-width:360px}
+.dash-table td{padding:9px 12px;border:1px solid var(--bd);font-size:13px;color:var(--text2)}
+.dash-table tr:first-child td{background:var(--bg2);font-weight:600;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.dash-table tr:last-child td{border-top:2px solid var(--bd2);font-weight:700;color:var(--text)}
+.dash-inp{width:80px;font-size:13px;border:1px solid var(--bd2);border-radius:var(--r);padding:4px 8px;background:var(--bg2);color:var(--text);outline:none;text-align:right}
+.dash-inp:focus{border-color:var(--blue)}
+/* ── DRAG PHASES ── */
+.phase-chips-wrap{padding:12px 18px;border-top:1px solid var(--bd);background:var(--bg2)}
+.phase-chips-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
+.phase-proj-group{margin-bottom:10px}
+.phase-proj-label{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px}
+.p-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:6px;cursor:grab;border:1px solid var(--bd);background:var(--bg);color:var(--text2);margin:2px;user-select:none;transition:opacity .15s}
+.p-chip:active{cursor:grabbing;opacity:.7}
+.p-chip.done{background:var(--gbg);color:var(--gtx);border-color:var(--green)}
+.p-chip.prog{background:var(--bbg);color:var(--btx);border-color:var(--blue)}
+.p-chip.plan{background:var(--abg);color:var(--atx);border-color:var(--amber)}
+.g-cell.drag-over{background:rgba(55,138,221,.18)!important;outline:2px dashed var(--blue);outline-offset:-2px}
+
 /* USER STATS STYLE */
 .user-selector { font-size:12px; padding:5px 10px; border:1px solid var(--border2); border-radius:var(--r); background:var(--bg); color:var(--text); outline:none; font-weight:600; cursor:pointer;}
 .ts-meta { font-size:11px; color:var(--text3); margin-top:2px; display:block; font-style:italic;}
@@ -423,31 +445,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ov-tab.on{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
 /* lock icon on tasks not owned */
 .task-locked{font-size:11px;color:var(--text3);padding:2px 5px;background:var(--bg3);border-radius:4px;flex-shrink:0;}
-/* ── REPORT MONTH FILTER & KPI ── */
-.report-month-bar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;align-items:center;padding:9px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);}
-.month-btn{font-size:11px;padding:4px 9px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
-.month-btn:hover{background:var(--bg3);color:var(--text);}
-.month-btn.on{background:var(--text);color:var(--bg);font-weight:700;border-color:var(--text);}
-.month-btn.yr.on{background:var(--blue);color:#fff;border-color:var(--blue);}
-.kpi-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px;}
-.kpi-card{background:var(--bg2);border-radius:var(--rl);padding:14px;border:1px solid var(--border);text-align:center;}
-.kpi-card .kv{font-size:30px;font-weight:700;line-height:1.1;margin-bottom:4px;}
-.kpi-card .kl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
-.kpi-card.added .kv{color:var(--blue);}
-.kpi-card.done-c .kv{color:var(--green);}
-.kpi-card.open-c .kv{color:var(--amber);}
-.kpi-card.rate-c .kv{color:var(--text);}
-.print-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;margin-left:auto;}
-.print-btn:hover{background:var(--bg2);}
-.mbr-row{display:flex;align-items:center;gap:12px;padding:10px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;flex-wrap:wrap;}
-.mbr-name{font-size:13px;font-weight:700;color:var(--text);min-width:90px;}
-.mbr-added{font-size:12px;color:var(--blue);min-width:80px;}
-.mbr-done{font-size:12px;color:var(--green);min-width:80px;}
-.mbr-open{font-size:12px;color:var(--amber);min-width:60px;}
-.mbr-detail{font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;}
-.mbr-detail:hover{background:var(--bg3);}
-.period-lbl{font-size:12px;color:var(--text3);font-style:italic;margin-left:auto;}
-@media print{.topbar,.sb,.team-bar,.report-toolbar,.report-month-bar{display:none!important;}.ov-body{overflow:visible!important;padding:20px;}.kpi-cards{page-break-inside:avoid;}}
+
 </style>
 </head>
 <body>
@@ -679,7 +677,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   /* ── STATE ── */
   window.D={};
-  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,reportMonth:null,reportYear:null,showTeam:false,modal:null,roadFilter:'all',roadView:'lanes',tlYear:2026,statusMenu:false,priMenu:false,hltMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
+  window.ui={sel:null,tab:'tasks',gview:'overview',ovTab:'dashboard',reportMember:null,showTeam:false,modal:null,roadFilter:'all',roadView:'gantt',tlYear:2026,statusMenu:false,priMenu:false,hltMenu:false,nc:{fp:'',fi:'',tp:'',rel:'integration',st:'planned'}};
   window.mFormState={name:'',local:'',type:'',status:'progress',desc:'',tags:[]};
 
   /* ── DATA HELPERS ── */
@@ -687,7 +685,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   window.pTasks = function(pid){return Object.values(window.D.tasks||{}).filter(t=>t.p===pid);}
   window.openTasks = function(pid){return pTasks(pid).filter(t=>!t.done).length;}
   window.roadItems = function(pid){return Object.values(window.D.road||{}).filter(r=>r.p===pid);}
-  window.getMeta = function(pid){const d=(window.D.pmeta||{})[pid]||{};return{leader:d.leader||'',devs:window.toArr(d.devs),items:window.toArr(d.items),goals:window.toArr(d.goals),phases:window.toArr(d.phases),services:window.toArr(d.services),notes:d.notes||''};}
+  window.getMeta = function(pid){const d=(window.D.pmeta||{})[pid]||{};return{leader:d.leader||'',devs:window.toArr(d.devs),items:window.toArr(d.items),goals:window.toArr(d.goals),phases:window.toArr(d.phases),services:window.toArr(d.services),notes:d.notes||'',dashboard:d.dashboard||{}};}
   window.getItems = function(pid){return getMeta(pid).items||[];}
   window.pName = function(pid){const p=(window.D.projects||{})[pid];return p?p.name:pid;}
   window.sdot = function(s){const m=window.SM[s]||window.SM.progress;return '<span class="dot '+m.d+'" style="width:6px;height:6px"></span>';}
@@ -755,7 +753,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       },
       tasks,road,conns,
       pmeta:{
-        moni:{leader:'Анар',devs:['Уртнасан','Баянмөнх'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]}
+        moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]},
+        'moni-transfer':{leader:'',devs:[],items:[],goals:[],phases:[],services:[],notes:'',dashboard:{declined:48,completed:28,confirmed:9,cancelled:72}}
       },
       eco:JSON.parse(JSON.stringify(window.DEF_ECO))
     };
@@ -833,12 +832,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     if(!meta.devs||meta.devs.length===0)h+='<span class="muted" style="font-size:12px">None</span>';
     else meta.devs.forEach(d=>h+='<span class="pmeta-c">'+esc(d)+'</span>');
     h+='</div></div><div class="tabs">'+
-       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Scope & Tasks ('+openTasks(p.id)+')</div>'+
+       '<div class="tab'+(window.ui.tab==='tasks'?' on':'')+'" onclick="selTab(\'tasks\')">Tasks</div>'+
        '<div class="tab'+(window.ui.tab==='roadmap'?' on':'')+'" onclick="selTab(\'roadmap\')">Roadmap</div>'+
-       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Configuration</div>'+
+       '<div class="tab'+(window.ui.tab==='meta'?' on':'')+'" onclick="selTab(\'meta\')">Planning</div>'+
+       (p.id==='moni-transfer'?'<div class="tab'+(window.ui.tab==='dashboard'?' on':'')+'" onclick="selTab(\'dashboard\')">Dashboard</div>':'')+
        '</div></div><div class="mbody">';
     if(window.ui.tab==='tasks')h+=renderProjectTasks(p,tasks,dn,tot,pct);
     else if(window.ui.tab==='roadmap')h+=renderProjectRoadmap(p);
+    else if(window.ui.tab==='dashboard')h+=renderProjectDashboard(p,meta);
     else h+=renderProjectMeta(p,meta);
     h+='</div>';m.innerHTML=h;
   }
@@ -911,52 +912,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
 
   function renderProjectMeta(p,meta){
-    // ── END GOALS ──
     const goals=meta.goals||[];
-    let goalsHtml='<div class="goal-list">'+(goals.length?goals.map(g=>'<div class="goal-item"><span class="goal-txt">'+esc(g.text)+'</span><button class="goal-del" onclick="window.removeGoal(\''+g.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 0">No end goals defined yet.</div>')+'</div>'+
-      '<div class="goal-add"><input id="goal-inp" type="text" placeholder="Define an end goal or success metric..." onkeydown="if(event.key===\'Enter\')window.addGoal()"><button onclick="window.addGoal()">+ Add</button></div>';
-    // ── PHASES ──
+    const goalsHtml='<div class="goal-list">'+(goals.length?goals.map(g=>'<div class="goal-item"><span class="goal-txt">'+esc(g.text)+'</span><button class="goal-del" onclick="window.removeGoal(\''+g.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 0">No goals defined yet.</div>')+'</div>'+
+      '<div class="goal-add"><input id="goal-inp" type="text" placeholder="Add end goal or vision statement..." onkeydown="if(event.key===\'Enter\')window.addGoal()"><button onclick="window.addGoal()">+ Add</button></div>';
     const phases=meta.phases||[];
-    let phasesHtml=phases.map(ph=>{
+    const phasesHtml=phases.map(ph=>{
       const feats=window.toArr(ph.features||[]);
       const sc=(window.PHST[ph.status]||window.PHST.planned).c;
       const sopts=Object.entries(window.PHST).map(([k,v])=>'<option value="'+k+'"'+(ph.status===k?' selected':'')+'>'+v.l+'</option>').join('');
       return'<div class="phase-card"><div class="phase-hdr"><span class="phase-name">'+esc(ph.name)+'</span>'+
         '<select class="phase-ssel '+sc+'" onchange="window.setPhaseStatus(\''+ph.id+'\',this.value)">'+sopts+'</select>'+
         '<button class="phase-del" onclick="window.deletePhase(\''+ph.id+'\')">&#10005;</button></div>'+
-        '<div class="phase-feats">'+(feats.length?feats.map(f=>'<div class="phase-feat"><span style="flex:1">'+esc(f.name)+'</span><button class="pf-del" onclick="window.removePF(\''+ph.id+'\',\''+f.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:12px;color:var(--text3)">No features in this phase.</div>')+'</div>'+
-        '<div class="phase-fadd"><input id="pf_'+ph.id+'" type="text" placeholder="Add feature..." onkeydown="if(event.key===\'Enter\')window.addPF(\''+ph.id+'\')"><button onclick="window.addPF(\''+ph.id+'\')">+</button></div></div>';
+        '<div class="phase-feats">'+(feats.length?feats.map(f=>'<div class="phase-feat"><span style="flex:1">'+esc(f.name)+'</span><button class="pf-del" onclick="window.removePF(\''+ph.id+'\',\''+f.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:12px;color:var(--text3)">No features yet.</div>')+'</div>'+
+        '<div class="phase-fadd"><input id="pf_'+ph.id+'" type="text" placeholder="Add feature to this phase..." onkeydown="if(event.key===\'Enter\')window.addPF(\''+ph.id+'\')"><button onclick="window.addPF(\''+ph.id+'\')">+</button></div></div>';
     }).join('')+'<button class="add-phase-btn" onclick="window.addPhase()">+ Add phase</button>';
-    // ── SERVICES ──
-    const svcs=meta.services||[];
-    let svcsHtml='<div class="svc-list">'+(svcs.length?svcs.map(s=>'<div class="svc-item">'+esc(s.name)+'<button class="svc-del" onclick="window.removeSvc(\''+s.id+'\')">&#10005;</button></div>').join(''):'<div style="font-size:12px;color:var(--text3);padding:2px 0">None listed.</div>')+'</div>'+
-      '<div class="svc-add"><input id="svc-inp" type="text" placeholder="e.g. Boxo API, Payment gateway..." onkeydown="if(event.key===\'Enter\')window.addSvc()"><button onclick="window.addSvc()">+ Add</button></div>';
-    let h='<div class="stitle">End Goals</div>'+goalsHtml+
-      '<div class="stitle" style="margin-top:16px">Development Phases</div>'+phasesHtml+
-      '<div class="stitle" style="margin-top:16px">External Services &amp; APIs</div>'+svcsHtml+
-      '<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">'+
-      '<div class="stitle">Description</div><div class="idesc">'+esc(p.desc||'No description added.')+'</div>'+
-       '<div class="stitle">Tags</div><div class="tags">';
-    if(!p.tags||p.tags.length===0)h+='<span class="muted">No tags.</span>';
-    else p.tags.forEach(t=>h+='<span class="tag">'+esc(t)+'</span>');
-    h+='</div><div class="ps-grid">'+
-       '<div class="ps-col"><div class="ps-col-title">Context & Core Architecture Items</div><div class="ps-items" id="meta-items-list">';
-    const items=meta.items||[];
-    if(items.length===0)h+='<div class="muted" id="no-items-lbl">No sub-items documented.</div>';
-    else items.forEach(i=>h+='<div class="ps-item"><span class="ps-item-name">'+esc(i.name)+'</span><span class="crel" style="font-size:9px">'+esc(i.kind)+'</span><button class="ps-xbtn" onclick="removeItem(\''+i.id+'\')">&#10005;</button></div>');
-    h+='</div><div class="ps-add"><input type="text" id="fi_inp" placeholder="Add feature/endpoint..." onkeydown="if(event.key===\'Enter\')addItem(\'feature\')"><button onclick="addItem(\'feature\')">+</button></div></div>'+
-       '<div class="ps-col"><div class="ps-col-title">Team Allocation</div>'+
-       '<div class="team-sec"><div class="tf"><span class="tfl">Product Lead</span><select onchange="setLeader(this.value)"><option value="">Unassigned</option>';
-    ['Халиунаа','Зул-Эрдэнэ','Анар'].forEach(u=>h+='<option value="'+u+'"'+(meta.leader===u?' selected':'')+'>'+u+'</option>');
-    h+='</select></div><div class="tf"><span class="tfl">Developers</span><div class="dev-chips">';
-    (meta.devs||[]).forEach((d,i)=>h+='<span class="dev-chip">'+esc(d)+'<button onclick="removeDev('+i+')">&#10005;</button></span>');
-    h+='<select class="dev-add-sel" onchange="if(this.value){addDev(this.value);this.value=\'\';}"><option value="">+ Add...</option>';
-    ['Баянмөнх','Итгэл','Нямбаяр','Нямдорж','Содбаяр','Төгөлдөр','Уртнасан'].forEach(u=>{if(!(meta.devs||[]).includes(u))h+='<option value="'+u+'">'+u+'</option>';});
-    h+='</select></div></div></div></div></div>';
-    h+='<div class="stitle" style="margin-top:14px">Notes &amp; Decisions</div>'+
-       '<textarea class="notes-area" placeholder="Key decisions, blockers, context for the team..." oninput="window.setNotes(this.value)">'+esc(meta.notes||'')+'</textarea>';
-    return h;
+    const lopts='<option value="">—</option>'+(window.D.team||[]).map(m=>'<option value="'+esc(m)+'"'+(meta.leader===m?' selected':'')+'>'+esc(m)+'</option>').join('');
+    const dchips=(meta.devs||[]).map((d,i)=>'<span class="dev-chip">'+esc(d)+'<button onclick="window.removeDev('+i+')">&#10005;</button></span>').join('');
+    const avail=(window.D.team||[]).filter(m=>!(meta.devs||[]).includes(m));
+    const dadd=avail.length?'<select class="dev-add-sel" onchange="window.addDev(this.value);this.value=\'\'"><option value="">+ Add developer</option>'+avail.map(m=>'<option value="'+esc(m)+'">'+esc(m)+'</option>').join('')+'</select>':'';
+    const teamHtml='<div class="team-sec">'+
+      '<div class="tf"><span class="tfl">Lead</span><select onchange="window.setLeader(this.value)">'+lopts+'</select></div>'+
+      '<div class="tf" style="align-items:flex-start"><span class="tfl" style="margin-top:4px">Devs</span>'+
+      '<div class="dev-chips">'+dchips+dadd+(!dchips&&!dadd?'<span style="font-size:12px;color:var(--text3)">Add via Team button</span>':'')+'</div></div></div>';
+    const notesHtml='<textarea class="notes-area" placeholder="Notes, decisions, context..." oninput="window.setNotes(this.value)" style="min-height:60px">'+esc(meta.notes||'')+'</textarea>';
+    return'<div class="stitle" style="margin-top:0">End Goals &amp; Vision</div>'+goalsHtml+
+      '<div class="stitle">Development Phases</div>'+phasesHtml+
+      '<div class="stitle">Responsible</div>'+teamHtml+
+      '<div class="stitle">Notes</div>'+notesHtml;
   }
+  function renderProjectDashboard(p,meta){
+    const dash=meta.dashboard||{};
+    const dec=dash.declined||0,comp=dash.completed||0,conf=dash.confirmed||0,canc=dash.cancelled||0;
+    const total=dec+comp+conf+canc;
+    return'<div class="dash-wrap">'+
+      '<div class="dash-title">'+esc(p.name)+'</div>'+
+      '<table class="dash-table">'+
+      '<tr><td>Status</td><td style="text-align:right">Total</td></tr>'+
+      '<tr><td>Declined transactions</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+dec+'" onchange="window.setDashboard(\'declined\',this.value)"></td></tr>'+
+      '<tr><td>Completed transactions</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+comp+'" onchange="window.setDashboard(\'completed\',this.value)"></td></tr>'+
+      '<tr><td>Confirmed / created</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+conf+'" onchange="window.setDashboard(\'confirmed\',this.value)"></td></tr>'+
+      '<tr><td>Cancelled</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+canc+'" onchange="window.setDashboard(\'cancelled\',this.value)"></td></tr>'+
+      '<tr><td>Total</td><td id="dash-total" style="text-align:right;font-size:15px">'+total+'</td></tr>'+
+      '</table></div>';
+  }
+
 
   function renderGlobalView(m){
     if(window.ui.gview==='overview')renderOverview(m);
@@ -1100,224 +1099,104 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       h += '</div>';
 
     } else {
-      // ── REPORT TAB (ENHANCED with Month Filter + KPI) ──
-      const allMemberNames = ['Халиунаа', 'Зул-Эрдэнэ', 'Анар'];
-      const selMember = window.ui.reportMember || 'all';
-      const selYear   = window.ui.reportYear  || null;
-      const selMonth  = window.ui.reportMonth || null;
-      const MONTHS_MN = ['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар','7-р сар','8-р сар','9-р сар','10-р сар','11-р сар','12-р сар'];
-      const periodLabel = selYear && selMonth ? (selYear+' оны '+MONTHS_MN[selMonth-1]) : (selYear ? selYear+' он' : 'Нийт хугацаа');
+      // ── REPORT TAB ──
+      const members = Object.keys(userStats);
+      const selMember = window.ui.reportMember || window.currentUser || members[0];
+      if (!window.ui.reportMember) window.ui.reportMember = selMember;
 
-      // ── Helper: is task created in period ──
-      function taskCreatedInPeriod(t, yr, mo) {
-        if (!yr && !mo) return true;
-        const ds = (t.at||'').split(' ')[0];
-        if (!ds) return false;
-        const p = ds.split('-').map(Number);
-        if (yr && mo) return p[0]===yr && p[1]===mo;
-        if (yr) return p[0]===yr;
-        return true;
-      }
-      // ── Helper: is task completed in period ──
-      function taskDoneInPeriod(t, yr, mo) {
-        if (!t.done) return false;
-        if (!yr && !mo) return true;
-        const ds = (t.doneAt||t.at||'').split(' ')[0];
-        if (!ds) return false;
-        const p = ds.split('-').map(Number);
-        if (yr && mo) return p[0]===yr && p[1]===mo;
-        if (yr) return p[0]===yr;
-        return true;
-      }
-
-      // ── Member selector ──
-      h += '<div class="report-toolbar" style="gap:6px;margin-bottom:10px;flex-wrap:wrap;">';
+      // Member selector buttons
+      h += '<div class="report-toolbar">';
       h += '<span style="font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Ажилтан:</span>';
-      h += `<button class="report-member-btn${selMember==='all'?' active':''}" onclick="window.ui.reportMember='all';window.render();">👥 Бүгд</button>`;
-      allMemberNames.forEach(mn => {
-        h += `<button class="report-member-btn${mn===selMember?' active':''}" onclick="window.ui.reportMember='${mn}';window.render();">${esc(mn)}</button>`;
-      });
-      h += '<button class="print-btn" onclick="window.printReport()">🖨 Хэвлэх / Export</button>';
-      h += '</div>';
-
-      // ── Month/Year filter bar ──
-      const AV_YEARS = [2025, 2026, 2027];
-      h += '<div class="report-month-bar">';
-      h += '<span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.05em;margin-right:4px;">📅 Хугацаа:</span>';
-      h += `<button class="month-btn${!selYear&&!selMonth?' on':''}" onclick="window.ui.reportYear=null;window.ui.reportMonth=null;window.render();">Нийт</button>`;
-      AV_YEARS.forEach(y => {
-        h += `<button class="month-btn yr${selYear===y&&!selMonth?' on':''}" onclick="window.ui.reportYear=${y};window.ui.reportMonth=null;window.render();">${y}</button>`;
-      });
-      h += '<span style="width:1px;background:var(--border2);align-self:stretch;margin:0 6px;flex-shrink:0;"></span>';
-      window.MONTHS.forEach((mn, i) => {
-        const isOn = selMonth===(i+1);
-        h += `<button class="month-btn${isOn?' on':''}" onclick="window.ui.reportYear=${selYear||2026};window.ui.reportMonth=${i+1};window.render();">${mn}</button>`;
+      members.forEach(m => {
+        h += `<button class="report-member-btn${m===selMember?' active':''}" onclick="window.ui.reportMember='${m}';window.render();">${esc(m)}</button>`;
       });
       h += '</div>';
 
-      // ── Aggregate tasks across all members or single member ──
-      const allTasksAll = Object.values(window.D.tasks||{});
-      const memberTasks = selMember==='all' ? allTasksAll : allTasksAll.filter(t=>t.by===selMember);
-      const addedInPeriod     = memberTasks.filter(t => taskCreatedInPeriod(t, selYear, selMonth));
-      const completedInPeriod = memberTasks.filter(t => taskDoneInPeriod(t, selYear, selMonth));
-      const currentlyOpen     = memberTasks.filter(t => !t.done);
-      const kpiRate = addedInPeriod.length ? Math.round((addedInPeriod.filter(t=>t.done).length / addedInPeriod.length)*100) : 0;
+      // Collect tasks for selected member
+      const allTasks = Object.values(window.D.tasks||{}).filter(t => t.by === selMember);
+      const inProgTasks = allTasks.filter(t => !t.done);
+      const doneTasks   = allTasks.filter(t => t.done);
 
-      // ── KPI Cards ──
-      h += `<div class="kpi-cards">`;
-      h += `<div class="kpi-card added"><div class="kv">${addedInPeriod.length}</div><div class="kl">Нийт таск</div></div>`;
-      h += `<div class="kpi-card done-c"><div class="kv">${completedInPeriod.length}</div><div class="kl">Дууссан</div></div>`;
-      h += `<div class="kpi-card open-c"><div class="kv">${currentlyOpen.length}</div><div class="kl">Ажиллаж байгаа</div></div>`;
-      h += `<div class="kpi-card rate-c"><div class="kv">${kpiRate}%</div><div class="kl">KPI Гүйцэтгэл</div></div>`;
-      h += `</div>`;
+      const stat = userStats[selMember];
+      const openCount = stat.totalSub - stat.doneSub;
+      const pct = stat.totalSub ? Math.round((stat.doneSub/stat.totalSub)*100) : 0;
 
-      // ── Breakdown section ──
-      if (selMember === 'all') {
-        // ── All members: per-member rows ──
-        h += `<div class="report-section"><div class="report-section-title"><span>Ажилтнаар KPI задаргаа</span><span class="rs-badge rs-inprog">${periodLabel}</span></div>`;
-        allMemberNames.forEach(mbr => {
-          const mt = allTasksAll.filter(t=>t.by===mbr);
-          const mAdded = mt.filter(t=>taskCreatedInPeriod(t,selYear,selMonth));
-          const mDone  = mt.filter(t=>taskDoneInPeriod(t,selYear,selMonth));
-          const mOpen  = mt.filter(t=>!t.done);
-          const mRate  = mAdded.length ? Math.round((mAdded.filter(t=>t.done).length/mAdded.length)*100) : 0;
-          h += `<div class="mbr-row">` +
-               `<span class="mbr-name">${esc(mbr)}</span>` +
-               `<span class="mbr-added">📥 +${mAdded.length} нэмэгдсэн</span>` +
-               `<span class="mbr-done">✅ ${mDone.length} дуусгасан</span>` +
-               `<span class="mbr-open">⏳ ${mOpen.length} нээлттэй</span>` +
-               `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${mRate}%"></div></div>` +
-               `<span class="stat-pct">${mRate}%</span>` +
-               `<button class="mbr-detail" onclick="window.ui.reportMember='${mbr}';window.render();">Дэлгэрэнгүй →</button>` +
+      // Summary bar
+      h += '<div class="report-summary-bar">' +
+           `<div class="rsb-item"><div class="rsb-val">${stat.totalSub}</div><div class="rsb-lbl">Нийт таск</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item"><div class="rsb-val blue">${openCount}</div><div class="rsb-lbl">Хийгдэж байгаа</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item"><div class="rsb-val green">${stat.doneSub}</div><div class="rsb-lbl">Хийгдсэн</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item"><div class="rsb-val" style="color:var(--text)">${pct}%</div><div class="rsb-lbl">Гүйцэтгэл</div></div>` +
+           '<div class="rsb-sep"></div>' +
+           `<div class="rsb-item" style="flex:1;align-items:flex-start;justify-content:center;padding-left:10px;">` +
+             `<div class="prog" style="width:100%;margin-top:10px;margin-bottom:0;height:6px;"><div class="pfill" style="width:${pct}%"></div></div>` +
+           `</div>` +
+           '</div>';
+
+      // In Progress section
+      h += '<div class="report-section">' +
+           `<div class="report-section-title"><span>Хийгдэж байгаа (In Progress)</span><span class="rs-badge rs-inprog">${inProgTasks.length}</span></div>`;
+      if (inProgTasks.length === 0) {
+        h += '<div class="report-empty">Одоогоор хийгдэж байгаа таск байхгүй байна.</div>';
+      } else {
+        inProgTasks.forEach(t => {
+          h += `<div class="report-row inprog">` +
+               `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
+               `<span class="report-row-txt">${esc(t.txt)}</span>` +
+               `<span class="report-row-status rrs-ip">In Progress</span>` +
+               `<span class="report-row-date">${esc(t.at||'')}</span>` +
                `</div>`;
         });
-        h += `</div>`;
-
-        // All members project breakdown
-        h += `<div class="report-section"><div class="report-section-title"><span>Прожектоор нийт задаргаа</span><span class="period-lbl">${periodLabel}</span></div>`;
-        const byProjAll = {};
-        addedInPeriod.forEach(t => {
-          if(!byProjAll[t.p]) byProjAll[t.p]={done:0,open:0,members:new Set()};
-          t.done ? byProjAll[t.p].done++ : byProjAll[t.p].open++;
-          if(t.by) byProjAll[t.p].members.add(t.by);
-        });
-        if(Object.keys(byProjAll).length===0){
-          h += '<div class="report-empty">Таск байхгүй.</div>';
-        } else {
-          Object.entries(byProjAll).forEach(([pid,cnt])=>{
-            const tot2=cnt.done+cnt.open;
-            const pp=Math.round((cnt.done/tot2)*100);
-            h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
-                 `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
-                 `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
-                 `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
-                 `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
-                 `<span class="stat-pct">${pp}%</span>` +
-                 `</div>`;
-          });
-        }
-        h += `</div>`;
-
-      } else {
-        // ── Individual member: task list ──
-        const doneList = addedInPeriod.filter(t=>t.done);
-        const openList = addedInPeriod.filter(t=>!t.done);
-
-        // Completed tasks
-        h += `<div class="report-section"><div class="report-section-title"><span>✅ Дуусгасан ажлууд</span><span class="rs-badge rs-done">${doneList.length}</span><span class="period-lbl">${periodLabel}</span></div>`;
-        if(doneList.length===0){
-          h += '<div class="report-empty">Энэ хугацаанд дуусгасан таск байхгүй байна.</div>';
-        } else {
-          doneList.forEach(t => {
-            const dDate = (t.doneAt||t.at||'').split(' ')[0];
-            h += `<div class="report-row done">` +
-                 `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
-                 `<span class="report-row-txt">${esc(t.txt)}</span>` +
-                 `<span class="report-row-status rrs-dn">✓ Дууссан</span>` +
-                 `<span class="report-row-date">${esc(dDate)}</span>` +
-                 `</div>`;
-          });
-        }
-        h += '</div>';
-
-        // Open tasks
-        h += `<div class="report-section"><div class="report-section-title"><span>⏳ Хийгдэж байгаа</span><span class="rs-badge rs-todo">${openList.length}</span></div>`;
-        if(openList.length===0){
-          h += '<div class="report-empty">Энэ хугацааны таскууд бүгд дуусгагдсан байна.</div>';
-        } else {
-          openList.forEach(t => {
-            h += `<div class="report-row inprog">` +
-                 `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
-                 `<span class="report-row-txt">${esc(t.txt)}</span>` +
-                 `<span class="report-row-status rrs-ip">In Progress</span>` +
-                 `<span class="report-row-date">${esc(t.at||'')}</span>` +
-                 `</div>`;
-          });
-        }
-        h += '</div>';
-
-        // Project breakdown
-        h += `<div class="report-section"><div class="report-section-title"><span>Прожектоор задаргаа</span><span class="period-lbl">${periodLabel}</span></div>`;
-        const byProj2 = {};
-        addedInPeriod.forEach(t => {
-          if(!byProj2[t.p]) byProj2[t.p]={done:0,open:0};
-          t.done ? byProj2[t.p].done++ : byProj2[t.p].open++;
-        });
-        if(Object.keys(byProj2).length===0){
-          h += '<div class="report-empty">Таск байхгүй байна.</div>';
-        } else {
-          Object.entries(byProj2).forEach(([pid,cnt])=>{
-            const tot2=cnt.done+cnt.open;
-            const pp=Math.round((cnt.done/tot2)*100);
-            h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
-                 `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
-                 `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
-                 `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
-                 `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
-                 `<span class="stat-pct">${pp}%</span>` +
-                 `</div>`;
-          });
-        }
-        h += '</div>';
       }
+      h += '</div>';
 
-      // ── Monthly trend (mini bar chart) ──
-      h += `<div class="report-section"><div class="report-section-title"><span>📊 Сарын гүйцэтгэлийн чиг хандлага (${selYear||2026})</span></div>`;
-      const trendYear = selYear||2026;
-      const trendTasks = selMember==='all' ? allTasksAll : allTasksAll.filter(t=>t.by===selMember);
-      const trendData = window.MONTHS.map((_,i) => {
-        const mo = i+1;
-        const added2 = trendTasks.filter(t=>{ const ds=(t.at||'').split(' ')[0]; const p=ds.split('-').map(Number); return p[0]===trendYear&&p[1]===mo; }).length;
-        const done2  = trendTasks.filter(t=>{ const ds=(t.doneAt||t.at||'').split(' ')[0]; const p=ds.split('-').map(Number); return t.done&&p[0]===trendYear&&p[1]===mo; }).length;
-        return {mo, added: added2, done: done2};
+      // Done section
+      h += '<div class="report-section">' +
+           `<div class="report-section-title"><span>Хийгдсэн (Done)</span><span class="rs-badge rs-done">${doneTasks.length}</span></div>`;
+      if (doneTasks.length === 0) {
+        h += '<div class="report-empty">Хийгдсэн таск байхгүй байна.</div>';
+      } else {
+        doneTasks.forEach(t => {
+          h += `<div class="report-row done">` +
+               `<span class="report-row-proj">${esc(pName(t.p))}</span>` +
+               `<span class="report-row-txt">${esc(t.txt)}</span>` +
+               `<span class="report-row-status rrs-dn">✓ Дууссан</span>` +
+               `<span class="report-row-date">${esc(t.at||'')}</span>` +
+               `</div>`;
+        });
+      }
+      h += '</div>';
+
+      // Cross-project breakdown
+      h += '<div class="report-section">' +
+           '<div class="report-section-title"><span>Прожектоор задаргаа</span></div>';
+      const byProj = {};
+      allTasks.forEach(t => {
+        if (!byProj[t.p]) byProj[t.p] = { done: 0, open: 0 };
+        t.done ? byProj[t.p].done++ : byProj[t.p].open++;
       });
-      const maxVal = Math.max(1, ...trendData.map(d=>d.added));
-      h += `<div style="display:flex;align-items:flex-end;gap:4px;height:70px;padding:0 2px;margin-bottom:4px;">`;
-      trendData.forEach(d => {
-        const hAdded = Math.round((d.added/maxVal)*60);
-        const hDone  = Math.round((d.done/maxVal)*60);
-        const isSelMo = selMonth===d.mo;
-        h += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="window.ui.reportYear=${trendYear};window.ui.reportMonth=${d.mo};window.render();" title="${window.MONTHS[d.mo-1]}: +${d.added} нэмэгдсэн, ✓${d.done} дуусгасан">` +
-             `<div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:64px;gap:1px;">` +
-             (d.added>0 ? `<div style="width:100%;background:${isSelMo?'var(--blue)':'var(--blue-bg)'};border-radius:3px 3px 0 0;height:${hAdded}px;border:1px solid var(--blue);opacity:${isSelMo?1:0.7};"></div>` : `<div style="height:4px;"></div>`) +
-             `</div>` +
-             `<span style="font-size:9px;color:${isSelMo?'var(--text)':'var(--text3)'};font-weight:${isSelMo?700:400};">${window.MONTHS[d.mo-1]}</span>` +
-             `</div>`;
-      });
-      h += `</div>`;
-      h += `<div style="display:flex;gap:12px;font-size:11px;color:var(--text3);margin-top:4px;">` +
-           `<span><span style="display:inline-block;width:10px;height:10px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:2px;margin-right:3px;"></span>Нийт таск</span>` +
-           `<span style="font-size:11px;color:var(--text3);">Багана дарж тухайн сараар шүүнэ</span>` +
-           `</div>`;
-      h += `</div>`;
+      if (Object.keys(byProj).length === 0) {
+        h += '<div class="report-empty">Таск байхгүй байна.</div>';
+      } else {
+        Object.entries(byProj).forEach(([pid, cnt]) => {
+          const tot2 = cnt.done + cnt.open;
+          const pp = Math.round((cnt.done/tot2)*100);
+          h += `<div style="display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px;">` +
+               `<span style="font-size:13px;font-weight:600;color:var(--text);min-width:120px;">${esc(pName(pid))}</span>` +
+               `<span style="font-size:12px;color:var(--green)">✓ ${cnt.done}</span>` +
+               `<span style="font-size:12px;color:var(--text3)">/ ${tot2} таск</span>` +
+               `<div class="stat-prog-bar" style="flex:1;"><div class="stat-prog-fill" style="width:${pp}%"></div></div>` +
+               `<span class="stat-pct">${pp}%</span>` +
+               `</div>`;
+        });
+      }
+      h += '</div>';
     }
 
     m.innerHTML = h + '</div>';
-  }
-
-  /* ── PRINT REPORT ── */
-  window.printReport = function() {
-    window.print();
   }
 
   /* ── ТАСК РУУ ШИЛЖИХ ҮСРЭХ ФУНКЦ ── */
@@ -1383,6 +1262,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     const year=window.ui.tlYear;
     const allItems=Object.values(window.D.road||{});
     const ps=window.projs();
+    // split: scheduled this year vs unscheduled
     const sched={};ps.forEach(p=>{sched[p.id]=[];});
     const unsched=[];
     allItems.forEach(r=>{
@@ -1391,46 +1271,100 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       else{unsched.push(r);}
     });
     ps.forEach(p=>{sched[p.id].sort((a,b)=>(a.month||1)-(b.month||1));});
-    const activePs=ps;  // show all projects — empty rows guide users to add roadmap items
+    const activePs=ps.filter(p=>allItems.some(r=>r.p===p.id));
+
+    // ── row-packing: assign items to sub-rows so overlapping bars don't collide ──
+    function packRows(items){
+      const sorted=[...items].sort((a,b)=>(a.month||1)-(b.month||1));
+      const rows=[];
+      sorted.forEach(item=>{
+        const sm=Math.max(1,item.month||1),em=Math.min(12,item.endMonth||sm);
+        let placed=false;
+        for(let r=0;r<rows.length;r++){
+          const fits=rows[r].every(ex=>{const es=Math.max(1,ex.month||1),ee=Math.min(12,ex.endMonth||es);return em<es||sm>ee;});
+          if(fits){rows[r].push({...item,_row:r});placed=true;break;}
+        }
+        if(!placed)rows.push([{...item,_row:rows.length}]);
+      });
+      return rows;
+    }
+
+    // ── table ──
     let t='<div class="gantt-body"><table class="gantt-table">';
-    t+='<tr class="gh-yr"><td class="g-lbl" style="border-right:1px solid var(--border2)"></td><td colspan="12" style="text-align:center;padding:6px;border-right:1px solid var(--border)">'+year+'</td></tr>';
-    t+='<tr class="gh-half"><td class="g-lbl" style="border-right:1px solid var(--border2)"></td><td colspan="6" style="border-right:1px solid var(--border2)">H1</td><td colspan="6" style="border-right:1px solid var(--border)">H2</td></tr>';
-    t+='<tr class="gh-q"><td class="g-lbl" style="border-right:1px solid var(--border2)"></td>';
-    ['Q1','Q2','Q3','Q4'].forEach(q=>{t+='<td colspan="3" style="border-right:1px solid var(--border2)">'+q+'</td>';});
-    t+='</tr><tr class="gh-month"><td class="g-lbl" style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;padding:6px 10px;text-align:left;border-right:1px solid var(--border2)">Project</td>';
+    // year row
+    t+='<tr class="gh-yr"><td class="g-lbl" style="border-right:1px solid var(--bd2)"></td><td colspan="12" style="text-align:center;padding:6px;border-right:1px solid var(--bd)">'+year+'</td></tr>';
+    // H1/H2
+    t+='<tr class="gh-half"><td class="g-lbl" style="border-right:1px solid var(--bd2)"></td><td colspan="6" style="border-right:1px solid var(--bd2)">H1</td><td colspan="6" style="border-right:1px solid var(--bd)">H2</td></tr>';
+    // Q1-Q4
+    t+='<tr class="gh-q"><td class="g-lbl" style="border-right:1px solid var(--bd2)"></td>';
+    ['Q1','Q2','Q3','Q4'].forEach(q=>{t+='<td colspan="3" style="border-right:1px solid var(--bd2)">'+q+'</td>';});
+    t+='</tr>';
+    // months
+    t+='<tr class="gh-month"><td class="g-lbl" style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;padding:6px 10px;text-align:left;border-right:1px solid var(--bd2)">Project</td>';
     window.MONTHS.forEach((m,i)=>{t+='<td class="'+(i+1===window.CM&&year===window.CY?'curr':'')+'">'+(i+1===window.CM&&year===window.CY?'&#9654; ':'')+m+'</td>';});
     t+='</tr>';
+
     activePs.forEach(p=>{
       const col=window.pcol(p.id);
       const items=sched[p.id];
-      t+='<tr class="g-prow"><td class="g-lbl"><div class="g-lbl-inner" onclick="window.selProj(\''+p.id+'\')">'+window.sdot(p.status)+'<span>'+esc(p.name)+'</span></div></td>';
-      for(let m=1;m<=12;m++){t+='<td class="g-cell'+(m===window.CM&&year===window.CY?' curr':'')+'" style="'+(m===12?'border-right:1px solid var(--border)':'')+'"></td>';}
+      const rows=packRows(items);
+      const rowCount=Math.max(1,rows.length);
+      const rowH=Math.max(44,rowCount*38+10)+'px';
+      // project row with month cells as drop targets
+      t+='<tr class="g-prow" style="height:'+rowH+'"><td class="g-lbl" style="border-right:1px solid var(--bd2);vertical-align:top"><div class="g-lbl-inner" onclick="window.selProj(\''+p.id+'\')">'+window.sdot(p.status)+'<span>'+esc(p.name)+'</span></div></td>';
+      for(let m=1;m<=12;m++){
+        t+='<td class="g-cell'+(m===window.CM&&year===window.CY?' curr':'')+'"'+
+          ' ondragover="event.preventDefault();this.classList.add(\'drag-over\')"'+
+          ' ondragleave="this.classList.remove(\'drag-over\')"'+
+          ' ondrop="window.dropPhase(event,\''+p.id+'\','+m+')"'+
+          ' style="'+(m===12?'border-right:1px solid var(--bd)':'')+'"></td>';
+      }
       t+='</tr>';
+      // bar overlay row
       if(items.length){
         t+='<tr style="height:0"><td style="padding:0;border:none"></td><td colspan="12" style="padding:0;border:none;position:relative">';
-        t+='<div style="position:relative;height:0"><div style="position:absolute;top:-43px;left:0;right:0;height:42px;pointer-events:none">';
-        items.forEach(r=>{
-          const sm=Math.max(1,Math.min(12,r.month||1));const em=Math.max(sm,Math.min(12,r.endMonth||sm));
-          const lp=((sm-1)/12*100).toFixed(2);const wp=((em-sm+1)/12*100).toFixed(2);
-          t+='<div class="g-bar" style="left:calc('+lp+'% + 3px);width:calc('+wp+'% - 6px);background:'+col+'20;color:'+col+';border-color:'+col+'55;pointer-events:auto" onclick="window.selProj(\''+p.id+'\')" title="'+esc(r.txt)+'">'+esc(r.txt)+'</div>';
+        t+='<div style="position:relative;height:0"><div style="position:absolute;top:-'+rowH+';left:0;right:0;height:'+rowH+';pointer-events:none">';
+        rows.forEach((row,ri)=>{
+          row.forEach(r=>{
+            const sm=Math.max(1,Math.min(12,r.month||1));
+            const em=Math.max(sm,Math.min(12,r.endMonth||sm));
+            const lp=((sm-1)/12*100).toFixed(2);
+            const wp=((em-sm+1)/12*100).toFixed(2);
+            const top=4+ri*38;
+            t+='<div class="g-bar" style="top:'+top+'px;height:30px;left:calc('+lp+'% + 3px);width:calc('+wp+'% - 6px);background:'+col+'20;color:'+col+';border-color:'+col+'55;pointer-events:auto" onclick="window.selProj(\''+p.id+'\')" title="'+esc(r.txt)+'">'+esc(r.txt)+'</div>';
+          });
         });
         t+='</div></div></td></tr>';
       }
     });
-    t+='</table>';
-    if(activePs.length===0){
-      t+='<div style="padding:32px 24px;text-align:center;color:var(--text3);font-size:13px">';
-      t+='<div style="font-size:22px;margin-bottom:8px">&#128197;</div>';
-      t+='<div style="font-weight:600;color:var(--text2);margin-bottom:4px">No projects yet</div>';
-      t+='<div>Add projects, then open each one &rarr; Roadmap tab to set item dates</div>';
-      t+='</div>';
-    }
-    if(unsched.length){
-      t+='<div class="gantt-unsched"><div class="gantt-unsched-title">Items without timeline dates ('+unsched.length+') \u2014 open each project \u2192 Roadmap tab to assign months</div><div>';
+    t+='</table></div>';
+
+    // ── phases panel: draggable project phases ──
+    let hasPhases=false;
+    let phaseHtml='';
+    ps.forEach(p=>{
+      const meta=window.getMeta(p.id);
+      const phases=window.toArr(meta.phases);
+      if(!phases.length)return;
+      hasPhases=true;
+      const col=window.pcol(p.id);
+      phaseHtml+='<div class="phase-proj-group">'+
+        '<div class="phase-proj-label" style="color:'+col+'">'+esc(p.name)+'</div>'+
+        phases.map(ph=>{
+          const statusCls={done:'done','in-progress':'prog',planned:'plan'}[ph.status]||'plan';
+          return'<span class="p-chip '+statusCls+'" draggable="true" ondragstart="window.dragPhase(event,\''+p.id+'\',\''+esc(ph.name).replace(/'/g,"\\'")+'\',\''+ph.status+'\')" title="Drag onto timeline to schedule">'+
+            (ph.status==='done'?'&#10003; ':ph.status==='in-progress'?'&#9654; ':'&#9711; ')+
+            esc(ph.name)+'</span>';
+        }).join('')+
+        '</div>';
+    });
+    if(hasPhases){
+      t+='<div class="phase-chips-wrap"><div class="phase-chips-title">&#9776; Project phases — drag onto timeline to schedule</div>'+phaseHtml+'</div>';
+    } else if(unsched.length){
+      t+='<div class="gantt-unsched"><div class="gantt-unsched-title">Items without dates ('+unsched.length+') — set dates in project Roadmap tab</div><div>';
       unsched.forEach(r=>{const proj=(window.D.projects||{})[r.p];t+='<span class="gantt-unitem" onclick="window.selProj(\''+r.p+'\')">'+(proj?esc(proj.name)+': ':'')+esc(r.txt)+'</span>';});
       t+='</div></div>';
     }
-    t+='</div>';  // close gantt-body — unsched is inside it and scrolls with the chart
     return t;
   }
 
@@ -1441,7 +1375,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       '<div class="road-toolbar">'+
       '<div class="stog"><button class="'+(rv==='lanes'?'on':'')+'" onclick="window.ui.roadView=\'lanes\';window.render()">Lanes</button>'+
       '<button class="'+(rv==='gantt'?'on':'')+'" onclick="window.ui.roadView=\'gantt\';window.render()">Timeline</button></div>'+
-      (rv==='gantt'?'<div class="stog"><button class="'+(yr===2025?'on':'')+'" onclick="window.ui.tlYear=2025;window.render()">2025</button><button class="'+(yr===2026?'on':'')+'" onclick="window.ui.tlYear=2026;window.render()">2026</button><button class="'+(yr===2027?'on':'')+'" onclick="window.ui.tlYear=2027;window.render()">2027</button></div>':'<div style="flex:1"></div>')+
+      (rv==='gantt'?'<div class="stog"><button class="'+(yr===2026?'on':'')+'" onclick="window.ui.tlYear=2026;window.render()">2026</button><button class="'+(yr===2027?'on':'')+'" onclick="window.ui.tlYear=2027;window.render()">2027</button></div>':'<div style="flex:1"></div>')+
       '</div>';
     if(rv==='gantt'){m.innerHTML=h+buildGantt();return;}
     h+='<div class="scrollbody">';
@@ -1514,15 +1448,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         alert('🔒 Зөвхөн ' + (window.D.tasks[tid].by||'нэмсэн хүн') + ' энэ таскийг өөрчлөх боломжтой.');
         return;
       }
-      const nowDone = !window.D.tasks[tid].done;
-      window.D.tasks[tid].done = nowDone;
-      window.D.tasks[tid].modifiedBy = window.currentUser;
-      if (nowDone) {
-        const nd = new Date();
-        window.D.tasks[tid].doneAt = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0')+' '+String(nd.getHours()).padStart(2,'0')+':'+String(nd.getMinutes()).padStart(2,'0');
-      } else {
-        delete window.D.tasks[tid].doneAt;
-      }
+      window.D.tasks[tid].done=!window.D.tasks[tid].done;
+      window.D.tasks[tid].modifiedBy = window.currentUser; 
       window.save();
       window.render();
     }
@@ -1590,6 +1517,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
   window.delConn = function(cid){if(window.D.conns[cid]){delete window.D.conns[cid];window.save();window.render();}}
 
+
+
+
+  /* ── DRAG & DROP PHASES ── */
+  window._dragPhase = null;
+  window.dragPhase = function(e, projId, phaseName, status){
+    window._dragPhase = {projId, phaseName, status};
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('text/plain', phaseName);
+  };
+  window.dropPhase = function(e, targetProjId, month){
+    e.preventDefault();
+    e.target.classList.remove('drag-over');
+    const d = window._dragPhase;
+    if(!d || d.projId !== targetProjId) return;
+    const id = 'r' + window.uid();
+    if(!window.D.road) window.D.road = {};
+    window.D.road[id] = {id, p: targetProjId, txt: d.phaseName, lane: 'now',
+      month: month, endMonth: Math.min(12, month + 1), year: window.ui.tlYear};
+    window._dragPhase = null;
+    window.save();
+    window.render();
+  };
+
+  /* ── DASHBOARD ACTION ── */
+  window.setDashboard = function(key,val){
+    const pid=window.ui.sel;
+    if(!window.D.pmeta)window.D.pmeta={};
+    const m=window.getMeta(pid);
+    if(!m.dashboard)m.dashboard={};
+    m.dashboard[key]=parseInt(val)||0;
+    window.D.pmeta[pid]={...m};
+    window.save();
+    const d=m.dashboard;
+    const total=(d.declined||0)+(d.completed||0)+(d.confirmed||0)+(d.cancelled||0);
+    const el=document.getElementById('dash-total');
+    if(el)el.textContent=total;
+  };
 
   /* ── NEW: PRIORITY / HEALTH ACTIONS ── */
   window.togglePriMenu = function(e){e.stopPropagation();window.ui.priMenu=!window.ui.priMenu;window.ui.hltMenu=false;window.ui.statusMenu=false;window.render();if(window.ui.priMenu)document.addEventListener('click',closeSmenu);}
