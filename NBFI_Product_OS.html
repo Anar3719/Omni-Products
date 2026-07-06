@@ -754,7 +754,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       tasks,road,conns,
       pmeta:{
         moni:{leader:'Анар',devs:['Anand','Bilguun'],items:[{id:'i1',name:'eSIM API',kind:'feature'}]},
-        'moni-transfer':{leader:'',devs:[],items:[],goals:[],phases:[],services:[],notes:'',dashboard:{declined:48,completed:28,confirmed:9,cancelled:72}}
+        'moni-transfer':{leader:'',devs:[],items:[],goals:[],phases:[],services:[],notes:'',dashboard:{declined:48,completed:28,confirmed:9,cancelled:72,usa:48,china:28,australia:9,korea:72,japan:10}}
       },
       eco:JSON.parse(JSON.stringify(window.DEF_ECO))
     };
@@ -942,18 +942,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   }
   function renderProjectDashboard(p,meta){
     const dash=meta.dashboard||{};
+    // status table
     const dec=dash.declined||0,comp=dash.completed||0,conf=dash.confirmed||0,canc=dash.cancelled||0;
-    const total=dec+comp+conf+canc;
+    const tot1=dec+comp+conf+canc;
+    // country table
+    const usa=dash.usa||0,china=dash.china||0,aus=dash.australia||0,kor=dash.korea||0,jpn=dash.japan||0;
+    const tot2=usa+china+aus+kor+jpn;
+    function row(label,key,val,totId){
+      return'<tr><td>'+label+'</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+val+'" onchange="window.setDashboard(\''+key+'\',this.value,\''+totId+'\')"></td></tr>';
+    }
     return'<div class="dash-wrap">'+
       '<div class="dash-title">'+esc(p.name)+'</div>'+
+      '<div style="display:flex;gap:24px;flex-wrap:wrap">'+
+      '<div>'+
       '<table class="dash-table">'+
       '<tr><td>Status</td><td style="text-align:right">Total</td></tr>'+
-      '<tr><td>Declined transactions</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+dec+'" onchange="window.setDashboard(\'declined\',this.value)"></td></tr>'+
-      '<tr><td>Completed transactions</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+comp+'" onchange="window.setDashboard(\'completed\',this.value)"></td></tr>'+
-      '<tr><td>Confirmed / created</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+conf+'" onchange="window.setDashboard(\'confirmed\',this.value)"></td></tr>'+
-      '<tr><td>Cancelled</td><td style="text-align:right"><input class="dash-inp" type="number" value="'+canc+'" onchange="window.setDashboard(\'cancelled\',this.value)"></td></tr>'+
-      '<tr><td>Total</td><td id="dash-total" style="text-align:right;font-size:15px">'+total+'</td></tr>'+
-      '</table></div>';
+      row('Declined transactions','declined',dec,'dash-tot1')+
+      row('Completed transactions','completed',comp,'dash-tot1')+
+      row('Confirmed / created','confirmed',conf,'dash-tot1')+
+      row('Cancelled','cancelled',canc,'dash-tot1')+
+      '<tr><td>Total</td><td id="dash-tot1" style="text-align:right;font-size:15px">'+tot1+'</td></tr>'+
+      '</table></div>'+
+      '<div>'+
+      '<table class="dash-table">'+
+      '<tr><td>Country</td><td style="text-align:right">Total</td></tr>'+
+      row('USA','usa',usa,'dash-tot2')+
+      row('China','china',china,'dash-tot2')+
+      row('Australia','australia',aus,'dash-tot2')+
+      row('Korea','korea',kor,'dash-tot2')+
+      row('Japan','japan',jpn,'dash-tot2')+
+      '<tr><td>Total</td><td id="dash-tot2" style="text-align:right;font-size:15px">'+tot2+'</td></tr>'+
+      '</table></div>'+
+      '</div></div>';
   }
 
 
@@ -1542,7 +1562,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   };
 
   /* ── DASHBOARD ACTION ── */
-  window.setDashboard = function(key,val){
+  window.setDashboard = function(key,val,totId){
     const pid=window.ui.sel;
     if(!window.D.pmeta)window.D.pmeta={};
     const m=window.getMeta(pid);
@@ -1551,9 +1571,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     window.D.pmeta[pid]={...m};
     window.save();
     const d=m.dashboard;
-    const total=(d.declined||0)+(d.completed||0)+(d.confirmed||0)+(d.cancelled||0);
-    const el=document.getElementById('dash-total');
-    if(el)el.textContent=total;
+    const tot1=(d.declined||0)+(d.completed||0)+(d.confirmed||0)+(d.cancelled||0);
+    const tot2=(d.usa||0)+(d.china||0)+(d.australia||0)+(d.korea||0)+(d.japan||0);
+    const el1=document.getElementById('dash-tot1');
+    const el2=document.getElementById('dash-tot2');
+    if(el1)el1.textContent=tot1;
+    if(el2)el2.textContent=tot2;
   };
 
   /* ── NEW: PRIORITY / HEALTH ACTIONS ── */
